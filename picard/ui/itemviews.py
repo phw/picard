@@ -609,7 +609,8 @@ class BaseTreeView(QtWidgets.QTreeWidget):
                 releases_menu.setEnabled(False)
 
         if config.setting["enable_ratings"] and \
-           len(self.window.selected_objects) == 1 and isinstance(obj, Track):
+           len(self.window.selected_objects) == 1 and \
+           (isinstance(obj, Track) or isinstance(obj, File)):
             menu.addSeparator()
             action = QtWidgets.QWidgetAction(menu)
             action.setDefaultWidget(RatingWidget(menu, obj))
