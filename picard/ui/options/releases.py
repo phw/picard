@@ -24,8 +24,6 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-
-from locale import strxfrm
 from operator import itemgetter
 
 from PyQt5 import (
@@ -270,7 +268,7 @@ class ReleasesOptionsPage(OptionsPage):
             source_list = [(c[0], _(c[1])) for c in source.items()]
 
         def fcmp(x):
-            return strxfrm(x[1])
+            return x[1]
         source_list.sort(key=fcmp)
         saved_data = config.setting[setting]
         move = []
