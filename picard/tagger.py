@@ -850,7 +850,7 @@ class Tagger(QtWidgets.QApplication):
             files = list(self.unclustered_files.files)
         else:
             files = self.get_files_from_objects(objs)
-        for name, artist, files in Cluster.cluster(files, 1.0):
+        for name, artist, files in Cluster.cluster(files):
             QtCore.QCoreApplication.processEvents()
             cluster = self.load_cluster(name, artist)
             for file in sorted(files, key=attrgetter('discnumber', 'tracknumber', 'base_filename')):
