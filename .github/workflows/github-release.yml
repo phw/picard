@@ -1,0 +1,31 @@
+name: Prepare release
+
+on: push
+
+jobs:
+  prepare-release:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v1
+      if: startsWith(github.ref, 'refs/tags/')
+    - uses: actions/setup-python@v1
+      if: startsWith(github.ref, 'refs/tags/')
+      with:
+        python-version: 3.8
+    - name: Prepare changelog
+      id: changelog
+      if: startsWith(github.ref, 'refs/tags/')
+      run: |
+        PICARD_VERSION=$(python -c "import picard; print(picard.__version__)")
+        echo "::set-output name=version::"$PICARD_VERSION
+        ./scripts/package/changelog-for-version.py $PICARD_VERSION > changes-$PICARD_VERSION.txt
+    - name: Update release
+      uses: softprops/action-gh-release@v1
+      if: startsWith(github.ref, 'refs/tags/')
+      with:
+        name: MusicBrainz Picard ${{ steps.changelog.outputs.version }}
+        body_path: changes-${{ steps.changelog.outputs.version }}.txt
+        draft: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
