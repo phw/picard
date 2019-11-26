@@ -26,6 +26,5 @@ jobs:
       with:
         name: MusicBrainz Picard ${{ steps.changelog.outputs.version }}
         body_path: changes-${{ steps.changelog.outputs.version }}.txt
-        draft: true
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
