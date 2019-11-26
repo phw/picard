@@ -1,3 +1,8 @@
+# Version 2.3.0.dev1 - 2019-11-26
+
+## Feature
+- Dummy release
+
 # Version 2.2.3 - 2019-11-06
 
 ## Bug-fix
