@@ -9,6 +9,17 @@ jobs:
       matrix:
         os: [macos-latest, ubuntu-latest, windows-latest]
         python-version: [3.5, 3.6, 3.7, 3.8]
+      include:
+      # Ubuntu 18.04
+      - os: ubuntu-18.04
+        python-version: 3.7
+        env:
+          VERSIONED_PIP_DEPS: pyqt5==5.12.1 mutagen==1.40.0
+      # Oldest supported dependencies
+      - os: ubuntu-16.04
+        python-version: 3.5
+        env:
+          VERSIONED_PIP_DEPS: pyqt5==5.8 mutagen==1.37 sip==4.19.8
     env:
       CODACY_PROJECT_TOKEN: ${{ secrets.CODACY_PROJECT_TOKEN }}
 
@@ -22,6 +33,10 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
+    - name: Install versioned dependencies
+      if: env.VERSIONED_PIP_DEPS
+      run: |
+        pip install $VERSIONED_DEPS
     - name: Check coding style
       run: |
         pip install flake8 isort
