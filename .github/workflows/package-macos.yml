@@ -28,10 +28,12 @@ jobs:
 
     steps:
     - uses: actions/checkout@v1
-    - name: Set up Python 3.7
-      uses: actions/setup-python@v1
-      with:
-        python-version: 3.7
+    # - name: Set up Python 3.7
+    #   uses: actions/setup-python@v1
+    #   with:
+    #     python-version: 3.7
+    - name: Set up Python
+      run: brew reinstall python
     - name: Cache libdiscid
       uses: actions/cache@v1
       with:
@@ -40,16 +42,16 @@ jobs:
     - name: Patch build version
       if: startsWith(github.ref, 'refs/tags/') != true
       run: |
-        python setup.py patch_version --platform=$(git rev-list --count HEAD).$(git rev-parse --short HEAD)
+        python3 setup.py patch_version --platform=$(git rev-list --count HEAD).$(git rev-parse --short HEAD)
     - name: Setup macOS build environment
       run: |
         ./scripts/package/macos-setup.sh
         mkdir artifacts
     - name: Install dependencies
       run: |
-        python -m pip install --upgrade pip
+        python3 -m pip install --upgrade pip
         source bin/activate
-        pip install -r requirements-macos.txt
+        pip3 install -r requirements-macos.txt
     - name: Build macOS app
       run: |
         source bin/activate
