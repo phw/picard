@@ -144,6 +144,7 @@ else:
     if os_name == 'Darwin':
         info_plist = {
             'NSHighResolutionCapable': 'True',
+            'NSRequiresAquaSystemAppearance': 'False',
             'NSPrincipalClass': 'NSApplication',
             'CFBundleName': PICARD_APP_NAME,
             'CFBundleDisplayName': PICARD_DISPLAY_NAME,
