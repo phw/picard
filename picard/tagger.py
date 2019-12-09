@@ -138,16 +138,16 @@ class Tagger(QtWidgets.QApplication):
 
     def __init__(self, picard_args, unparsed_args, localedir, autoupdate):
 
-        # Use the new fusion style from PyQt5 for a modern and consistent look
-        # across all OSes.
-        if not IS_MACOS and not IS_HAIKU:
-            self.setStyle('Fusion')
-
         # Set the WM_CLASS to 'MusicBrainz-Picard' so desktop environments
         # can use it to look up the app
         super().__init__(['MusicBrainz-Picard'] + unparsed_args)
         self.__class__.__instance = self
         config._setup(self, picard_args.config_file)
+
+        # Use the new fusion style from PyQt5 for a modern and consistent look
+        # across all OSes.
+        if not IS_MACOS and not IS_HAIKU and not config.setting['use_system_theme']:
+            self.setStyle('Fusion')
 
         super().setStyleSheet(
             'QGroupBox::title { /* PICARD-1206, Qt bug workaround */ }'
