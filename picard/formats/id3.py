@@ -346,7 +346,7 @@ class ID3File(File):
         self._info(metadata, file)
         return metadata
 
-    def _save(self, filename, metadata):
+    def _save(self, filename, metadata, fd=None):
         """Save metadata to the file."""
         log.debug("Saving file %r", filename)
         tags = self._get_tags(filename)

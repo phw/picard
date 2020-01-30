@@ -233,9 +233,10 @@ class MP4File(File):
         self._info(metadata, file)
         return metadata
 
-    def _save(self, filename, metadata):
+    def _save(self, filename, metadata, fd=None):
         log.debug("Saving file %r", filename)
-        file = MP4(encode_filename(self.filename))
+        print(fd)
+        file = MP4(fd or encode_filename(self.filename))
         if file.tags is None:
             file.add_tags()
         tags = file.tags
@@ -299,7 +300,7 @@ class MP4File(File):
 
         self._remove_deleted_tags(metadata, tags)
 
-        file.save()
+        file.save(fd)
 
     def _remove_deleted_tags(self, metadata, tags):
         """Remove the tags from the file that were deleted in the UI"""
