@@ -63,7 +63,8 @@ if os.path.isfile(fpcalc_name):
 runtime_hooks = []
 if os_name == 'Windows':
     runtime_hooks.append('scripts/pyinstaller/win-console-hook.py')
-elif os_name == 'Darwin':
+runtime_hooks.append('scripts/pyinstaller/faulthandler-hook.py')
+if os_name == 'Darwin':
     runtime_hooks.append('scripts/pyinstaller/macos-library-path-hook.py')
 if '--onefile' in sys.argv:
     runtime_hooks.append('scripts/pyinstaller/portable-hook.py')
