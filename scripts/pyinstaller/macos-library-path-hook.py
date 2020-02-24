@@ -25,7 +25,7 @@ import sys
 
 print("CWD", os.getcwd())
 
-os.chdir(sys._MEIPASS)
+os.chdir(os.path.abspath(os.path.join(sys._MEIPASS, '..', '..')))
 
 # On macOS ensure libraries such as libdiscid.dylib get loaded from app bundle
 os.environ['DYLD_FALLBACK_LIBRARY_PATH'] = '%s:%s' % (
