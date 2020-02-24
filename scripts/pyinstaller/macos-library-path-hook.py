@@ -23,6 +23,14 @@ import os
 import sys
 
 
+print("CWD", os.getcwd())
+
+os.chdir(sys._MEIPASS)
+
 # On macOS ensure libraries such as libdiscid.dylib get loaded from app bundle
 os.environ['DYLD_FALLBACK_LIBRARY_PATH'] = '%s:%s' % (
     os.path.dirname(sys.executable), os.environ.get('DYLD_FALLBACK_LIBRARY_PATH', ''))
+
+
+print("sys._MEIPASS", sys._MEIPASS)
+print("DYLD_FALLBACK_LIBRARY_PATH", os.environ['DYLD_FALLBACK_LIBRARY_PATH'])
