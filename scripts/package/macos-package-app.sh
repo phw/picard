@@ -21,7 +21,7 @@ CODESIGN=0
 NOTARIZE=0
 KEYCHAIN_PATH=picard.keychain
 KEYCHAIN_PASSWORD=picard
-CERTIFICATE_NAME="Developer ID Application: MetaBrainz Foundation Inc."
+CERTIFICATE="Developer ID Application: MetaBrainz Foundation Inc."
 CERTIFICATE_FILE=scripts/package/appledev.p12
 
 if [ -n "$encrypted_be5fb2212036_key" ] && [ -n "$encrypted_be5fb2212036_iv" ]; then
@@ -50,33 +50,47 @@ fi
 cd dist
 
 # Create app bundle
-ditto -rsrc --arch x86_64 'MusicBrainz Picard.app' 'MusicBrainz Picard.tmp'
-rm -r 'MusicBrainz Picard.app'
-mv 'MusicBrainz Picard.tmp' 'MusicBrainz Picard.app'
+APP_PACKAGE="MusicBrainz Picard.app"
+TEMP_PACKAGE="${APP_PACKAGE}.tmp"
+ditto -rsrc --arch x86_64 "$APP_PACKAGE" "$TEMP_PACKAGE"
+rm -r "$APP_PACKAGE"
+mv "$TEMP_PACKAGE" "$APP_PACKAGE"
 if [ "$CODESIGN" = '1' ]; then
+    codesign --verbose --keychain "$KEYCHAIN_PATH" --sign "$CERTIFICATE" \
+        "$APP_PACKAGE"/Contents/MacOS/Qt{Network,OpenGL,PrintSupport,Qml,Svg,WebSockets}
+    codesign --verbose --keychain "$KEYCHAIN_PATH" --sign "$CERTIFICATE" \
+        "$APP_PACKAGE"/Contents/MacOS/*.{dylib,so}
+    codesign --verbose --keychain "$KEYCHAIN_PATH" --sign "$CERTIFICATE" \
+        "$APP_PACKAGE"/Contents/MacOS/**/*.{dylib,so}
+    codesign --verbose --keychain "$KEYCHAIN_PATH" --sign "$CERTIFICATE" \
+        "$APP_PACKAGE"/Contents/MacOS/{fpcalc,picard-run,Python}
     # Enable hardened runtime if app will get notarized
     if [ "$NOTARIZE" = "1" ]; then
-      codesign --verify --verbose \
+      codesign --verbose --keychain "$KEYCHAIN_PATH" --sign "$CERTIFICATE" \
         --options runtime \
         --entitlements ../scripts/package/entitlements.plist \
-        --keychain "$KEYCHAIN_PATH" --sign "$CERTIFICATE_NAME" \
-        "MusicBrainz Picard.app"
-      ../scripts/package/macos-notarize-app.sh "MusicBrainz Picard.app"
+        "$APP_PACKAGE"
     else
-      codesign --verify --verbose \
-        --keychain "$KEYCHAIN_PATH" --sign "$CERTIFICATE_NAME" \
-        "MusicBrainz Picard.app"
+      codesign --verbose --keychain "$KEYCHAIN_PATH" --sign "$CERTIFICATE" \
+        "$APP_PACKAGE"
+    fi
+
+    # Verify the signing, this mimics what Gatekeeper does to check the app
+    codesign --verify --deep --strict --verbose=2 "$APP_PACKAGE"
+
+    if [ "$NOTARIZE" = "1" ]; then
+      ../scripts/package/macos-notarize-app.sh "$APP_PACKAGE"
     fi
 fi
 
 # Verify Picard executable works and required dependencies are bundled
-VERSIONS=$("MusicBrainz Picard.app/Contents/MacOS/picard-run" --long-version)
+VERSIONS=$("$APP_PACKAGE/Contents/MacOS/picard-run" --long-version)
 echo "$VERSIONS"
 ASTRCMP_REGEX="astrcmp C"
 [[ $VERSIONS =~ $ASTRCMP_REGEX ]] || (echo "Failed: Build does not include astrcmp C" && false)
 LIBDISCID_REGEX="libdiscid [0-9]+\.[0-9]+\.[0-9]+"
 [[ $VERSIONS =~ $LIBDISCID_REGEX ]] || (echo "Failed: Build does not include libdiscid" && false)
-"MusicBrainz Picard.app/Contents/MacOS/fpcalc" -version
+"$APP_PACKAGE/Contents/MacOS/fpcalc" -version
 
 # Package app bundle into DMG image
 if [ -n "$TRAVIS_OSX_IMAGE" ]; then
@@ -85,9 +99,9 @@ else
   DMG="MusicBrainz-Picard-$VERSION.dmg"
 fi
 hdiutil create -volname "MusicBrainz Picard $VERSION" \
-  -srcfolder 'MusicBrainz Picard.app' -ov -format UDBZ "$DMG"
+  -srcfolder "$APP_PACKAGE" -ov -format UDBZ "$DMG"
 [ "$CODESIGN" = '1' ] && codesign --verify --verbose \
-  --keychain "$KEYCHAIN_PATH" --sign "$CERTIFICATE_NAME" "$DMG"
+  --keychain "$KEYCHAIN_PATH" --sign "$CERTIFICATE" "$DMG"
 md5 -r "$DMG"
 
 if [ -n "$UPLOAD_OSX" ]; then
