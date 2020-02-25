@@ -61,9 +61,10 @@ if [ "$CODESIGN" = '1' ]; then
     }
 
     signfiles "$APP_PACKAGE"/Contents/MacOS/Qt{Network,OpenGL,PrintSupport,Qml,Svg,WebSockets}
+    signfiles "$APP_PACKAGE"/Contents/MacOS/Python
     signfiles "$APP_PACKAGE"/Contents/MacOS/*.{dylib,so}
     signfiles "$APP_PACKAGE"/Contents/MacOS/{objc,PyQt5,picard/util}/*.so
-    signfiles "$APP_PACKAGE"/Contents/MacOS/{fpcalc,picard-run,Python}
+    signfiles "$APP_PACKAGE"/Contents/MacOS/{fpcalc,picard-run}
     # Enable hardened runtime if app will get notarized
     if [ "$NOTARIZE" = "1" ]; then
       signfiles --options runtime \
