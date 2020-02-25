@@ -56,23 +56,21 @@ ditto -rsrc --arch x86_64 "$APP_PACKAGE" "$TEMP_PACKAGE"
 rm -r "$APP_PACKAGE"
 mv "$TEMP_PACKAGE" "$APP_PACKAGE"
 if [ "$CODESIGN" = '1' ]; then
-    codesign --verbose --keychain "$KEYCHAIN_PATH" --sign "$CERTIFICATE" \
-        "$APP_PACKAGE"/Contents/MacOS/Qt{Network,OpenGL,PrintSupport,Qml,Svg,WebSockets}
-    codesign --verbose --keychain "$KEYCHAIN_PATH" --sign "$CERTIFICATE" \
-        "$APP_PACKAGE"/Contents/MacOS/*.{dylib,so}
-    codesign --verbose --keychain "$KEYCHAIN_PATH" --sign "$CERTIFICATE" \
-        "$APP_PACKAGE"/Contents/MacOS/**/*.{dylib,so}
-    codesign --verbose --keychain "$KEYCHAIN_PATH" --sign "$CERTIFICATE" \
-        "$APP_PACKAGE"/Contents/MacOS/{fpcalc,picard-run,Python}
+    signfiles() {
+      codesign --verbose --keychain "$KEYCHAIN_PATH" --sign "$CERTIFICATE" "$@"
+    }
+
+    signfiles "$APP_PACKAGE"/Contents/MacOS/Qt{Network,OpenGL,PrintSupport,Qml,Svg,WebSockets}
+    signfiles "$APP_PACKAGE"/Contents/MacOS/*.{dylib,so}
+    signfiles "$APP_PACKAGE"/Contents/MacOS/**/*.so
+    signfiles "$APP_PACKAGE"/Contents/MacOS/{fpcalc,picard-run,Python}
     # Enable hardened runtime if app will get notarized
     if [ "$NOTARIZE" = "1" ]; then
-      codesign --verbose --keychain "$KEYCHAIN_PATH" --sign "$CERTIFICATE" \
-        --options runtime \
+      signfiles --options runtime \
         --entitlements ../scripts/package/entitlements.plist \
         "$APP_PACKAGE"
     else
-      codesign --verbose --keychain "$KEYCHAIN_PATH" --sign "$CERTIFICATE" \
-        "$APP_PACKAGE"
+      signfiles "$APP_PACKAGE"
     fi
 
     # Verify the signing, this mimics what Gatekeeper does to check the app
