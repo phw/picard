@@ -57,11 +57,10 @@ rm -r "$APP_PACKAGE"
 mv "$TEMP_PACKAGE" "$APP_PACKAGE"
 if [ "$CODESIGN" = '1' ]; then
     signfiles() {
-
       codesign --verbose --keychain "$KEYCHAIN_PATH" --sign "$CERTIFICATE" "$@"
     }
 
-    signfiles "$APP_PACKAGE"/Contents/MacOS/Qt{Network,OpenGL,PrintSupport,Qml,Svg,WebSockets}
+    signfiles "$APP_PACKAGE"/Contents/MacOS/Qt*
     signfiles "$APP_PACKAGE"/Contents/MacOS/Python
     signfiles "$APP_PACKAGE"/Contents/MacOS/*.{dylib,so,zip}
     signfiles "$APP_PACKAGE"/Contents/MacOS/{Foundation,objc,PyQt5,picard/util}/*.so
