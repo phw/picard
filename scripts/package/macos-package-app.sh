@@ -63,20 +63,20 @@ if [ "$CODESIGN" = '1' ]; then
     # First sign all files in the package
     signfiles --deep "$APP_PACKAGE"
 
-    # Enable hardened runtime if app will get notarized
-    if [ "$NOTARIZE" = "1" ]; then
-      signfiles --options runtime --force "$APP_PACKAGE"/Contents/MacOS/fpcalc
-      signfiles --options runtime --force \
-        --entitlements ../scripts/package/entitlements.plist \
-        "$APP_PACKAGE"
-    fi
+    # # Enable hardened runtime if app will get notarized
+    # if [ "$NOTARIZE" = "1" ]; then
+    #   signfiles --options runtime --force "$APP_PACKAGE"/Contents/MacOS/fpcalc
+    #   signfiles --options runtime --force \
+    #     --entitlements ../scripts/package/entitlements.plist \
+    #     "$APP_PACKAGE"
+    # fi
 
     # Verify the signing, this mimics what Gatekeeper does to check the app
     codesign --verify --deep --strict --verbose=2 "$APP_PACKAGE"
 
-    if [ "$NOTARIZE" = "1" ]; then
-      ../scripts/package/macos-notarize-app.sh "$APP_PACKAGE"
-    fi
+    # if [ "$NOTARIZE" = "1" ]; then
+    #   ../scripts/package/macos-notarize-app.sh "$APP_PACKAGE"
+    # fi
 fi
 
 # Verify Picard executable works and required dependencies are bundled
