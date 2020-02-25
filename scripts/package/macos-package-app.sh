@@ -56,14 +56,14 @@ mv 'MusicBrainz Picard.tmp' 'MusicBrainz Picard.app'
 if [ "$CODESIGN" = '1' ]; then
     # Enable hardened runtime if app will get notarized
     if [ "$NOTARIZE" = "1" ]; then
-      codesign --verify --verbose --deep \
+      codesign --verify --verbose \
         --options runtime \
         --entitlements ../scripts/package/entitlements.plist \
         --keychain "$KEYCHAIN_PATH" --sign "$CERTIFICATE_NAME" \
         "MusicBrainz Picard.app"
       ../scripts/package/macos-notarize-app.sh "MusicBrainz Picard.app"
     else
-      codesign --verify --verbose --deep \
+      codesign --verify --verbose \
         --keychain "$KEYCHAIN_PATH" --sign "$CERTIFICATE_NAME" \
         "MusicBrainz Picard.app"
     fi
