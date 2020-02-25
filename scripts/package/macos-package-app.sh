@@ -63,7 +63,7 @@ if [ "$CODESIGN" = '1' ]; then
 
     signfiles "$APP_PACKAGE"/Contents/MacOS/Qt{Network,OpenGL,PrintSupport,Qml,Svg,WebSockets}
     signfiles "$APP_PACKAGE"/Contents/MacOS/Python
-    signfiles "$APP_PACKAGE"/Contents/MacOS/*.{dylib,so}
+    signfiles "$APP_PACKAGE"/Contents/MacOS/*.{dylib,so,zip}
     signfiles "$APP_PACKAGE"/Contents/MacOS/{Foundation,objc,PyQt5,picard/util}/*.so
     signfiles "$APP_PACKAGE"/Contents/MacOS/PyQt5/Qt/plugins/*/*.dylib
     signfiles "$APP_PACKAGE"/Contents/MacOS/PyQt5/Qt/translations/*.qm
