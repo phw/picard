@@ -60,23 +60,15 @@ if [ "$CODESIGN" = '1' ]; then
       codesign --verbose --keychain "$KEYCHAIN_PATH" --sign "$CERTIFICATE" "$@"
     }
 
-    signfiles \
-      "$APP_PACKAGE"/Contents/MacOS/Qt* \
-      "$APP_PACKAGE"/Contents/MacOS/Python \
-      "$APP_PACKAGE"/Contents/MacOS/*.{dylib,so} \
-      "$APP_PACKAGE"/Contents/MacOS/base_library.zip \
-      "$APP_PACKAGE"/Contents/MacOS/{CoreFoundation,Foundation,objc,PyQt5,picard/util}/*.so \
-      "$APP_PACKAGE"/Contents/MacOS/PyQt5/Qt/plugins/*/*.dylib \
-      "$APP_PACKAGE"/Contents/MacOS/PyQt5/Qt/translations/*.qm
+    # First sign all files in the package
+    signfiles --deep "$APP_PACKAGE"
+
     # Enable hardened runtime if app will get notarized
     if [ "$NOTARIZE" = "1" ]; then
-      signfiles --options runtime "$APP_PACKAGE"/Contents/MacOS/fpcalc
-      signfiles --options runtime \
+      signfiles --options runtime --force "$APP_PACKAGE"/Contents/MacOS/fpcalc
+      signfiles --options runtime --force \
         --entitlements ../scripts/package/entitlements.plist \
         "$APP_PACKAGE"
-    else
-      signfiles "$APP_PACKAGE"/Contents/MacOS/fpcalc
-      signfiles "$APP_PACKAGE"
     fi
 
     # Verify the signing, this mimics what Gatekeeper does to check the app
