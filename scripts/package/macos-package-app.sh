@@ -43,9 +43,9 @@ if [ -f scripts/package/appledev.p12 ] && [ -n "$appledev_p12_password" ]; then
 fi
 
 # Submit app for notarization on macOS >= 10.14
-# if [ "$MACOS_VERSION_MAJOR" -eq 10 ] && [ "$MACOS_VERSION_MINOR" -ge 14 ]; then
-#     NOTARIZE=1
-# fi
+if [ "$MACOS_VERSION_MAJOR" -eq 10 ] && [ "$MACOS_VERSION_MINOR" -ge 14 ]; then
+    NOTARIZE=1
+fi
 
 cd dist
 
