@@ -57,6 +57,7 @@ rm -r "$APP_PACKAGE"
 mv "$TEMP_PACKAGE" "$APP_PACKAGE"
 if [ "$CODESIGN" = '1' ]; then
     signfiles() {
+
       codesign --verbose --keychain "$KEYCHAIN_PATH" --sign "$CERTIFICATE" "$@"
     }
 
@@ -65,6 +66,7 @@ if [ "$CODESIGN" = '1' ]; then
     signfiles "$APP_PACKAGE"/Contents/MacOS/*.{dylib,so}
     signfiles "$APP_PACKAGE"/Contents/MacOS/{Foundation,objc,PyQt5,picard/util}/*.so
     signfiles "$APP_PACKAGE"/Contents/MacOS/PyQt5/Qt/plugins/*/*.dylib
+    signfiles "$APP_PACKAGE"/Contents/MacOS/PyQt5/Qt/translations/*.qm
     signfiles "$APP_PACKAGE"/Contents/MacOS/{fpcalc,picard-run}
     # Enable hardened runtime if app will get notarized
     if [ "$NOTARIZE" = "1" ]; then
