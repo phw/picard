@@ -60,12 +60,13 @@ if [ "$CODESIGN" = '1' ]; then
       codesign --verbose --keychain "$KEYCHAIN_PATH" --sign "$CERTIFICATE" "$@"
     }
 
-    signfiles "$APP_PACKAGE"/Contents/MacOS/Qt*
-    signfiles "$APP_PACKAGE"/Contents/MacOS/Python
-    signfiles "$APP_PACKAGE"/Contents/MacOS/*.{dylib,so,zip}
-    signfiles "$APP_PACKAGE"/Contents/MacOS/{Foundation,objc,PyQt5,picard/util}/*.so
-    signfiles "$APP_PACKAGE"/Contents/MacOS/PyQt5/Qt/plugins/*/*.dylib
-    signfiles "$APP_PACKAGE"/Contents/MacOS/PyQt5/Qt/translations/*.qm
+    signfiles \
+      "$APP_PACKAGE"/Contents/MacOS/Qt* \
+      "$APP_PACKAGE"/Contents/MacOS/Python \
+      "$APP_PACKAGE"/Contents/MacOS/*.{dylib,so,zip} \
+      "$APP_PACKAGE"/Contents/MacOS/{CoreFoundation,Foundation,objc,PyQt5,picard/util}/*.so \
+      "$APP_PACKAGE"/Contents/MacOS/PyQt5/Qt/plugins/*/*.dylib \
+      "$APP_PACKAGE"/Contents/MacOS/PyQt5/Qt/translations/*.qm
     signfiles "$APP_PACKAGE"/Contents/MacOS/{fpcalc,picard-run}
     # Enable hardened runtime if app will get notarized
     if [ "$NOTARIZE" = "1" ]; then
