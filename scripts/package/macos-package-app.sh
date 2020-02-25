@@ -63,17 +63,19 @@ if [ "$CODESIGN" = '1' ]; then
     signfiles \
       "$APP_PACKAGE"/Contents/MacOS/Qt* \
       "$APP_PACKAGE"/Contents/MacOS/Python \
-      "$APP_PACKAGE"/Contents/MacOS/*.{dylib,so,zip} \
+      "$APP_PACKAGE"/Contents/MacOS/*.{dylib,so} \
+      "$APP_PACKAGE"/Contents/MacOS/base_library.zip} \
       "$APP_PACKAGE"/Contents/MacOS/{CoreFoundation,Foundation,objc,PyQt5,picard/util}/*.so \
       "$APP_PACKAGE"/Contents/MacOS/PyQt5/Qt/plugins/*/*.dylib \
       "$APP_PACKAGE"/Contents/MacOS/PyQt5/Qt/translations/*.qm
-    signfiles "$APP_PACKAGE"/Contents/MacOS/{fpcalc,picard-run}
     # Enable hardened runtime if app will get notarized
     if [ "$NOTARIZE" = "1" ]; then
+      signfiles --options runtime "$APP_PACKAGE"/Contents/MacOS/fpcalc
       signfiles --options runtime \
         --entitlements ../scripts/package/entitlements.plist \
         "$APP_PACKAGE"
     else
+      signfiles "$APP_PACKAGE"/Contents/MacOS/fpcalc
       signfiles "$APP_PACKAGE"
     fi
 
