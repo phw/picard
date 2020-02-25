@@ -64,7 +64,7 @@ if [ "$CODESIGN" = '1' ]; then
       "$APP_PACKAGE"/Contents/MacOS/Qt* \
       "$APP_PACKAGE"/Contents/MacOS/Python \
       "$APP_PACKAGE"/Contents/MacOS/*.{dylib,so} \
-      "$APP_PACKAGE"/Contents/MacOS/base_library.zip} \
+      "$APP_PACKAGE"/Contents/MacOS/base_library.zip \
       "$APP_PACKAGE"/Contents/MacOS/{CoreFoundation,Foundation,objc,PyQt5,picard/util}/*.so \
       "$APP_PACKAGE"/Contents/MacOS/PyQt5/Qt/plugins/*/*.dylib \
       "$APP_PACKAGE"/Contents/MacOS/PyQt5/Qt/translations/*.qm
