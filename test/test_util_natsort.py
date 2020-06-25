@@ -31,6 +31,7 @@ class NatsortTest(PicardTestCase):
         self.assertTrue(natsort.natkey('foo1bar') < natsort.natkey('foo02bar'))
         self.assertTrue(natsort.natkey('foo1bar') == natsort.natkey('foo01bar'))
         self.assertTrue(natsort.natkey('foo (100)') < natsort.natkey('foo (00200)'))
+        self.assertTrue(natsort.natkey('foo (2⁸)') < natsort.natkey('foo (2⁰⁹)'))
 
     def test_natsorted(self):
         unsorted_list = ['foo11', 'foo0012', 'foo02', 'foo0', 'foo1', 'foo10', 'foo9']
@@ -43,6 +44,6 @@ class NatsortTest(PicardTestCase):
 
     def test_natkey_handles_numeric_chars(self):
         self.assertEqual(
-            natsort.natkey('foo0123456789|²³|٠١٢٣٤٥٦٧٨٩|๐๑๒๓๔๕๖๗๘๙|𝟜𝟚bar'),
-            [strxfrm('foo'), 123456789, strxfrm('|²³|'), 123456789,
+            natsort.natkey('foo0123456789|²³⁴⁵|٠١٢٣٤٥٦٧٨٩|๐๑๒๓๔๕๖๗๘๙|𝟜𝟚bar'),
+            [strxfrm('foo'), 123456789, strxfrm('|^'), 2345, strxfrm('|'), 123456789,
              strxfrm('|'), 123456789, strxfrm('|'), 42, strxfrm('bar')])

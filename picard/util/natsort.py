@@ -27,12 +27,16 @@ import re
 
 
 RE_NUMBER = re.compile(r'(\d+)')
+SUPERSCRIPT_NUMBERS = '⁰²³⁴⁵⁶⁷⁸⁹'
+RE_SUPERSCRIPT_NUMBER = re.compile('([' + SUPERSCRIPT_NUMBERS + ']+)')
+NUMBER_REPLACEMENTS = str.maketrans(SUPERSCRIPT_NUMBERS, '023456789')
 
 
 def natkey(text):
     """
     Return a sort key for a string for natural sort order.
     """
+    text = RE_SUPERSCRIPT_NUMBER.sub(r'^\1', text).translate(NUMBER_REPLACEMENTS)
     return [int(s) if s.isdecimal() else strxfrm(s)
             for s in RE_NUMBER.split(str(text).replace('\0', ''))]
 
