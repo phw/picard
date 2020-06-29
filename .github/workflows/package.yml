@@ -41,6 +41,7 @@ jobs:
         key: ${{ runner.os }}-libdiscid-${{ env.DISCID_VERSION }}-${{ env.MACOSX_DEPLOYMENT_TARGET }}
     - name: Setup macOS build environment
       run: |
+        echo "::set-env name=SDKROOT::$(xcodebuild -version -sdk macosx10.14 Path)"
         ./scripts/package/macos-setup.sh
         echo "::add-path::/Library/Frameworks/Python.framework/Versions/3.7/bin"
         echo "::add-path::/usr/local/opt/gettext/bin"
