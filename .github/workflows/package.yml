@@ -41,6 +41,7 @@ jobs:
         key: ${{ runner.os }}-libdiscid-${{ env.DISCID_VERSION }}-${{ env.MACOSX_DEPLOYMENT_TARGET }}
     - name: Setup macOS build environment
       run: |
+        xcodebuild -sdk -version
         export SDKROOT=$(xcodebuild -version -sdk macosx10.14 Path)
         echo "::set-env name=SDKROOT::$SDKROOT"
         ./scripts/package/macos-setup.sh
