@@ -79,6 +79,15 @@ ext_modules = [
     Extension('picard.util._astrcmp', sources=['picard/util/_astrcmp.c']),
 ]
 
+try:
+    from Cython.Build import cythonize
+    ext_modules += cythonize('picard/script/parser.py', language_level=3)
+    ext_modules += cythonize('picard/script/functions.py', language_level=3)
+    ext_modules += cythonize('picard/util/natsort.py', language_level=3)
+    ext_modules += cythonize('picard/util/textencoding.py', language_level=3)
+except ImportError:
+    pass
+
 tx_executable = find_executable('tx')
 
 

@@ -34,6 +34,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
+import builtins
 from collections import namedtuple
 import datetime
 from functools import reduce
@@ -56,6 +57,8 @@ try:
     from markdown import markdown
 except ImportError:
     markdown = None
+
+N_ = builtins.__dict__.get('N_', lambda t: t)  # Explicitly define N_ for compilation with cython
 
 
 Bound = namedtuple("Bound", ["lower", "upper"])
