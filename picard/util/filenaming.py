@@ -8,7 +8,7 @@
 # Copyright (C) 2017 Sambhav Kothari
 # Copyright (C) 2017 Ville Skyttä
 # Copyright (C) 2018 Antonio Larrosa
-# Copyright (C) 2019 Philipp Wolfer
+# Copyright (C) 2019-2020 Philipp Wolfer
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -43,6 +43,22 @@ from picard.util import (
     decode_filename,
     encode_filename,
 )
+
+
+# File paths limits for Windows. See:
+# http://msdn.microsoft.com/en-us/library/windows/desktop/aa365247(v=vs.85).aspx
+#
+# The MAX_PATH is 260 characters (including a trailing null character).
+# With this possible format for a file:
+# "X:\<244-char dir path>\<11-char filename><NUL>".
+
+# Our constraints:
+# the entire path's length
+WIN_MAX_FILEPATH_LEN = 259
+# the entire parent directory path's length, *excluding* the final separator
+WIN_MAX_DIRPATH_LEN = 247
+# a single node's length (this seems to be the case for older NTFS)
+WIN_MAX_NODE_LEN = 226
 
 
 def _get_utf16_length(text):
@@ -166,6 +182,16 @@ def shorten_path(path, length, mode):
     )
 
 
+def normalize_path(path):
+    """Normalize a file path to a common format.
+    """
+    LONG_PATH_PREFIX = '\\\\?\\'
+    path = os.path.normpath(os.path.realpath(path))
+    if IS_WIN and len(path) > WIN_MAX_FILEPATH_LEN and not path.startswith(LONG_PATH_PREFIX):
+        path = LONG_PATH_PREFIX + path
+    return path
+
+
 def _shorten_to_utf16_ratio(text, ratio):
     """Shortens the string to the given ratio (and strips it)."""
     length = _get_utf16_length(text)
@@ -184,36 +210,22 @@ def _make_win_short_filename(relpath, reserved=0):
               e.g. 3 if it will be joined with "X:\", respectively 5 for "X:\y\".
               (note the inclusion of the final backslash)
     """
-    # See:
-    # http://msdn.microsoft.com/en-us/library/windows/desktop/aa365247(v=vs.85).aspx
-    #
-    # The MAX_PATH is 260 characters, with this possible format for a file:
-    # "X:\<244-char dir path>\<11-char filename><NUL>".
-
-    # Our constraints:
-    # the entire path's length
-    MAX_FILEPATH_LEN = 259
-    # the entire parent directory path's length, *excluding* the final separator
-    MAX_DIRPATH_LEN = 247
-    # a single node's length (this seems to be the case for older NTFS)
-    MAX_NODE_LEN = 226
-
     # to make predictable directory paths we need to fit the directories in
-    # MAX_DIRPATH_LEN, and truncate the filename to whatever's left
-    remaining = MAX_DIRPATH_LEN - reserved
+    # WIN_MAX_DIRPATH_LEN, and truncate the filename to whatever's left
+    remaining = WIN_MAX_DIRPATH_LEN - reserved
 
     # to make things more readable...
     def shorten(path, length):
         return shorten_path(path, length, mode=SHORTEN_UTF16)
     xlength = _get_utf16_length
 
-    # shorten to MAX_NODE_LEN from the beginning
-    relpath = shorten(relpath, MAX_NODE_LEN)
+    # shorten to WIN_MAX_NODE_LEN from the beginning
+    relpath = shorten(relpath, WIN_MAX_NODE_LEN)
     dirpath, filename = os.path.split(relpath)
     # what if dirpath is already the right size?
     dplen = xlength(dirpath)
     if dplen <= remaining:
-        filename_max = MAX_FILEPATH_LEN - (reserved + dplen + 1)  # the final separator
+        filename_max = WIN_MAX_FILEPATH_LEN - (reserved + dplen + 1)  # the final separator
         filename = shorten(filename, filename_max)
         return os.path.join(dirpath, filename)
 
@@ -260,8 +272,8 @@ def _make_win_short_filename(relpath, reserved=0):
         # did we win back some chars from .floor()s and .strip()s?
         recovered = remaining - sum(map(xlength, dirnames))
         # so how much do we have left for the filename?
-        filename_max = MAX_FILEPATH_LEN - MAX_DIRPATH_LEN - 1 + recovered
-        #                                                   ^ the final separator
+        filename_max = WIN_MAX_FILEPATH_LEN - WIN_MAX_DIRPATH_LEN - 1 + recovered
+        #                                                           ^ the final separator
 
         # and don't forget to cache
         computed[(dirpath, reserved)] = (finaldirpath, filename_max)

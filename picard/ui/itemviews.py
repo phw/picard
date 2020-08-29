@@ -78,6 +78,7 @@ from picard.util import (
     natsort,
     restore_method,
 )
+from picard.util.filenaming import normalize_path
 
 from picard.ui.collectionmenu import CollectionMenu
 from picard.ui.colors import interface_colors
@@ -726,7 +727,7 @@ class BaseTreeView(QtWidgets.QTreeWidget):
         for url in urls:
             log.debug("Dropped the URL: %r", url.toString(QtCore.QUrl.RemoveUserInfo))
             if url.scheme() == "file" or not url.scheme():
-                filename = os.path.normpath(os.path.realpath(url.toLocalFile().rstrip("\0")))
+                filename = normalize_path(url.toLocalFile().rstrip("\0"))
                 file = BaseTreeView.tagger.files.get(filename)
                 if file:
                     files.append(file)

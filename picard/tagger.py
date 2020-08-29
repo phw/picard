@@ -119,6 +119,7 @@ from picard.util import (
     webbrowser2,
 )
 from picard.util.checkupdate import UpdateCheckManager
+from picard.util.filenaming import normalize_path
 from picard.webservice import WebService
 from picard.webservice.api_helpers import (
     AcoustIdAPIHelper,
@@ -505,7 +506,7 @@ class Tagger(QtWidgets.QApplication):
         ignore_hidden = config.setting["ignore_hidden_files"]
         new_files = []
         for filename in filenames:
-            filename = os.path.normpath(os.path.realpath(filename))
+            filename = normalize_path(filename)
             if ignore_hidden and is_hidden(filename):
                 log.debug("File ignored (hidden): %r" % (filename))
                 continue

@@ -6,7 +6,7 @@
 # Copyright (C) 2016 Sambhav Kothari
 # Copyright (C) 2018 Wieland Hoffmann
 # Copyright (C) 2018-2019 Laurent Monin
-# Copyright (C) 2019 Philipp Wolfer
+# Copyright (C) 2019-2020 Philipp Wolfer
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -34,7 +34,10 @@ from picard.const.sys import (
     IS_MACOS,
     IS_WIN,
 )
-from picard.util.filenaming import make_short_filename
+from picard.util.filenaming import (
+    make_short_filename,
+    normalize_path,
+)
 
 
 class ShortFilenameTest(PicardTestCase):
@@ -143,3 +146,16 @@ class ShortFilenameTest(PicardTestCase):
     def test_whitespace(self):
         fn = make_short_filename(self.root, os.path.join("a1234567890   ", "  b1234567890  "))
         self.assertEqual(fn, os.path.join("a1234567890", "b1234567890"))
+
+
+class NormalizePathTest(PicardTestCase):
+    def test_normalize_path(self):
+        path = './foo/bar.mp3'
+        expected = os.path.join(os.getcwd(), 'foo', 'bar.mp3')
+        self.assertEqual(expected, normalize_path(path))
+
+    @unittest.skipUnless(IS_WIN, "windows test")
+    def test_normalize_win_long_path(self):
+        path = "C:\\Users\\Joe\\Music\\Wolfgang Amadeus Mozart, Slovak Philharmonic Orchestra, Slovak Philharmonic Chorus, Zdeněk Košler - Requiem (1989) [CD-MP3]\\001 - Wolfgang Amadeus Mozart - Requiem in D minor, K. 626 (Süßmayr completion) - I. Introitus - Requiem aeternam.mp3"
+        expected = '\\\\?\\' + path
+        self.assertEqual(expected, normalize_path(path))
