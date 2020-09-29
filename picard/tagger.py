@@ -1079,8 +1079,11 @@ def main(localedir=None, autoupdate=True):
 
     try:
         from PyQt5.QtDBus import QDBusConnection
+        from picard.dbus_application import FreedesktopApplicationService
         dbus = QDBusConnection.sessionBus()
         dbus.registerService(PICARD_APP_ID)
+        # Service needs to be assigned a variable to avoid garbage collection
+        service = FreedesktopApplicationService(dbus)  # noqa: F841
     except ImportError:
         pass
 
