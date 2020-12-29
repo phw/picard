@@ -89,6 +89,11 @@ else
   DMG="MusicBrainz-Picard-${VERSION}.dmg"
 fi
 mkdir staging
+# Ensure no stale extended attributes are in the files.
+# Fixes issues with Gatekeeper on macOS 10.12 and 10.13.
+if [ "$MACOSX_DEPLOYMENT_TARGET" = "10.12" ]; then
+  xattr -cr "$APP_BUNDLE"
+fi
 mv "$APP_BUNDLE" staging/
 # Offer a link to /Applications for easy installation
 ln -s /Applications staging/Applications
