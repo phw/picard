@@ -49,6 +49,15 @@ from picard.util import mbid_validate
 from picard.util.thread import to_main
 
 
+try:
+    from http.server import ThreadingHTTPServer
+except ImportError:
+    from socketserver import ThreadingMixIn
+
+    class ThreadingHTTPServer(ThreadingMixIn, HTTPServer):
+        daemon_threads = True
+
+
 SERVER_VERSION = '%s-%s/%s' % (PICARD_ORG_NAME, PICARD_APP_NAME, PICARD_VERSION_STR)
 RE_VALID_ORIGINS = re.compile(r'^(?:[^\.]+\.)*musicbrainz\.org$')
 
@@ -99,7 +108,7 @@ class BrowserIntegration(QtCore.QObject):
 
         for port in range(config.setting["browser_integration_port"], 65535):
             try:
-                self.server = HTTPServer((host_address, port), RequestHandler)
+                self.server = ThreadingHTTPServer((host_address, port), RequestHandler)
             except OSError:
                 continue
             log.info("Starting the browser integration (%s:%d)", host_address, port)
