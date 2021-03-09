@@ -68,6 +68,9 @@ class FileBrowser(QtWidgets.QTreeView):
         self.set_as_starting_directory_action = QtGui.QAction(_("&Set as starting directory"), self)
         self.set_as_starting_directory_action.triggered.connect(self.set_as_starting_directory)
         self.addAction(self.set_as_starting_directory_action)
+        self.refresh_action = QtWidgets.QAction(_("&Refresh…"), self)
+        self.refresh_action.triggered.connect(self.refresh)
+        self.addAction(self.refresh_action)
         self.doubleClicked.connect(self.load_file_for_item)
         self.focused = False
         self.tagger.format_registry.formats_changed.connect(self._update_name_filters)
@@ -81,8 +84,10 @@ class FileBrowser(QtWidgets.QTreeView):
         menu.addAction(self.load_selected_files_action)
         menu.addSeparator()
         menu.addAction(self.move_files_here_action)
-        menu.addAction(self.toggle_hidden_action)
         menu.addAction(self.set_as_starting_directory_action)
+        menu.addSeparator()
+        menu.addAction(self.toggle_hidden_action)
+        menu.addAction(self.refresh_action)
         menu.exec(event.globalPos())
         event.accept()
 
@@ -172,6 +177,21 @@ class FileBrowser(QtWidgets.QTreeView):
         config = get_config()
         config.persist['show_hidden_files'] = state
         self._update_model_filter()
+
+    def refresh(self):
+        current_path = self.model.filePath(self.currentIndex())
+        current_expanded = self.isExpanded(self.currentIndex())
+        selected_paths = [(self.model.filePath(index), self.isExpanded(index)) for index in self.selectedIndexes()]
+        self._set_model()
+        current_index = self.model.index(current_path)
+        self.setCurrentIndex(current_index)
+        if current_expanded:
+            self.expand(current_index)
+        for path, expanded in selected_paths:
+            index = self.model.index(path)
+            if expanded:
+                self.expand(index)
+            self.selectionModel().select(index, QtCore.QItemSelectionModel.Select)
 
     def save_state(self):
         indexes = self.selectedIndexes()
