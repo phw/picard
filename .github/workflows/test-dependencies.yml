@@ -1,0 +1,37 @@
+name: Test with different dependency versions
+
+on: [push, pull_request]
+
+jobs:
+  test-pyqt5:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        python-version: ['3.7']
+        dependencies: [
+          "PyQt5==5.14.2",
+          "PyQt5==5.13.2",
+          "PyQt5==5.12.3",
+          "PyQt5==5.11.3",
+          "PyQt5==5.10.1 sip==4.19.8 mutagen==1.37",
+        ]
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v1
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install $DEPENDENCIES
+        pip install -r requirements.txt
+      env:
+        DEPENDENCIES: ${{ matrix.dependencies }}
+    - name: Test with pytest
+      run: |
+        pip install pytest pytest-randomly pytest-cov
+        pytest --verbose test
+

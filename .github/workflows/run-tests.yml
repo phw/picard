@@ -1,32 +1,27 @@
-name: Run tests
-
-on: [push, pull_request]
+on:
+  workflow_call:
+    inputs:
+      runs-on:
+        description: Platform to execute on
+        required: true
+        type: string
+      python-version:
+        description: Python version to build with
+        required: true
+        type: string
 
 jobs:
   test-latest:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [macos-latest, ubuntu-latest, windows-latest]
-        python-version: ['3.6', '3.7', '3.8', '3.9', '3.10']
-        exclude:
-        - os: macos-latest
-          python-version: '3.6'
-        # pyobjc is not yet compatible with Python 3.10
-        - os: macos-latest
-          python-version: '3.10'
-        include:
-        - os: macos-10.15
-          python-version: '3.6'
+    runs-on: ${{ inputs.runs-on }}
     env:
       CODACY_PROJECT_TOKEN: ${{ secrets.CODACY_PROJECT_TOKEN }}
 
     steps:
     - uses: actions/checkout@v2
-    - name: Set up Python ${{ matrix.python-version }}
+    - name: Set up Python ${{ inputs.python-version }}
       uses: actions/setup-python@v1
       with:
-        python-version: ${{ matrix.python-version }}
+        python-version: ${{ inputs.python-version }}
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
@@ -56,72 +51,3 @@ jobs:
       run: |
         pip install codacy-coverage
         python-codacy-coverage -r coverage.xml
-
-  test-requirements:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest]
-        python-version: ['3.7']
-        dependencies: [
-          "PyQt5==5.14.2",
-          "PyQt5==5.13.2",
-          "PyQt5==5.12.3",
-          "PyQt5==5.11.3",
-          "PyQt5==5.10.1 sip==4.19.8 mutagen==1.37",
-        ]
-
-    steps:
-    - uses: actions/checkout@v2
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v1
-      with:
-        python-version: ${{ matrix.python-version }}
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install $DEPENDENCIES
-        pip install -r requirements.txt
-      env:
-        DEPENDENCIES: ${{ matrix.dependencies }}
-    - name: Test with pytest
-      run: |
-        pip install pytest pytest-randomly pytest-cov
-        pytest --verbose test
-
-  pip-install: # Test whether a clean pip install from source works
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [macos-latest, ubuntu-latest, windows-latest]
-        python-version: ['3.8']
-
-    steps:
-    - uses: actions/checkout@v2
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v1
-      with:
-        python-version: ${{ matrix.python-version }}
-    - name: Install gettext (Linux)
-      if: runner.os == 'Linux'
-      run: |
-        sudo apt-get update
-        sudo apt-get install gettext
-    - name: Install gettext (macOS)
-      if: runner.os == 'macOS'
-      run: |
-        brew install gettext
-        brew link gettext --force
-        echo "/usr/local/opt/gettext/bin" >> $GITHUB_PATH
-    - name: Run pip install .
-      run: |
-        python -m pip install --upgrade pip
-        pip install .
-    - name: Test running installed package
-      if: runner.os != 'Windows'
-      run: picard --long-version --no-crash-dialog
-    - name: Verify sdist package
-      if: runner.os != 'Windows'
-      run: |
-        pip install pytest
-        scripts/package/run-sdist-test.sh
