@@ -4,31 +4,31 @@ on: [push, pull_request]
 
 jobs:
   python-3_6:
-    uses: ./.github/workflows/run-tests.yml
+    uses: ./.github/workflows/run-tests.yml@reusable-test-workflow
     with:
       runs-on: linux-latest
       python-version: '3.6'
 
   python-3_7:
-    uses: ./.github/workflows/run-tests.yml
+    uses: ./.github/workflows/run-tests.yml@reusable-test-workflow
     with:
       runs-on: linux-latest
       python-version: '3.7'
 
   python-3_8:
-    uses: ./.github/workflows/run-tests.yml
+    uses: ./.github/workflows/run-tests.yml@reusable-test-workflow
     with:
       runs-on: linux-latest
       python-version: '3.8'
 
   python-3_9:
-    uses: ./.github/workflows/run-tests.yml
+    uses: ./.github/workflows/run-tests.yml@reusable-test-workflow
     with:
       runs-on: linux-latest
       python-version: '3.9'
 
   python-3_10:
-    uses: ./.github/workflows/run-tests.yml
+    uses: ./.github/workflows/run-tests.yml@reusable-test-workflow
     with:
       runs-on: linux-latest
       python-version: '3.10'
