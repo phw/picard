@@ -4,31 +4,31 @@ on: [push, pull_request]
 
 jobs:
   python-3_6:
-    uses: phw/picard/.github/workflows/run-tests.yml@reusable-test-workflow
+    uses: ./.github/workflows/run-tests.yml
     with:
       runs-on: linux-latest
       python-version: '3.6'
 
   python-3_7:
-    uses: phw/picard/.github/workflows/run-tests.yml@reusable-test-workflow
+    uses: ./.github/workflows/run-tests.yml
     with:
       runs-on: linux-latest
       python-version: '3.7'
 
   python-3_8:
-    uses: phw/picard/.github/workflows/run-tests.yml@reusable-test-workflow
+    uses: ./.github/workflows/run-tests.yml
     with:
       runs-on: linux-latest
       python-version: '3.8'
 
   python-3_9:
-    uses: phw/picard/.github/workflows/run-tests.yml@reusable-test-workflow
+    uses: ./.github/workflows/run-tests.yml
     with:
       runs-on: linux-latest
       python-version: '3.9'
 
   python-3_10:
-    uses: phw/picard/.github/workflows/run-tests.yml@reusable-test-workflow
+    uses: ./.github/workflows/run-tests.yml
     with:
       runs-on: linux-latest
       python-version: '3.10'
