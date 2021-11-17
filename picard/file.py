@@ -72,6 +72,7 @@ from picard.plugin import (
     PluginPriority,
 )
 from picard.script import get_file_naming_script
+from picard.util.thread import to_main
 from picard.util import (
     decode_filename,
     emptydir,
@@ -886,7 +887,7 @@ class File(QtCore.QObject, Item):
 
     def update_item(self, update_selection=True):
         if self.item:
-            self.item.update(update_selection=update_selection)
+            to_main(self.item.update, update_selection=update_selection)
 
     def iterfiles(self, save=False):
         yield self

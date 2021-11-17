@@ -67,6 +67,7 @@ from picard.util.imagelist import (
     update_metadata_images,
 )
 from picard.util.progresscheckpoints import ProgressCheckpoints
+from picard.util.thread import to_main
 
 from picard.ui.item import (
     FileListItem,
@@ -161,7 +162,7 @@ class Cluster(FileList):
         self.metadata['totaltracks'] = len(self.files)
         if self.can_show_coverart:
             add_metadata_images(self, added_files)
-        self.item.add_files(added_files)
+        to_main(self.item.add_files, added_files)
         if new_album:
             self._update_related_album(added_files=added_files)
 
@@ -173,7 +174,7 @@ class Cluster(FileList):
         self.metadata.length -= file.metadata.length
         self.files.remove(file)
         self.metadata['totaltracks'] = len(self.files)
-        self.item.remove_file(file)
+        to_main(self.item.remove_file, file)
         if self.can_show_coverart:
             file.metadata_images_changed.disconnect(self.update_metadata_images)
             remove_metadata_images(self, [file])
@@ -185,7 +186,7 @@ class Cluster(FileList):
 
     def update(self):
         if self.item:
-            self.item.update()
+            to_main(self.item.update)
 
     def get_num_files(self):
         return len(self.files)

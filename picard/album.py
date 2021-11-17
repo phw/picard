@@ -90,6 +90,7 @@ from picard.util.imagelist import (
     update_metadata_images,
 )
 from picard.util.textencoding import asciipunct
+from picard.util.thread import to_main
 
 from picard.ui.item import Item
 
@@ -509,7 +510,7 @@ class Album(DataObject, Item):
 
     def update(self, update_tracks=True, update_selection=True):
         if self.item:
-            self.item.update(update_tracks, update_selection=update_selection)
+            to_main(self.item.update, update_tracks, update_selection=update_selection)
 
     def _add_file(self, track, file, new_album=True):
         self._files += 1

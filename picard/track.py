@@ -69,6 +69,7 @@ from picard.script import (
     ScriptParser,
     enabled_tagger_scripts_texts,
 )
+from picard.util.thread import to_main
 from picard.util import pattern_as_regex
 from picard.util.imagelist import (
     ImageList,
@@ -219,7 +220,7 @@ class Track(DataObject, FileListItem):
 
     def update(self):
         if self.item:
-            self.item.update()
+            to_main(self.item.update)
 
     def is_linked(self):
         return self.num_linked_files > 0
