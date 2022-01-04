@@ -185,22 +185,29 @@ Section Uninstall
 
   SetShellVarContext all
   Delete "$DESKTOP\${PRODUCT_NAME}.lnk"
-
-  SetShellVarContext all
   Delete "$SMPROGRAMS\${PRODUCT_NAME}.lnk"
-
-  SetShellVarContext all
   Delete "$QUICKLAUNCH\${PRODUCT_NAME}.lnk"
 
   DeleteRegKey ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}"
   DeleteRegKey HKLM "Software\MusicBrainz\${PRODUCT_NAME}"
 
   !insertmacro INSTALLOPTIONS_READ $R0 "removeSettings.ini" "Field 1" "State"
-  StrCmp $R0 "1" 0 +2
-    ; Even more attempts
+  StrCmp $R0 "1" 0 endRemoveSettings
+    ; Remove user specific settings, plugins and caches
+    SetShellVarContext current
+    Delete "$APPDATA\MusicBrainz\Picard*.ini"
+    Delete "$APPDATA\MusicBrainz\.Picard*.ini.synclock"
+    RMDir /r "$APPDATA\MusicBrainz\Picard"
+    RMDir /r "$LOCALAPPDATA\MusicBrainz\Picard"
+    ; There might be other application's data in the MusicBrainz folder, only
+    ; delete if empty
+    RMDir "$APPDATA\MusicBrainz"
+    RMDir "$LOCALAPPDATA\MusicBrainz"
+    ; Clear registry settings, for legacy installs
     DeleteRegKey HKCU "Software\MusicBrainz\Picard\persist"
     DeleteRegKey HKCU "Software\MusicBrainz\Picard\setting"
     DeleteRegKey HKCU "Software\MusicBrainz\Picard"
+  endRemoveSettings:
 SectionEnd
 
 ; Checks whether program is running.
