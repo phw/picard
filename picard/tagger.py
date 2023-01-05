@@ -94,6 +94,7 @@ from picard.config import (
 )
 from picard.config_upgrade import upgrade_config
 from picard.const import (
+    DEFAULT_MAX_LOAD_THREADS,
     USER_DIR,
     USER_PLUGIN_DIR,
 )
@@ -373,6 +374,14 @@ class Tagger(QtWidgets.QApplication):
         # operations to finish.
         self.priority_thread_pool = QtCore.QThreadPool(self)
         self.priority_thread_pool.setMaxThreadCount(1)
+
+        # Use a separate thread pool for loading files with limited thread to
+        # improve loading throughput. Parallel reading of files can give
+        # higher performance, but too much parallel readings slows down the IO.
+        self.load_thread_pool = QtCore.QThreadPool(self)
+        self.load_thread_pool.setMaxThreadCount(
+            min(DEFAULT_MAX_LOAD_THREADS, QtCore.QThread.idealThreadCount())
+        )
 
         # Use a separate thread pool for file saving, with a thread count of 1,
         # to avoid race conditions in File._save_and_rename.

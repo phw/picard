@@ -34,6 +34,7 @@
 
 import builtins
 from collections import OrderedDict
+import os
 
 from picard import PICARD_VERSION
 from picard.const import appdirs
@@ -151,6 +152,12 @@ PLUGINS_API = {
 
 # Default query limit
 QUERY_LIMIT = 50
+
+# Maximum number of loading threads used by default
+try:
+    DEFAULT_MAX_LOAD_THREADS = int(os.environ.get('PICARD_MAX_LOAD_THREADS', 3))
+except (TypeError, ValueError):
+    DEFAULT_MAX_LOAD_THREADS = 3
 
 # Maximum number of covers to draw in a stack in CoverArtThumbnail
 MAX_COVERS_TO_STACK = 4
