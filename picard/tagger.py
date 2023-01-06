@@ -558,6 +558,10 @@ class Tagger(QtWidgets.QApplication):
             log.error("No command pause time specified.")
 
     def handle_command_quit(self, argstring):
+        if hasattr(self, '_loading_start'):
+            from time import monotonic
+            duration = monotonic() - self.tagger._loading_start
+            print(f'====> THREADS {DEFAULT_MAX_LOAD_THREADS}, TIME {duration}')
         self.exit()
         self.quit()
 
@@ -712,11 +716,11 @@ class Tagger(QtWidgets.QApplication):
         self._acoustid.done()
         if self.pipe_handler:
             self.pipe_handler.pipe_running = False
+        self.webservice.stop()
         self.thread_pool.waitForDone()
         self.save_thread_pool.waitForDone()
         self.priority_thread_pool.waitForDone()
         self.browser_integration.stop()
-        self.webservice.stop()
         self.run_cleanup()
         QtCore.QCoreApplication.processEvents()
 
@@ -925,6 +929,8 @@ class Tagger(QtWidgets.QApplication):
 
     def add_paths(self, paths, target=None):
         config = get_config()
+        from time import monotonic
+        self._loading_start = monotonic()
         files = self._scan_paths_recursive(paths,
                             config.setting['recursively_add_files'],
                             config.setting["ignore_hidden_files"])

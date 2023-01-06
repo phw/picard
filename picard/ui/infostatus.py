@@ -89,6 +89,10 @@ class InfoStatus(QtWidgets.QWidget, Ui_InfoStatus):
         self.set_pending_files(pending_files)
         self.set_pending_requests(pending_requests)
 
+        if not pending_files and hasattr(self.tagger, '_loading_start'):
+            from picard.util.thread import to_main
+            to_main(self.tagger.handle_command_quit, "")
+
         # estimate eta
         total_pending = pending_files + pending_requests
         last_pending = self._last_pending_files + self._last_pending_requests
