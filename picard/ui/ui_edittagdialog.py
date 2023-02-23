@@ -117,6 +117,6 @@ class Ui_EditTagDialog(object):
         self.add_value.setText(_("Add value"))
         self.remove_value.setText(_("Remove value"))
         self.move_value_up.setToolTip(_("Move selected value up"))
-        self.move_value_up.setAccessibleDescription(_("Move selected value up"))
+        # self.move_value_up.setAccessibleDescription(_("Move selected value up"))
         self.move_value_down.setToolTip(_("Move selected value down"))
-        self.move_value_down.setAccessibleDescription(_("Move selected value down"))
+        # self.move_value_down.setAccessibleDescription(_("Move selected value down"))

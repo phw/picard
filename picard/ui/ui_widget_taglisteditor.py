@@ -68,10 +68,10 @@ class Ui_TagListEditor(object):
         TagListEditor.setWindowTitle(_("Form"))
         self.tags_add_btn.setText(_("Add new tag"))
         self.tags_move_up_btn.setToolTip(_("Move tag up"))
-        self.tags_move_up_btn.setAccessibleName(_("Move tag up"))
+        # self.tags_move_up_btn.setAccessibleName(_("Move tag up"))
         self.tags_move_down_btn.setToolTip(_("Move tag down"))
-        self.tags_move_down_btn.setAccessibleName(_("Move tag down"))
+        # self.tags_move_down_btn.setAccessibleName(_("Move tag down"))
         self.tags_remove_btn.setToolTip(_("Remove selected tags"))
-        self.tags_remove_btn.setAccessibleName(_("Remove selected tags"))
+        # self.tags_remove_btn.setAccessibleName(_("Remove selected tags"))
         self.tags_remove_btn.setText(_("Remove tags"))
 from picard.ui.widgets.editablelistview import UniqueEditableListView

@@ -215,8 +215,8 @@ class MetadataBox(QtWidgets.QTableWidget):
         super().__init__(parent)
         config = get_config()
         self.parent = parent
-        self.setAccessibleName(_("metadata view"))
-        self.setAccessibleDescription(_("Displays original and new tags for the selected files"))
+        # self.setAccessibleName(_("metadata view"))
+        # self.setAccessibleDescription(_("Displays original and new tags for the selected files"))
         self.setColumnCount(3)
         self.setHorizontalHeaderLabels((_("Tag"), _("Original Value"), _("New Value")))
         self.horizontalHeader().setStretchLastSection(True)
