@@ -144,22 +144,18 @@ def _relation_attributes(relation):
 
 
 def _relations_to_metadata_type_artist(relation, m, **context):
-    config = context['config']
-    instrumental = context['instrumental']
-    use_credited_as = context['use_credited_as']
-    use_instrument_credits = context['use_instrument_credits']
-
     artist = relation['artist']
-    value, valuesort = _translate_artist_node(artist, config=config)
+    value, valuesort = _translate_artist_node(artist, config=context['config'])
     has_translation = (value != artist['name'])
-    if not has_translation and use_credited_as and 'target-credit' in relation:
+    if not has_translation and context['use_credited_as'] and 'target-credit' in relation:
         credited_as = relation['target-credit']
         if credited_as:
             value = credited_as
+
     reltype = relation['type']
     attribs = _relation_attributes(relation)
     if reltype in {'vocal', 'instrument', 'performer'}:
-        if use_instrument_credits:
+        if context['use_instrument_credits']:
             attr_credits = relation.get('attribute-credits', {})
         else:
             attr_credits = {}
@@ -175,8 +171,10 @@ def _relations_to_metadata_type_artist(relation, m, **context):
             name = _artist_rel_types[reltype]
         except KeyError:
             return
-    if instrumental and name == 'lyricist':
+
+    if context['instrumental'] and name == 'lyricist':
         return
+
     m.add_unique(name, value)
     if name == 'composer':
         m.add_unique('composersort', valuesort)
@@ -191,8 +189,7 @@ def _relations_to_metadata_type_work(relation, m, **context):
         performance_attributes = _relation_attributes(relation)
         for attribute in performance_attributes:
             m.add_unique("~performance_attributes", attribute)
-        instrumental = 'instrumental' in performance_attributes
-        work_to_metadata(relation['work'], m, instrumental)
+        work_to_metadata(relation['work'], m, instrumental='instrumental' in performance_attributes)
 
 
 def _relations_to_metadata_type_url(relation, m, **context):
@@ -201,14 +198,13 @@ def _relations_to_metadata_type_url(relation, m, **context):
         if amz is not None:
             m['asin'] = amz['asin']
     elif relation['type'] == 'license':
-        url = relation['url']['resource']
-        m.add('license', url)
+        m.add('license', relation['url']['resource'])
 
 
 def _relations_to_metadata_type_series(relation, m, **context):
-    entity = context['entity']
     if relation['type'] == 'part of':
         series = relation['series']
+        entity = context['entity']
         var_prefix = f'~{entity}_' if entity else '~'
         m.add(f'{var_prefix}series', series['name'])
         m.add(f'{var_prefix}seriesid', series['id'])
