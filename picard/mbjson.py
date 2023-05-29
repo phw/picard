@@ -143,7 +143,12 @@ def _relation_attributes(relation):
     return tuple()
 
 
-def _relations_to_metadata_type_artist(relation, m, config, instrumental, use_credited_as, use_instrument_credits):
+def _relations_to_metadata_type_artist(relation, m, **context):
+    config = context['config']
+    instrumental = context['instrumental']
+    use_credited_as = context['use_credited_as']
+    use_instrument_credits = context['use_instrument_credits']
+
     artist = relation['artist']
     value, valuesort = _translate_artist_node(artist, config=config)
     has_translation = (value != artist['name'])
@@ -181,7 +186,7 @@ def _relations_to_metadata_type_artist(relation, m, config, instrumental, use_cr
         m.add_unique('~writersort', valuesort)
 
 
-def _relations_to_metadata_type_work(relation, m):
+def _relations_to_metadata_type_work(relation, m, **context):
     if relation['type'] == 'performance':
         performance_attributes = _relation_attributes(relation)
         for attribute in performance_attributes:
@@ -190,7 +195,7 @@ def _relations_to_metadata_type_work(relation, m):
         work_to_metadata(relation['work'], m, instrumental)
 
 
-def _relations_to_metadata_type_url(relation, m):
+def _relations_to_metadata_type_url(relation, m, **context):
     if relation['type'] == 'amazon asin' and 'asin' not in m:
         amz = parse_amazon_url(relation['url']['resource'])
         if amz is not None:
@@ -200,7 +205,8 @@ def _relations_to_metadata_type_url(relation, m):
         m.add('license', url)
 
 
-def _relations_to_metadata_type_series(relation, m, entity):
+def _relations_to_metadata_type_series(relation, m, **context):
+    entity = context['entity']
     if relation['type'] == 'part of':
         series = relation['series']
         var_prefix = f'~{entity}_' if entity else '~'
@@ -212,17 +218,25 @@ def _relations_to_metadata_type_series(relation, m, entity):
 
 def _relations_to_metadata(relations, m, instrumental=False, config=None, entity=None):
     config = config or get_config()
-    use_credited_as = not config.setting['standardize_artists']
-    use_instrument_credits = not config.setting['standardize_instruments']
+    context = {
+        'config': config,
+        'instrumental': instrumental,
+        'use_credited_as': not config.setting['standardize_artists'],
+        'use_instrument_credits': not config.setting['standardize_instruments'],
+        'entity': entity,
+    }
+    # build a list of callable methods according to the relation target type
+    # those methods have to start with the same prefix and use same arguments
+    prefix = '_relations_to_metadata_type_'
+    # below the key is the target type, the value the actual function to call
+    funcs = {
+        name[len(prefix):]: v
+        for name, v in globals().items()
+        if name.startswith(prefix) and callable(v)
+    }
     for relation in relations:
-        if relation['target-type'] == 'artist':
-            _relations_to_metadata_type_artist(relation, m, config, instrumental, use_credited_as, use_instrument_credits)
-        elif relation['target-type'] == 'work':
-            _relations_to_metadata_type_work(relation, m)
-        elif relation['target-type'] == 'url':
-            _relations_to_metadata_type_url(relation, m)
-        elif relation['target-type'] == 'series':
-            _relations_to_metadata_type_series(relation, m, entity)
+        if relation['target-type'] in funcs:
+            funcs[relation['target-type']](relation, m, **context)
 
 
 def _translate_artist_node(node, config=None):
