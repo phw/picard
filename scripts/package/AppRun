@@ -1,0 +1,8 @@
+#!/bin/sh
+
+export PATH="$APPDIR/usr/bin/:$PATH"
+
+# Set the original working dir as the working dir.
+# Ensures relative path arguments are resolved as expected.
+cd $OWD
+"$APPDIR"/usr/bin/picard "$@"
