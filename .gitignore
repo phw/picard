@@ -22,6 +22,8 @@ Thumbs.db:encryptable
 *.pyc
 *.pyd
 *.so
+*.AppImage
+*.AppImage.zsync
 appxmanifest.xml
 build/
 coverage.xml
