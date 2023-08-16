@@ -259,6 +259,7 @@ jobs:
         sudo apt-get install gettext
     - name: Package AppImage
       run: |
+        patch -p1 < scripts/package/appimage.patch
         curl -Lo appimagecraft "$APPIMAGECRAFT_URL"
         chmod +x appimagecraft
         ./appimagecraft
