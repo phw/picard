@@ -756,11 +756,6 @@ def _get_description():
         return f.read()
 
 
-def _get_requirements():
-    with open(os.path.join(this_directory, 'requirements.txt'), encoding='utf-8') as f:
-        return f.readlines()
-
-
 args = {
     'name': PACKAGE_NAME,
     'version': PICARD_VERSION_STR_SHORT,
@@ -791,7 +786,6 @@ args = {
         'patch_version': picard_patch_version,
     },
     'scripts': ['scripts/' + PACKAGE_NAME],
-    'install_requires': _get_requirements(),
     'python_requires': '~=3.8',
     'classifiers': [
         'License :: OSI Approved :: GNU General Public License v2 or later (GPLv2+)',
