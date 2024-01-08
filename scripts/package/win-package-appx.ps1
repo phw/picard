@@ -36,15 +36,15 @@ if ($Certificate) {
 
 # Build
 Remove-Item -Path build,dist/picard,locale -Recurse -ErrorAction Ignore
-python setup.py clean 2>&1 | %{ "$_" }
+poetry run python setup.py clean 2>&1 | %{ "$_" }
 ThrowOnExeError "setup.py clean failed"
-python setup.py build --build-number=$BuildNumber --disable-autoupdate 2>&1 | %{ "$_" }
+poetry run python setup.py build --build-number=$BuildNumber --disable-autoupdate 2>&1 | % { "$_" }
 ThrowOnExeError "setup.py build failed"
-python setup.py build_ext -i 2>&1 | %{ "$_" }
+poetry run python setup.py build_ext -i 2>&1 | % { "$_" }
 ThrowOnExeError "setup.py build_ext -i failed"
 
 # Package application
-pyinstaller --noconfirm --clean picard.spec 2>&1 | %{ "$_" }
+poetry run pyinstaller --noconfirm --clean picard.spec 2>&1 | % { "$_" }
 ThrowOnExeError "PyInstaller failed"
 $PackageDir = (Resolve-Path dist\picard)
 FinalizePackage $PackageDir

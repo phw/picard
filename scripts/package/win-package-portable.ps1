@@ -25,15 +25,15 @@ Write-Output "Building portable exe..."
 
 # Build
 Remove-Item -Path build,locale -Recurse -ErrorAction Ignore
-python setup.py clean 2>&1 | %{ "$_" }
+poetry run python setup.py clean 2>&1 | % { "$_" }
 ThrowOnExeError "setup.py clean failed"
-python setup.py build --build-number=$BuildNumber 2>&1 | %{ "$_" }
+poetry run python setup.py build --build-number=$BuildNumber 2>&1 | %{ "$_" }
 ThrowOnExeError "setup.py build failed"
-python setup.py build_ext -i 2>&1 | %{ "$_" }
+poetry run python setup.py build_ext -i 2>&1 | %{ "$_" }
 ThrowOnExeError "setup.py build_ext -i failed"
 
 # Package application
 $env:PICARD_BUILD_PORTABLE = '1'
-pyinstaller --noconfirm --clean picard.spec 2>&1 | %{ "$_" }
+poetry run pyinstaller --noconfirm --clean picard.spec 2>&1 | %{ "$_" }
 ThrowOnExeError "PyInstaller failed"
 CodeSignBinary -BinaryPath dist\MusicBrainz-Picard-*.exe -ErrorAction Stop

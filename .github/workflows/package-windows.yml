@@ -43,16 +43,14 @@ jobs:
         FPCALC_SHA256SUM: 36b478e16aa69f757f376645db0d436073a42c0097b6bb2677109e7835b59bbc
     - name: Install dependencies
       run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements-build.txt
-        pip install -r requirements-win.txt
+        poetry install --with=build
     - name: Patch build version
       if: startsWith(github.ref, 'refs/tags/') != true
       run: |
-        python setup.py patch_version --platform=$Env:BUILD_NUMBER.$(git rev-parse --short HEAD)
+        poetry run python setup.py patch_version --platform=$Env:BUILD_NUMBER.$(git rev-parse --short HEAD)
     - name: Run tests
       timeout-minutes: 30
-      run: python setup.py test
+      run: poetry run python setup.py test
     - name: Prepare code signing certificate
       if: matrix.type != 'store-app'
       run: |
