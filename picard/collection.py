@@ -155,9 +155,9 @@ def add_release_to_user_collections(release_node):
     if 'collections' in release_node:
         release_id = release_node['id']
         config = get_config()
-        username = config.persist['oauth_username'].lower()
+        username = config.persist['oauth_username'].casefold()
         for node in release_node['collections']:
-            if node['editor'].lower() == username:
+            if node['editor'].casefold() == username:
                 col_id = node['id']
                 col_name = node['name']
                 col_size = node['release-count']

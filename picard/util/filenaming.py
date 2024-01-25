@@ -422,7 +422,7 @@ def samefile_different_casing(path1, path2):
         return False
     file1 = os.path.basename(path1)
     file2 = os.path.basename(path2)
-    return file1 != file2 and file1.lower() == file2.lower()
+    return file1 != file2 and file1.casefold() == file2.casefold()
 
 
 def _make_unique_temp_name(target_path):

@@ -699,7 +699,7 @@ def _cmp(op, x, y, _type):
     if _type == 'text':
         return '1' if op(x, y) else ""
     elif _type == 'nocase':
-        return '1' if op(x.lower(), y.lower()) else ""
+        return '1' if op(x.casefold(), y.casefold()) else ""
     elif _type == 'float':
         _typer = float
     elif _type == 'int':
@@ -1598,7 +1598,7 @@ def _extract(_func, _type, *args):
         op = operator.lt if _func == min else operator.gt
         val = None
         for item in haystack:
-            if val is None or op(item.lower(), val.lower()):
+            if val is None or op(item.casefold(), val.casefold()):
                 val = item
         return str(val)
 

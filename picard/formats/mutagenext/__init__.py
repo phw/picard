@@ -23,7 +23,7 @@
 
 def delall_ci(tags, key):
     """Delete all tags with given key, case-insensitive"""
-    key = key.lower()
+    key = key.casefold()
     for k in list(tags.keys()):
-        if k.lower() == key:
+        if k.casefold() == key:
             del tags[k]
