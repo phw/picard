@@ -135,6 +135,7 @@ Section "!$(SectionRequired)" required
   SectionIn RO
     SetOutPath "$INSTDIR"
     SetOverwrite on
+    SetRegView 64
 
     ; Files
     File /r /x "locale" "${PROJECT_PATH}\dist\picard\"
@@ -153,6 +154,8 @@ Section "!$(SectionRequired)" required
     WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "URLInfoAbout" "${PRODUCT_URL}"
     WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "HelpLink" "${PRODUCT_HELP_URL}"
     WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "UninstallString" "$INSTDIR\uninst.exe"
+    WriteRegDWORD ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "VersionMajor" 2
+    WriteRegDWORD ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "VersionMinor" 11
 SectionEnd
 
 Section "$(SectionLanguages)" lang
@@ -186,6 +189,8 @@ Function un.RemoveSettingsPage
 FunctionEnd
 
 Section Uninstall
+  SetRegView 64
+
   RMDir /r "$INSTDIR"
 
   SetShellVarContext all
@@ -272,7 +277,19 @@ Function un.onInit
   !insertmacro INSTALLOPTIONS_WRITE "removeSettings.ini" "Field 1" "Text" "$(OptionRemoveSettings)"
 FunctionEnd
 
+; Read a registry string from 64 bit registry, fall back to 32 bit if not found
+!macro ReadRegStr3264 out root sub key
+  !define ID ${__LINE__}
+  ReadRegStr ${out} ${root}64 "${sub}" "${key}"
+  StrCmp ${out} "" 0 end_${ID}
+  ReadRegStr ${out} ${root}32 "${sub}" "${key}"
+  end_${ID}:
+  !undef ID
+!macroend
+
 Function .onInit
+  SetRegView 64
+
   ; Abort installation if this is not a 64 bit system
   ${IfNot} ${RunningX64}
     MessageBox MB_ICONSTOP|MB_OK "$(MsgRequires64Bit)" /SD IDOK
@@ -291,14 +308,16 @@ Function .onInit
   ; Uninstall previous installation
   ; $0 = Path to uninstaller
   ; $1 = Previous installation directory
-  ReadRegStr $0 HKLM "${PRODUCT_UNINST_KEY}" "UninstallString"
+  ; ReadRegStr $0 HKLM "${PRODUCT_UNINST_KEY}" "UninstallString"
+  !insertmacro ReadRegStr3264 $0 HKLM "${PRODUCT_UNINST_KEY}" "UninstallString"
   StrCmp $0 "" skipUninstall
     MessageBox MB_OKCANCEL|MB_ICONEXCLAMATION "$(MsgAlreadyInstalled)" /SD IDOK IDOK uninstall
     Abort
 
   uninstall:
     ClearErrors
-    ReadRegStr $1 HKLM "Software\MusicBrainz\${PRODUCT_NAME}" "InstallDir"
+    ; ReadRegStr $1 HKLM "Software\${PRODUCT_PUBLISHER}\${PRODUCT_NAME}" "InstallDir"
+    !insertmacro ReadRegStr3264 $1 HKLM "Software\${PRODUCT_PUBLISHER}\${PRODUCT_NAME}" "InstallDir"
     ; The _? must be set to the install directory, it also ensures ExecWait
     ; actually waits for the installer to finish. We need to remove the
     ; installer itself manually afterwards.
