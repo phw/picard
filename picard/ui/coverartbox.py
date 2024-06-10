@@ -163,7 +163,7 @@ class CoverArtThumbnail(ActiveLabel):
 
         if not accepted:
             for url in mime_data.urls():
-                if url.scheme() in {'https', 'http', 'file'}:
+                if url.scheme() in {'https', 'http', 'file', 'data'}:
                     accepted = True
                     log.debug("Dropped %s url (with %d bytes of data)",
                               url.toString(), len(dropped_data or ''))
@@ -522,6 +522,11 @@ class CoverArtBox(QtWidgets.QGroupBox):
                 with open(path, 'rb') as f:
                     data = f.read()
                 self.load_remote_image(url, data)
+        elif url.scheme() == 'data':
+            from picard.util import datauri
+            data = datauri.parse(url.toString())
+            if data.mediatype.startswith('image/'):
+                self.load_remote_image(url, data.data)
 
     def on_remote_image_fetched(self, url, data, reply, error, fallback_data=None):
         if error:
