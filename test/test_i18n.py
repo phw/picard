@@ -28,12 +28,20 @@ from unittest.mock import (
     patch,
 )
 
+from PyQt5.QtCore import (
+    QCollator,
+    QLocale,
+)
+
 from test.picardtestcase import PicardTestCase
 
 from picard import i18n
 
 
 localedir = os.path.join(os.path.dirname(__file__), '..', 'locale')
+default_collator = QCollator(QLocale('de'))
+numeric_collator = QCollator(QLocale('de'))
+numeric_collator.setNumericMode(True)
 
 
 class TestI18n(PicardTestCase):
@@ -78,11 +86,25 @@ class TestI18n(PicardTestCase):
         # self.assertEqual('Französisch', gettext_constants('French'))
         self.assertEqual('Frankreich', gettext_countries('France'))
 
+    @patch('picard.i18n._qcollator', default_collator)
+    @patch('picard.i18n._qcollator_numeric', numeric_collator)
     def test_sort_key(self):
-        i18n.setup_gettext(None, 'de')
         self.assertTrue(i18n.sort_key('äb') < i18n.sort_key('ac'))
         self.assertTrue(i18n.sort_key('foo002') < i18n.sort_key('foo1'))
         self.assertTrue(i18n.sort_key('foo1', numeric=True) < i18n.sort_key('foo002', numeric=True))
+
+    @patch('picard.i18n._qcollator', default_collator)
+    @patch('picard.i18n._qcollator_numeric', numeric_collator)
+    def test_sort_key_numbers_different_scripts(self):
+        for four in ('4', '𝟜', '٤', '๔'):
+            self.assertTrue(
+                i18n.sort_key('03', numeric=True) < i18n.sort_key(four, numeric=True),
+                msg=f'03 < {four}'
+            )
+            self.assertTrue(
+                i18n.sort_key(four, numeric=True) < i18n.sort_key('05', numeric=True),
+                msg=f'{four} < 05'
+            )
 
 
 @patch('locale.getpreferredencoding', autospec=True)
