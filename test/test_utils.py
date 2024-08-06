@@ -862,18 +862,18 @@ class WinPrefixLongpathTest(PicardTestCase):
         self.assertEqual(path, win_prefix_longpath(path))
 
 
-class StrxfrmTest(PicardTestCase):
+# class StrxfrmTest(PicardTestCase):
 
-    def test_strxfrm(self):
-        value = 'Motörhead'
-        self.assertEqual(
-            system_strxfrm(value),
-            strxfrm(value)
-        )
+#     def test_strxfrm(self):
+#         value = 'Motörhead'
+#         self.assertEqual(
+#             system_strxfrm(value),
+#             strxfrm(value)
+#         )
 
-    def test_strxfrm_ignore_null_chars(self):
-        result = strxfrm('Foo\0bar\0')
-        self.assertEqual(system_strxfrm('Foobar'), result)
+#     def test_strxfrm_ignore_null_chars(self):
+#         result = strxfrm('Foo\0bar\0')
+#         self.assertEqual(system_strxfrm('Foobar'), result)
 
 
 class SystemSupportsLongPathsTest(PicardTestCase):

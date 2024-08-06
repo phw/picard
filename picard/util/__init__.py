@@ -52,9 +52,11 @@ from collections import (
     namedtuple,
 )
 from collections.abc import Mapping
+import icu
 from itertools import chain
 import json
-from locale import strxfrm as _strxfrm
+# from locale import strxfrm as _strxfrm
+from locale import getlocale
 import ntpath
 from operator import attrgetter
 import os
@@ -1177,11 +1179,13 @@ def strxfrm(string):
 
     Returns: A string that can be compared locale-aware
     """
-    try:
-        return _strxfrm(string.replace('\0', ''))
-    except (OSError, ValueError) as err:
-        log.warning('strxfrm(%r) failed: %r', string, err)
-        return string.lower()
+    l = getlocale()[0]
+    return icu.Collator.createInstance(icu.Locale(l)).getSortKey(string)
+    # try:
+    #     return _strxfrm(string.replace('\0', ''))
+    # except (OSError, ValueError) as err:
+    #     log.warning('strxfrm(%r) failed: %r', string, err)
+    #     return string.lower()
 
 
 ENCODING_BOMS = {

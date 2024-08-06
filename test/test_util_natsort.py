@@ -20,7 +20,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 
-from locale import strxfrm
+from picard.util import strxfrm
 
 from test.picardtestcase import PicardTestCase
 

@@ -2,6 +2,7 @@ discid==1.2.0
 fasteners==0.18
 Markdown==3.4.4
 mutagen==1.47.0
+PyICU==2.13.1
 PyJWT==2.8.0
 pyobjc-core==9.1.1
 pyobjc-framework-Cocoa==9.1.1

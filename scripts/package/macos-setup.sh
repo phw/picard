@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 set -e
 
-# Install gettext
-brew install gettext
+# Install build dependencies with brew
+brew install gettext pkg-config icu4c
 brew link gettext --force
 
 # Install requested Python version
