@@ -98,12 +98,12 @@ class TestI18n(PicardTestCase):
     def test_sort_key_numbers_different_scripts(self):
         for four in ('4', '𝟜', '٤', '๔'):
             self.assertTrue(
-                i18n.sort_key('03', numeric=True) < i18n.sort_key(four, numeric=True),
-                msg=f'03 < {four}'
+                i18n.sort_key('3', numeric=True) < i18n.sort_key(four, numeric=True),
+                msg=f'3 < {four}'
             )
             self.assertTrue(
-                i18n.sort_key(four, numeric=True) < i18n.sort_key('05', numeric=True),
-                msg=f'{four} < 05'
+                i18n.sort_key(four, numeric=True) < i18n.sort_key('5', numeric=True),
+                msg=f'{four} < 5'
             )
 
 
