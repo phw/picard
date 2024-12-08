@@ -173,7 +173,7 @@ class OAuthManager:
             'client_secret': MUSICBRAINZ_OAUTH_CLIENT_SECRET,
         }
         self.webservice.post_url(
-            url=self.url(path="/oauth2/revoke"),
+            url=self.url(path="/new-oauth2/revoke"),
             data=self._query_data(params),
             handler=partial(self._on_revoke_token_finished, callback),
             mblogin=True,
@@ -265,7 +265,7 @@ class OAuthManager:
         }
         if not self.is_oob:
             params['state'] = self._create_auth_state(callback)
-        return bytes(self.url(path="/oauth2/authorize", params=params).toEncoded()).decode()
+        return bytes(self.url(path="/new-oauth2/authorize", params=params).toEncoded()).decode()
 
     def set_refresh_token(self, refresh_token, scopes):
         log.debug("OAuth: got refresh_token %s with scopes %s", refresh_token, scopes)
@@ -297,7 +297,7 @@ class OAuthManager:
             'client_secret': MUSICBRAINZ_OAUTH_CLIENT_SECRET,
         }
         self.webservice.post_url(
-            url=self.url(path="/oauth2/token"),
+            url=self.url(path="/new-oauth2/token"),
             data=self._query_data(params),
             handler=partial(self.on_refresh_access_token_finished),
             mblogin=True,
@@ -338,7 +338,7 @@ class OAuthManager:
             'code_verifier': self.__code_verifier,
         }
         self.webservice.post_url(
-            url=self.url(path="/oauth2/token"),
+            url=self.url(path="/new-oauth2/token"),
             data=self._query_data(params),
             handler=partial(self.on_exchange_authorization_code_finished, scopes, callback),
             mblogin=True,
@@ -367,7 +367,7 @@ class OAuthManager:
     def fetch_username(self, callback):
         log.debug("OAuth: fetching username")
         self.webservice.get_url(
-            url=self.url(path="/oauth2/userinfo"),
+            url=self.url(path="/new-oauth2/userinfo"),
             handler=partial(self.on_fetch_username_finished, callback),
             mblogin=True,
             priority=True,
