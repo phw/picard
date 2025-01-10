@@ -41,6 +41,10 @@ jobs:
     - run: git fetch --depth=1 origin +refs/tags/release-*:refs/tags/release-*
     - name: Setup macOS build environment
       run: |
+        mkdir -p ~/.config/pip
+        echo "[global]" > ~/.config/pip/pip.conf
+        echo "break-system-packages = true" >> ~/.config/pip/pip.conf
+        cat ~/.config/pip/pip.conf
         ./scripts/package/macos-setup.sh
         PYTHON_BASE_VERSION=$(echo $PYTHON_VERSION | sed -e "s/\.[0-9]\{1,\}$//")
         echo "/Library/Frameworks/Python.framework/Versions/$PYTHON_BASE_VERSION/bin" >> $GITHUB_PATH
