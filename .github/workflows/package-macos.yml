@@ -6,17 +6,24 @@ permissions: {}
 
 jobs:
   package-macos:
-    runs-on: macos-13
+    runs-on: ${{ matrix.setup.macos-runner }}
     strategy:
       matrix:
         setup:
-        - macos-deployment-version: 10.12
+        - macos-runner: macos-13
+          macos-deployment-version: 10.12
           python-version: 3.9.12-macosx10.9
           python-sha256sum: 7888174c6fe441b00448c7ab3e9cbf0e6c3c7dea0750577baf09e1383fc44656
           disable-webp: 1
-        - macos-deployment-version: 10.14
+        - macos-runner: macos-13
+          macos-deployment-version: 10.14
           python-version: 3.11.5-macos11
           python-sha256sum: c6cd76659bfb364c2ac63bc57f6b10c1e131a20170359c5d65e2d41fdc674a4f
+          disable-webp: 0
+        - macos-runner: macos-14
+          macos-deployment-version: 14.0
+          python-version: 3.13.1-macos11
+          python-sha256sum: 67c6f0a3190851e0013214d5abd725a42ec398ff1b50eec47826820fd052d86b
           disable-webp: 0
     env:
       DISCID_VERSION: 0.6.4
