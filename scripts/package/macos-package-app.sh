@@ -93,8 +93,9 @@ if [ "$CODESIGN" = '1' ]; then
 fi
 
 # Only test the app if it was codesigned, otherwise execution likely fails
-if [ "$CODESIGN" = '1' ]; then
+if [ "$CODESIGN" = '1' ] && [ "$TARGET_ARCH" = 'x86_64' ]; then
   echo "Verify Picard executable works and required dependencies are bundled..."
+  "$APP_BUNDLE/Contents/MacOS/picard-run" --long-version --no-crash-dialog || echo "Failed running picard-run"
   VERSIONS=$("$APP_BUNDLE/Contents/MacOS/picard-run" --long-version --no-crash-dialog)
   echo "$VERSIONS"
   ASTRCMP_REGEX="astrcmp C"
@@ -105,11 +106,7 @@ if [ "$CODESIGN" = '1' ]; then
 fi
 
 echo "Package app bundle into DMG image..."
-if [ -n "$MACOSX_DEPLOYMENT_TARGET" ]; then
-  DMG="MusicBrainz-Picard-${VERSION}-macOS-${MACOSX_DEPLOYMENT_TARGET}.dmg"
-else
-  DMG="MusicBrainz-Picard-${VERSION}.dmg"
-fi
+DMG="MusicBrainz-Picard${VERSION:+-$VERSION}${MACOSX_DEPLOYMENT_TARGET:+-macOS-$MACOSX_DEPLOYMENT_TARGET}${TARGET_ARCH:+-$TARGET_ARCH}.dmg"
 mkdir staging
 mv "$APP_BUNDLE" staging/
 # Offer a link to /Applications for easy installation

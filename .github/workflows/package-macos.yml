@@ -10,13 +10,20 @@ jobs:
     strategy:
       matrix:
         setup:
-        - macos-deployment-version: 10.12
+        - macos-deployment-version: '10.12'
+          target-arch: 'x86_64'
           python-version: 3.9.12-macosx10.9
           python-sha256sum: 7888174c6fe441b00448c7ab3e9cbf0e6c3c7dea0750577baf09e1383fc44656
           disable-webp: 1
-        - macos-deployment-version: 10.14
-          python-version: 3.11.5-macos11
-          python-sha256sum: c6cd76659bfb364c2ac63bc57f6b10c1e131a20170359c5d65e2d41fdc674a4f
+        - macos-deployment-version: '10.14'
+          target-arch: 'x86_64'
+          python-version: 3.13.1-macos11
+          python-sha256sum: 67c6f0a3190851e0013214d5abd725a42ec398ff1b50eec47826820fd052d86b
+          disable-webp: 0
+        - macos-deployment-version: '11.0'
+          target-arch: 'arm64'
+          python-version: 3.13.1-macos11
+          python-sha256sum: 67c6f0a3190851e0013214d5abd725a42ec398ff1b50eec47826820fd052d86b
           disable-webp: 0
     env:
       DISCID_VERSION: 0.6.4
@@ -26,6 +33,7 @@ jobs:
       PYTHON_VERSION: ${{ matrix.setup.python-version }}
       PYTHON_SHA256SUM: ${{ matrix.setup.python-sha256sum }}
       MACOSX_DEPLOYMENT_TARGET: ${{ matrix.setup.macos-deployment-version }}
+      TARGET_ARCH: ${{ matrix.setup.target-arch }}
       CODESIGN: 0
     steps:
     - uses: actions/checkout@v4
@@ -47,24 +55,13 @@ jobs:
       if: startsWith(github.ref, 'refs/tags/') != true
       run: |
         python3 setup.py patch_version --platform=$BUILD_NUMBER.$(git rev-parse --short HEAD)
-    - name: Compile and install PyInstaller
-      run: |
-        git clone --depth 1 --branch "$PYINSTALLER_VERSION" https://github.com/pyinstaller/pyinstaller.git pyinstaller
-        cd pyinstaller/bootloader
-        python3 ./waf --verbose all
-        cd ..
-        pip3 install .
-      env:
-        PYINSTALLER_VERSION: v5.13.2
-        CFLAGS: -mmacosx-version-min=${{ matrix.setup.macos-deployment-version }}
-        CPPFLAGS: -mmacosx-version-min=${{ matrix.setup.macos-deployment-version }}
-        LDFLAGS: -mmacosx-version-min=${{ matrix.setup.macos-deployment-version }}
-        LINKFLAGS: -mmacosx-version-min=${{ matrix.setup.macos-deployment-version }}
     - name: Install dependencies
       run: |
         pip3 install -r requirements-build.txt
-        pip3 install -r requirements-macos-${MACOSX_DEPLOYMENT_TARGET}.txt
+        pip3 install --no-binary "charset-normalizer,PyYAML" -r requirements-macos-${MACOSX_DEPLOYMENT_TARGET}.txt
         pip3 install zstandard
+      env:
+        PYINSTALLER_COMPILE_BOOTLOADER: "1"
     - name: Run tests
       timeout-minutes: 30
       run: |
@@ -96,5 +93,5 @@ jobs:
     - name: Archive production artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: macos-app-${{ matrix.setup.macos-deployment-version }}
+        name: macos-app-${{ matrix.setup.macos-deployment-version }}-${{ matrix.setup.target-arch }}
         path: artifacts/

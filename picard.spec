@@ -5,6 +5,7 @@ import os
 import platform
 import sys
 
+
 sys.path.insert(0, '.')
 from picard import (
     PICARD_APP_ID,
@@ -115,6 +116,7 @@ else:
     exe = EXE(pyz,
               a.scripts,
               exclude_binaries=True,
+              target_arch=os.environ.get('TARGET_ARCH', None),
               # Avoid name clash between picard executable and picard module folder
               name='picard' if os_name == 'Windows' else 'picard-run',
               debug=False,
