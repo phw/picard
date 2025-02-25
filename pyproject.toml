@@ -29,7 +29,21 @@ classifiers = [
     "Topic :: Multimedia :: Sound/Audio :: Analysis",
     "Intended Audience :: End Users/Desktop",
 ]
-dynamic = ["version", "readme", "dependencies"]
+dynamic = ["version", "readme"]
+dependencies = [
+    "charset-normalizer~=3.3",
+    "discid~=1.0",
+    "markdown~=3.2",
+    "mutagen~=1.37",
+    "pyjwt~=2.0",
+    "pyobjc-core>=6.2,<11 ; sys_platform == 'darwin'",
+    "pyobjc-framework-cocoa>=6.2,<11 ; sys_platform == 'darwin'",
+    "pyqt6>=6.6.1",
+    "pyqt6-qt6>=6.6.1",
+    "python-dateutil~=2.7",
+    "pywin32>=308 ; sys_platform == 'win32'",
+    "pyyaml>=5.1,<7",
+]
 
 [project.urls]
 Homepage = "https://picard.musicbrainz.org/"
@@ -37,6 +51,23 @@ Documentation = "https://picard-docs.musicbrainz.org/"
 Repository = "https://github.com/metabrainz/picard.git"
 Issues = "https://tickets.metabrainz.org/projects/PICARD/issues/"
 Changelog = "https://picard.musicbrainz.org/changelog/"
+
+[dependency-groups]
+build = [
+    "babel>=2.10.0",
+    "pyinstaller==6.12.0",
+    "pytest>=8.1",
+    "setuptools>=66.1.0",
+]
+dev = [
+    "autopep8>=2.3.2",
+    "babel>=2.6.0",
+    "flake8>=7.1.2",
+    "isort>=5.0",
+    "pycodestyle>=2.12.1",
+    "pylint>=2.6.0",
+    "wlc>=1.15",
+]
 
 [tool.setuptools]
 ext-modules = [
@@ -46,7 +77,6 @@ ext-modules = [
 [tool.setuptools.dynamic]
 version = {attr = "picard.PICARD_VERSION_STR_SHORT"}
 readme = {file = ["README.md"], content-type = "text/markdown"}
-dependencies = {file = ["requirements.txt"]}
 
 [tool.setuptools.packages.find]
 include = ["picard*"]
