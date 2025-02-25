@@ -27,10 +27,7 @@ jobs:
       uses: actions/setup-python@v5
       with:
         python-version: 3.13
-        cache: 'pip'
-        cache-dependency-path: |
-          requirements-build.txt
-          requirements-win.txt
+    - uses: astral-sh/setup-uv@v5
     - name: Setup Windows build environment
       run: |
         & .\scripts\package\win-setup.ps1 `
@@ -51,29 +48,23 @@ jobs:
       env:
         GETTEXT_VERSION: 0.22.4
         GETTEXT_SHA256SUM: 220068ac0b9e7aedda03534a3088e584640ac1e639800b3a0baa9410aa6d012a
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements-build.txt
-        pip install -r requirements-win.txt
     - name: Patch build version
       if: startsWith(github.ref, 'refs/tags/') != true
       run: |
         $ReleaseTag = $(git describe --match "release-*" --abbrev=0 --always HEAD)
         $BuildNumber = $(git rev-list --count "$ReleaseTag..HEAD")
-        python setup.py patch_version --platform=$Env:BUILD_NUMBER.$(git rev-parse --short HEAD)
+        uv run setup.py patch_version --platform=$Env:BUILD_NUMBER.$(git rev-parse --short HEAD)
     - name: Run tests
       timeout-minutes: 30
       run: pytest --verbose
     - name: Prepare clean build environment
       run: |
         Remove-Item -Path build,dist/picard,locale -Recurse -ErrorAction Ignore
-        python setup.py clean
+        uv run setup.py clean
     - name: Build
       run: |
-        python setup.py build --build-number=$BuildNumber
-        python setup.py build_ext
-        pyinstaller --noconfirm --clean picard.spec
+        uv run --group build setup.py build --build-number=$BuildNumber
+        uv run --with pyinstaller --noconfirm --clean picard.spec
         If ($env:PICARD_BUILD_PORTABLE -ne "1") {
           dist\picard\_internal\fpcalc -version
         }

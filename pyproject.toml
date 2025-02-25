@@ -68,6 +68,11 @@ dev = [
     "pylint>=2.6.0",
     "wlc>=1.15",
 ]
+test = [
+    "pytest>=8.3.4",
+    "pytest-cov>=6.0.0",
+    "pytest-randomly>=3.16.0",
+]
 
 [tool.setuptools]
 ext-modules = [

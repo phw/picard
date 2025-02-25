@@ -5,9 +5,9 @@
 set -e
 
 rm -rf dist
-python -m build --sdist
+uv build --sdist
 cd dist
 SDIST_ARCHIVE=$(echo picard-*.tar.gz)
 tar xvf "$SDIST_ARCHIVE"
 cd "${SDIST_ARCHIVE%.tar.gz}"
-pytest --verbose
+uv run --group test pytest --verbose
