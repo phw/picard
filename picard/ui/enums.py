@@ -77,6 +77,7 @@ class MainAction(str, Enum):
     EXIT = 'exit_action'
     GENERATE_FINGERPRINTS = 'generate_fingerprints_action'
     HELP = 'help_action'
+    MANAGE_PLUGINS = 'manage_plugin_action'
     OPEN_COLLECTION_IN_BROWSER = 'open_collection_in_browser_action'
     OPEN_FOLDER = 'open_folder_action'
     OPTIONS = 'options_action'

@@ -718,6 +718,8 @@ class MainWindow(QtWidgets.QMainWindow, PreserveGeometry):
             MainAction.GENERATE_FINGERPRINTS,
             MainAction.TAGS_FROM_FILENAMES,
             MainAction.OPEN_COLLECTION_IN_BROWSER,
+            '-',
+            MainAction.MANAGE_PLUGINS,
         )
 
         self.menuBar().addSeparator()
@@ -982,6 +984,25 @@ class MainWindow(QtWidgets.QMainWindow, PreserveGeometry):
                 signal.disconnect()
 
         return options_dialog
+
+    def show_install_plugin_dialog(self):
+        """Show the plugin installation dialog."""
+        from picard.ui.plugin_installation_dialog import PluginInstallationDialog
+
+        dialog = PluginInstallationDialog.show_instance(self)
+        dialog.plugin_installed.connect(self._on_plugin_installed)
+        dialog.installation_failed.connect(self._on_plugin_installation_failed)
+        return dialog
+
+    def _on_plugin_installed(self, url):
+        """Handle successful plugin installation."""
+        # TODO: Refresh plugin list, show success message, etc.
+        log.info("Plugin installed successfully from: %s", url)
+
+    def _on_plugin_installation_failed(self, error_message):
+        """Handle plugin installation failure."""
+        # TODO: Show error message, log error, etc.
+        log.error("Plugin installation failed: %s", error_message)
 
     def _options_closed(self):
         if self.script_editor_dialog is not None:
