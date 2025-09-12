@@ -18,204 +18,33 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
+"""Dialog for installing plugins from git repositories or local directories."""
+
 from contextlib import suppress
-import html
 from pathlib import Path
-import re
-from urllib.parse import urlparse
 
 from PyQt6 import (  # type: ignore[import-not-found]
     QtCore,
-    QtGui,
     QtWidgets,
 )
 
 from picard import log
 from picard.i18n import gettext as _
-from picard.plugin3.installer import (
-    ManifestValidationError,
-    PluginCopier,
-    PluginDiscovery,
-    PluginInstallationError,
-    PluginInstallationService,
-    PluginValidator,
-)
+from picard.plugin3.installer import ManifestValidationError, PluginDiscovery, PluginInstallationError, PluginValidator
 from picard.tagger import Tagger
 from picard.util import thread
 
 from picard.ui import PicardDialog, SingletonDialog
+from picard.ui.plugins_manager.config import DialogConfig
+from picard.ui.plugins_manager.list_components import SLUG_ROLE, PluginItemDelegate, PluginListModel
+from picard.ui.plugins_manager.manifest_info import build_manifest_info_html
+from picard.ui.plugins_manager.services import InstallerService
+from picard.ui.plugins_manager.validation import UrlValidator
+from picard.ui.plugins_manager.widgets import FeedbackWidget
 
-
-DEFAULT_WIDTH = 800
-DEFAULT_HEIGHT = 400
-
-
-DISABLED_ROLE: int = int(QtCore.Qt.ItemDataRole.UserRole) + 1
-SLUG_ROLE: int = DISABLED_ROLE + 1
 
 # Configuration: maximum characters to show for description previews
-DESCRIPTION_PREVIEW_CHARS: int = 100
-
-
-class PluginListModel(QtCore.QAbstractListModel):
-    """List model for displaying installed plugins with human-readable names.
-
-    Parameters
-    ----------
-    items
-        Initial list of plugin names.
-    disabled
-        Set of plugin names that are disabled.
-    parent
-        Optional parent QObject.
-    """
-
-    def __init__(self, items: list[tuple[str, str]] | None = None, disabled: set[str] | None = None, parent=None):
-        super().__init__(parent)
-        # Each item: (slug, display_label)
-        self._items: list[tuple[str, str]] = list(items or [])
-        self._disabled: set[str] = set(disabled or set())
-
-    def rowCount(self, parent: QtCore.QModelIndex | None = None) -> int:  # type: ignore[override]
-        """Return number of rows in the model."""
-        if parent is not None and parent.isValid():
-            return 0
-        return len(self._items)
-
-    def data(self, index: QtCore.QModelIndex, role: int = QtCore.Qt.ItemDataRole.DisplayRole):  # type: ignore[override]
-        """Return data for the given role at the specified index."""
-        if not index.isValid():
-            return None
-        row = index.row()
-        if row < 0 or row >= len(self._items):
-            return None
-        slug, label = self._items[row]
-        if role == QtCore.Qt.ItemDataRole.DisplayRole:
-            return label
-        if role == QtCore.Qt.ItemDataRole.ForegroundRole and slug in self._disabled:
-            palette = QtWidgets.QApplication.palette()
-            disabled_color = palette.color(
-                QtGui.QPalette.ColorGroup.Disabled,
-                QtGui.QPalette.ColorRole.Text,
-            )
-            return disabled_color
-        if role == DISABLED_ROLE:
-            return slug in self._disabled
-        if role == SLUG_ROLE:
-            return slug
-        return None
-
-    def flags(self, index: QtCore.QModelIndex) -> QtCore.Qt.ItemFlag:  # type: ignore[override]
-        """Return item flags for the given index."""
-        if not index.isValid():
-            return QtCore.Qt.ItemFlag.NoItemFlags
-        return QtCore.Qt.ItemFlag.ItemIsEnabled | QtCore.Qt.ItemFlag.ItemIsSelectable
-
-    def set_plugins(self, items: list[tuple[str, str]]) -> None:
-        """Replace the list of plugins (slug, label) and refresh the view.
-
-        Parameters
-        ----------
-        items
-            New list of plugin names.
-        """
-        self.beginResetModel()
-        self._items = list(items)
-        self.endResetModel()
-
-    def set_disabled(self, disabled: set[str]) -> None:
-        """Update the disabled set and refresh font styling.
-
-        Parameters
-        ----------
-        disabled
-            Set of plugin names that should be shown as disabled.
-        """
-        self._disabled = set(disabled)
-        if self._items:
-            top_left = self.index(0, 0)
-            bottom_right = self.index(len(self._items) - 1, 0)
-            self.dataChanged.emit(top_left, bottom_right, [QtCore.Qt.ItemDataRole.ForegroundRole])
-
-
-class PluginItemDelegate(QtWidgets.QStyledItemDelegate):
-    """Custom delegate to draw plugin rows with a 'Disabled' pill when applicable."""
-
-    def paint(self, painter: QtGui.QPainter, option: QtWidgets.QStyleOptionViewItem, index: QtCore.QModelIndex) -> None:  # type: ignore[override]
-        # Initialize style option to respect selection/hover states
-        opt = QtWidgets.QStyleOptionViewItem(option)
-        self.initStyleOption(opt, index)
-
-        # Measure badge if needed
-        is_disabled = bool(index.data(DISABLED_ROLE))
-        badge_text = _("Disabled") if is_disabled else ""
-        fm = opt.fontMetrics
-        spacing = 8
-        badge_hpad = 8
-        badge_vpad = 2
-        badge_rect = QtCore.QRect()
-        if is_disabled:
-            text_w = fm.horizontalAdvance(badge_text)
-            badge_w = text_w + 2 * badge_hpad
-            badge_h = fm.height() + 2 * badge_vpad
-            r = opt.rect
-            badge_x = r.right() - badge_w - spacing
-            badge_y = r.top() + (r.height() - badge_h) // 2
-            badge_rect = QtCore.QRect(badge_x, badge_y, badge_w, badge_h)
-
-        # Draw background for the whole row first
-        qstyle: QtWidgets.QStyle | None
-        if opt.widget is not None:
-            qstyle = opt.widget.style()
-        else:
-            qstyle = QtWidgets.QApplication.style()
-        if qstyle is None:
-            super().paint(painter, option, index)
-            return
-        style: QtWidgets.QStyle = qstyle
-        bg_opt = QtWidgets.QStyleOptionViewItem(opt)
-        bg_opt.text = ""
-        style.drawControl(QtWidgets.QStyle.ControlElement.CE_ItemViewItem, bg_opt, painter, opt.widget)
-
-        # Compute text rect avoiding badge
-        text_rect = QtCore.QRect(opt.rect)
-        if is_disabled:
-            text_rect.setRight(badge_rect.left() - spacing)
-
-        # Elide text to fit
-        elided = fm.elidedText(opt.text, QtCore.Qt.TextElideMode.ElideRight, max(0, text_rect.width()))
-
-        # Draw text using style so colors follow theme/selection
-        text_opt = QtWidgets.QStyleOptionViewItem(opt)
-        text_opt.rect = text_rect
-        text_opt.text = elided
-        style.drawControl(QtWidgets.QStyle.ControlElement.CE_ItemViewItem, text_opt, painter, opt.widget)
-
-        # Draw badge
-        if is_disabled:
-            painter.save()
-            painter.setRenderHint(QtGui.QPainter.RenderHint.Antialiasing, True)
-            palette = opt.palette
-            if opt.state & QtWidgets.QStyle.StateFlag.State_Selected:
-                bg_color = palette.color(QtGui.QPalette.ColorRole.Highlight).lighter(125)
-                text_color = palette.color(QtGui.QPalette.ColorRole.HighlightedText)
-            else:
-                # Subtle neutral pill
-                bg_color = palette.color(QtGui.QPalette.ColorRole.Midlight)
-                text_color = palette.color(QtGui.QPalette.ColorRole.Text)
-            # Fill rounded rect
-            path = QtGui.QPainterPath()
-            radius = max(8, badge_rect.height() // 4)
-            path.addRoundedRect(QtCore.QRectF(badge_rect), radius, radius)
-            painter.fillPath(path, bg_color)
-            # Draw text centered
-            painter.setPen(text_color)
-            painter.drawText(badge_rect, int(QtCore.Qt.AlignmentFlag.AlignCenter), badge_text)
-            painter.restore()
-
-    def sizeHint(self, option: QtWidgets.QStyleOptionViewItem, index: QtCore.QModelIndex) -> QtCore.QSize:  # type: ignore[override]
-        # Base size is sufficient; pill uses same font height
-        return super().sizeHint(option, index)
+DESCRIPTION_PREVIEW_CHARS: int = DialogConfig.DESCRIPTION_MAX_CHARS
 
 
 class PluginInstallationDialog(PicardDialog, SingletonDialog):
@@ -225,14 +54,25 @@ class PluginInstallationDialog(PicardDialog, SingletonDialog):
     plugin_installed = QtCore.pyqtSignal(str)  # Emitted when plugin is successfully installed
     installation_failed = QtCore.pyqtSignal(str)  # Emitted when installation fails
 
-    def __init__(self, parent=None):
+    def __init__(
+        self,
+        parent=None,
+        *,
+        installer: InstallerService | None = None,
+        validator: UrlValidator | None = None,
+        plugin_manager=None,
+    ):
         super().__init__(parent=parent)
         self.setWindowTitle(_("Install Plugin"))
         self.setModal(True)
-        self.resize(DEFAULT_WIDTH, DEFAULT_HEIGHT)
+        self.resize(DialogConfig.DEFAULT_WIDTH, DialogConfig.DEFAULT_HEIGHT)
 
-        # Git URL validation regex
-        self._git_url_pattern = re.compile(r'^https?://(?:[^@/]+@)?(?:[^:/]+)(?::\d+)?/[^/]+/[^/]+(?:\.git)?/?$')
+        # Services (injected for testability)
+        self._url_validator = validator or UrlValidator()
+        self._installer = installer or InstallerService()
+
+        # Plugin manager (injected for testability)
+        self._plugin_manager3 = plugin_manager or Tagger.instance().pluginmanager3
 
         # Current installation method
         self._current_method = "git"  # "git" or "local"
@@ -258,12 +98,13 @@ class PluginInstallationDialog(PicardDialog, SingletonDialog):
         plugins_buttons_layout = QtWidgets.QHBoxLayout()
         self.toggle_button = QtWidgets.QPushButton(_("Enable"))
         self.uninstall_button = QtWidgets.QPushButton(_("Uninstall"))
+        # Do not steal focus from the list when toggling
+        self.toggle_button.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
         plugins_buttons_layout.addWidget(self.toggle_button)
         plugins_buttons_layout.addWidget(self.uninstall_button)
         left_layout.addLayout(plugins_buttons_layout)
 
-        # Initialize plugin manager v3 and list
-        self._plugin_manager3 = Tagger.instance().pluginmanager3
+        # Initialize plugin list
         self._disabled_plugins: set[str] = set()
         self._refresh_plugins_list()
 
@@ -359,7 +200,7 @@ class PluginInstallationDialog(PicardDialog, SingletonDialog):
         layout.addWidget(desc_label)
 
         # URL inputs section (stackable up to 5)
-        self.max_urls = 5
+        self.max_urls = DialogConfig.MAX_URLS
         self.url_inputs: list[QtWidgets.QLineEdit] = []
         self.url_grid = QtWidgets.QGridLayout()
         self.url_grid.setHorizontalSpacing(8)
@@ -384,10 +225,7 @@ class PluginInstallationDialog(PicardDialog, SingletonDialog):
         feedback_container_layout.setContentsMargins(0, 0, 0, 0)
         feedback_container_layout.setSpacing(0)
 
-        self.url_feedback = QtWidgets.QLabel()
-        self.url_feedback.setStyleSheet("color: #d32f2f; font-size: 11px;")
-        self.url_feedback.setWordWrap(True)
-        self.url_feedback.hide()
+        self.url_feedback = FeedbackWidget()
         feedback_container_layout.addWidget(self.url_feedback)
 
         # Reserve a stable minimum height for feedback
@@ -450,10 +288,7 @@ class PluginInstallationDialog(PicardDialog, SingletonDialog):
         local_feedback_layout.setContentsMargins(0, 0, 0, 0)
         local_feedback_layout.setSpacing(0)
 
-        self.local_feedback = QtWidgets.QLabel()
-        self.local_feedback.setStyleSheet("color: #d32f2f; font-size: 11px;")
-        self.local_feedback.setWordWrap(True)
-        self.local_feedback.hide()
+        self.local_feedback = FeedbackWidget()
         local_feedback_layout.addWidget(self.local_feedback)
 
         # Reserve a stable minimum height for feedback
@@ -631,70 +466,14 @@ class PluginInstallationDialog(PicardDialog, SingletonDialog):
 
     def _display_plugin_info(self, manifest, path: Path) -> None:
         """Display plugin information in the info text area."""
-        info_lines = []
-
-        # Plugin name
-        if hasattr(manifest, 'name') and manifest.name:
-            if isinstance(manifest.name, dict):
-                name = manifest.name.get('en', list(manifest.name.values())[0] if manifest.name else 'Unknown')
-            else:
-                name = str(manifest.name)
-            info_lines.append(f"<b>Name:</b> {name}")
-
-        # Authors
-        if hasattr(manifest, 'authors') and manifest.authors:
-            authors = ', '.join(manifest.authors) if isinstance(manifest.authors, list) else str(manifest.authors)
-            info_lines.append(f"<b>Authors:</b> {authors}")
-
-        # Description (preview, escaped)
-        desc_preview = self._description_preview(manifest)
-        if desc_preview:
-            info_lines.append(f"<b>Description:</b> {html.escape(desc_preview)}")
-
-        # API versions
-        if hasattr(manifest, 'api') and manifest.api:
-            api_versions = ', '.join(manifest.api) if isinstance(manifest.api, list) else str(manifest.api)
-            info_lines.append(f"<b>API Versions:</b> {api_versions}")
-
-        # License
-        if hasattr(manifest, 'license') and manifest.license:
-            info_lines.append(f"<b>License:</b> {manifest.license}")
-
-        # Directory path
-        info_lines.append(f"<b>Directory:</b> {path}")
-
-        self.plugin_info_text.setHtml('<br>'.join(info_lines))
+        html_text = build_manifest_info_html(manifest, path, max_chars=DESCRIPTION_PREVIEW_CHARS)
+        self.plugin_info_text.setHtml(html_text)
 
     def _description_preview(self, manifest) -> str:
-        """Return a single-line, truncated description from the manifest.
+        # Backward-compat shim retained for tests that call this private method
+        from picard.ui.plugins_manager.manifest_info import description_preview as _dp
 
-        Picks localized text (prefers 'en'), collapses whitespace, and limits
-        length to DESCRIPTION_PREVIEW_CHARS; if truncated, appends '...'.
-        """
-        raw = None
-        # Handle both method-based and value-based description implementations
-        if hasattr(manifest, 'description'):
-            desc_attr = manifest.description  # may be method or data
-            if callable(desc_attr):
-                try:
-                    raw = desc_attr('en')  # prefer English
-                except TypeError:
-                    # Fallback if no language parameter supported
-                    raw = desc_attr()
-            else:
-                value = desc_attr
-                if isinstance(value, dict) and value:
-                    raw = value.get('en', next(iter(value.values())))
-                else:
-                    raw = str(value)
-        if not raw:
-            return ""
-        # Collapse whitespace to single spaces
-        normalized = " ".join(str(raw).split())
-        max_len = DESCRIPTION_PREVIEW_CHARS
-        if len(normalized) <= max_len:
-            return normalized
-        return normalized[: max_len - 3].rstrip() + "..."
+        return _dp(manifest, max_chars=DESCRIPTION_PREVIEW_CHARS)
 
     def _clear_plugin_info(self) -> None:
         """Clear the plugin information display."""
@@ -702,19 +481,15 @@ class PluginInstallationDialog(PicardDialog, SingletonDialog):
 
     def _show_local_error_feedback(self, message: str) -> None:
         """Show error feedback for local directory validation."""
-        self.local_feedback.setText(message)
-        self.local_feedback.setStyleSheet("color: #d32f2f; font-size: 11px;")
-        self.local_feedback.show()
+        self.local_feedback.show_error(message)
 
     def _show_local_success_feedback(self, message: str) -> None:
         """Show success feedback for local directory validation."""
-        self.local_feedback.setText(message)
-        self.local_feedback.setStyleSheet("color: #2e7d32; font-size: 11px;")
-        self.local_feedback.show()
+        self.local_feedback.show_success(message)
 
     def _hide_local_feedback(self) -> None:
         """Hide local directory feedback message."""
-        self.local_feedback.hide()
+        self.local_feedback.clear_and_hide()
 
     def _update_install_button_state(self) -> None:
         """Update the install button state based on current method and validation."""
@@ -810,35 +585,19 @@ class PluginInstallationDialog(PicardDialog, SingletonDialog):
 
     def _is_valid_git_url(self, url: str) -> bool:
         """Check if the URL is a valid git repository URL."""
-        if not url:
-            return False
-
-        # Basic URL validation
-        try:
-            parsed = urlparse(url)
-            if not parsed.scheme or not parsed.netloc:
-                return False
-        except (ValueError, TypeError):
-            return False
-
-        # Check if it looks like a git repository URL
-        return bool(self._git_url_pattern.match(url))
+        return self._url_validator.is_valid_git_url(url)
 
     def _show_error_feedback(self, message: str) -> None:
         """Show error feedback message."""
-        self.url_feedback.setText(message)
-        self.url_feedback.setStyleSheet("color: #d32f2f; font-size: 11px;")
-        self.url_feedback.show()
+        self.url_feedback.show_error(message)
 
     def _show_success_feedback(self, message: str) -> None:
         """Show success feedback message."""
-        self.url_feedback.setText(message)
-        self.url_feedback.setStyleSheet("color: #2e7d32; font-size: 11px;")
-        self.url_feedback.show()
+        self.url_feedback.show_success(message)
 
     def _hide_feedback(self) -> None:
         """Hide URL feedback message."""
-        self.url_feedback.hide()
+        self.url_feedback.clear_and_hide()
 
     def _start_installation(self) -> None:
         """Start the plugin installation process."""
@@ -882,10 +641,9 @@ class PluginInstallationDialog(PicardDialog, SingletonDialog):
         self.progress_label.setText(_("Installing plugin from local directory..."))
         self.install_button.setEnabled(False)
 
-        # Start installation in background thread
+        # Start installation in background thread via installer service
         def install_worker():
             try:
-                path = Path(directory_path)
 
                 def progress_cb(message: str) -> None:
                     QtCore.QMetaObject.invokeMethod(
@@ -895,41 +653,9 @@ class PluginInstallationDialog(PicardDialog, SingletonDialog):
                         QtCore.Q_ARG(str, message),
                     )
 
-                progress_cb("Scanning directory for plugins...")
+                installed_names = self._installer.install_from_local(directory_path, progress=progress_cb)
 
-                discovery = PluginDiscovery()
-                validator = PluginValidator()
-                copier = PluginCopier()
-
-                # Determine candidates
-                candidates: list[Path]
-                if (path / "__init__.py").exists() and (path / "MANIFEST.toml").exists():
-                    candidates = [path]
-                else:
-                    candidates = discovery.discover(path)
-
-                if not candidates:
-                    raise ManifestValidationError("No plugins found in directory")
-
-                progress_cb("Validating plugin manifests...")
-                validated: list[tuple[str, Path]] = []
-                for c in candidates:
-                    name = validator.validate(c)
-                    validated.append((name, c))
-
-                progress_cb("Installing plugins...")
-                from picard.plugin3.installer import PluginCopyPlan
-
-                copy_plans = [
-                    PluginCopyPlan(source=src, target=copier.plugins_root.joinpath(name)) for (name, src) in validated
-                ]
-
-                copier.copy(copy_plans)
-
-                # Touch installation markers and enable plugins
-                for name, _src in validated:
-                    with suppress(OSError):
-                        (copier.plugins_root / name / ".installed").touch(exist_ok=True)
+                for name in installed_names:
                     QtCore.QMetaObject.invokeMethod(
                         self,
                         "_enable_plugin_by_name",
@@ -944,7 +670,6 @@ class PluginInstallationDialog(PicardDialog, SingletonDialog):
                     QtCore.Q_ARG(str, directory_path),
                 )
 
-                # Refresh plugin list
                 QtCore.QMetaObject.invokeMethod(
                     self,
                     "_refresh_plugins_list",
@@ -966,7 +691,7 @@ class PluginInstallationDialog(PicardDialog, SingletonDialog):
 
         def install_worker():
             try:
-                installer = PluginInstallationService()
+                installer = self._installer
                 success_count = 0
                 error_count = 0
                 seen: set[str] = set()
@@ -1078,6 +803,9 @@ class PluginInstallationDialog(PicardDialog, SingletonDialog):
     # --- Installed plugins pane logic ---
     @QtCore.pyqtSlot()
     def _refresh_plugins_list(self) -> None:
+        # Preserve currently selected plugin slug to restore selection after refresh
+        previously_selected_slug = self._selected_plugin_name()
+
         items = self._get_installed_plugins_with_labels()
         self.plugins_model.set_plugins(items)
         enabled = set()
@@ -1085,6 +813,21 @@ class PluginInstallationDialog(PicardDialog, SingletonDialog):
             enabled = set(self._plugin_manager3.get_enabled_plugins())
         self._disabled_plugins = {slug for (slug, _label) in items} - enabled
         self.plugins_model.set_disabled(self._disabled_plugins)
+        # Restore selection and focus if possible
+        if previously_selected_slug is not None and self.plugins_view.selectionModel():
+            selection_model = self.plugins_view.selectionModel()
+            for row in range(self.plugins_model.rowCount()):
+                index = self.plugins_model.index(row, 0)
+                slug = self.plugins_model.data(index, SLUG_ROLE)
+                if slug == previously_selected_slug:
+                    flags = (
+                        QtCore.QItemSelectionModel.SelectionFlag.ClearAndSelect
+                        | QtCore.QItemSelectionModel.SelectionFlag.Current
+                    )
+                    selection_model.setCurrentIndex(index, flags)
+                    # Ensure keyboard focus stays on the list view
+                    self.plugins_view.setFocus(QtCore.Qt.FocusReason.OtherFocusReason)
+                    break
         self._update_plugin_action_buttons()
 
     def _selected_plugin_name(self) -> str | None:
