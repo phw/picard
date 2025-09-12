@@ -93,7 +93,10 @@ class PicardTestCase(unittest.TestCase):
     @staticmethod
     def init_config():
         fake_config = Mock()
-        fake_config.setting = {}
+        fake_config.setting = {
+            'enabled_plugins': [],
+            'enabled_plugins3': [],
+        }
         fake_config.persist = {}
         fake_config.profiles = {}
         # Make config object available for legacy use

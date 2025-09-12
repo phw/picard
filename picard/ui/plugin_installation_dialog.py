@@ -19,6 +19,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 from contextlib import suppress
+from pathlib import Path
 import re
 from urllib.parse import urlparse
 
@@ -34,7 +35,7 @@ from picard.plugin3.installer import (
     PluginInstallationError,
     PluginInstallationService,
 )
-from picard.pluginmanager import PluginManager
+from picard.tagger import Tagger
 from picard.util import thread
 
 from picard.ui import PicardDialog, SingletonDialog
@@ -206,7 +207,7 @@ class PluginItemDelegate(QtWidgets.QStyledItemDelegate):
 
 
 class PluginInstallationDialog(PicardDialog, SingletonDialog):
-    """Dialog for installing plugins from git repositories."""
+    """Dialog for installing plugins from git repositories or local directories."""
 
     # Signals
     plugin_installed = QtCore.pyqtSignal(str)  # Emitted when plugin is successfully installed
@@ -220,6 +221,9 @@ class PluginInstallationDialog(PicardDialog, SingletonDialog):
 
         # Git URL validation regex
         self._git_url_pattern = re.compile(r'^https?://(?:[^@/]+@)?(?:[^:/]+)(?::\d+)?/[^/]+/[^/]+(?:\.git)?/?$')
+
+        # Current installation method
+        self._current_method = "git"  # "git" or "local"
 
         self._setup_ui()
         self._connect_signals()
@@ -246,15 +250,10 @@ class PluginInstallationDialog(PicardDialog, SingletonDialog):
         plugins_buttons_layout.addWidget(self.uninstall_button)
         left_layout.addLayout(plugins_buttons_layout)
 
-        # Initialize plugin manager and list
-        self._plugin_manager = PluginManager()
-        with suppress(OSError, ImportError, RuntimeError):
-            # Attempt loading from default user plugin dir
-            self._plugin_manager.load_plugins_from_directory(self._plugin_manager.plugins_directory)
+        # Initialize plugin manager v3 and list
+        self._plugin_manager3 = Tagger.instance().pluginmanager3
         self._disabled_plugins: set[str] = set()
         self._refresh_plugins_list()
-        # Inject two demo items for visual testing
-        self._inject_demo_plugins()
 
         # Wire up selection and actions
         if self.plugins_view.selectionModel():
@@ -263,9 +262,67 @@ class PluginInstallationDialog(PicardDialog, SingletonDialog):
         self.uninstall_button.clicked.connect(self._uninstall_selected_plugin)
         self._update_plugin_action_buttons()
 
-        # Right pane: existing install UI
+        # Right pane: Tabbed installation interface
         right_container = QtWidgets.QWidget(self)
         layout = QtWidgets.QVBoxLayout(right_container)
+        layout.setAlignment(QtCore.Qt.AlignmentFlag.AlignTop)
+
+        # Create tab widget
+        self.tab_widget = QtWidgets.QTabWidget()
+        layout.addWidget(self.tab_widget)
+
+        # Git installation tab
+        self._setup_git_tab()
+
+        # Local installation tab
+        self._setup_local_tab()
+
+        # Always-visible progress area
+        self.progress_group = QtWidgets.QGroupBox(_("Installation Progress"))
+        progress_layout = QtWidgets.QVBoxLayout(self.progress_group)
+
+        self.progress_bar = QtWidgets.QProgressBar()
+        # Idle state: disabled and slightly visible
+        self.progress_bar.setRange(0, 100)
+        self.progress_bar.setValue(0)
+        self.progress_bar.setTextVisible(False)
+        self.progress_bar.setEnabled(False)
+        progress_layout.addWidget(self.progress_bar)
+
+        self.progress_label = QtWidgets.QLabel()
+        self.progress_label.setWordWrap(True)
+        # Reserve one line height so the group keeps steady height even with no text
+        self.progress_label.setMinimumHeight(self.fontMetrics().height())
+        self.progress_label.setText("")
+        progress_layout.addWidget(self.progress_label)
+
+        layout.addWidget(self.progress_group)
+
+        # Error display (separate from progress, shown when needed)
+        self.error_label = QtWidgets.QLabel()
+        self.error_label.setStyleSheet("color: #d32f2f; background-color: #ffebee; padding: 8px; border-radius: 4px;")
+        self.error_label.setWordWrap(True)
+        self.error_label.hide()
+        layout.addWidget(self.error_label)
+
+        # Button box
+        self.button_box = QtWidgets.QDialogButtonBox(
+            QtWidgets.QDialogButtonBox.StandardButton.Ok | QtWidgets.QDialogButtonBox.StandardButton.Cancel
+        )
+        self.button_box.button(QtWidgets.QDialogButtonBox.StandardButton.Ok).setText(_("Install"))
+        self.button_box.button(QtWidgets.QDialogButtonBox.StandardButton.Ok).setEnabled(False)
+        layout.addWidget(self.button_box)
+        # Keep right pane content stuck to the top when dialog grows vertically
+        layout.addStretch(1)
+
+        # Assemble panes
+        main_layout.addWidget(left_container, stretch=1)
+        main_layout.addWidget(right_container, stretch=2)
+
+    def _setup_git_tab(self):
+        """Set up the git repository installation tab."""
+        git_tab = QtWidgets.QWidget()
+        layout = QtWidgets.QVBoxLayout(git_tab)
         layout.setAlignment(QtCore.Qt.AlignmentFlag.AlignTop)
 
         # Title and description
@@ -325,52 +382,272 @@ class PluginInstallationDialog(PicardDialog, SingletonDialog):
         )
         layout.addWidget(self.feedback_container)
 
-        # Always-visible progress area
-        self.progress_group = QtWidgets.QGroupBox(_("Installation Progress"))
-        progress_layout = QtWidgets.QVBoxLayout(self.progress_group)
-
-        self.progress_bar = QtWidgets.QProgressBar()
-        # Idle state: disabled and slightly visible
-        self.progress_bar.setRange(0, 100)
-        self.progress_bar.setValue(0)
-        self.progress_bar.setTextVisible(False)
-        self.progress_bar.setEnabled(False)
-        progress_layout.addWidget(self.progress_bar)
-
-        self.progress_label = QtWidgets.QLabel()
-        self.progress_label.setWordWrap(True)
-        # Reserve one line height so the group keeps steady height even with no text
-        self.progress_label.setMinimumHeight(self.fontMetrics().height())
-        self.progress_label.setText("")
-        progress_layout.addWidget(self.progress_label)
-
-        layout.addWidget(self.progress_group)
-
-        # Error display (separate from progress, shown when needed)
-        self.error_label = QtWidgets.QLabel()
-        self.error_label.setStyleSheet("color: #d32f2f; background-color: #ffebee; padding: 8px; border-radius: 4px;")
-        self.error_label.setWordWrap(True)
-        self.error_label.hide()
-        layout.addWidget(self.error_label)
-
-        # Button box
-        self.button_box = QtWidgets.QDialogButtonBox(
-            QtWidgets.QDialogButtonBox.StandardButton.Ok | QtWidgets.QDialogButtonBox.StandardButton.Cancel
-        )
-        self.button_box.button(QtWidgets.QDialogButtonBox.StandardButton.Ok).setText(_("Install"))
-        self.button_box.button(QtWidgets.QDialogButtonBox.StandardButton.Ok).setEnabled(False)
-        layout.addWidget(self.button_box)
-        # Keep right pane content stuck to the top when dialog grows vertically
+        # Add stretch to push content to top
         layout.addStretch(1)
 
-        # Assemble panes
-        main_layout.addWidget(left_container, stretch=1)
-        main_layout.addWidget(right_container, stretch=2)
+        self.tab_widget.addTab(git_tab, _("From Git Repository"))
+
+    def _setup_local_tab(self):
+        """Set up the local directory installation tab."""
+        local_tab = QtWidgets.QWidget()
+        layout = QtWidgets.QVBoxLayout(local_tab)
+        layout.setAlignment(QtCore.Qt.AlignmentFlag.AlignTop)
+
+        # Title and description
+        title_label = QtWidgets.QLabel(_("Install Plugin from Local Directory"))
+        title_label.setStyleSheet("font-weight: bold; font-size: 14px;")
+        layout.addWidget(title_label)
+
+        desc_label = QtWidgets.QLabel(
+            _(
+                "Select a local directory containing a Picard plugin. "
+                "The directory should contain a MANIFEST.toml file and "
+                "follow the plugin package structure."
+            )
+        )
+        desc_label.setWordWrap(True)
+        desc_label.setStyleSheet("color: #666; margin-bottom: 10px;")
+        layout.addWidget(desc_label)
+
+        # Directory selection
+        dir_layout = QtWidgets.QHBoxLayout()
+        dir_label = QtWidgets.QLabel(_("Plugin Directory:"))
+        dir_label.setMinimumWidth(120)
+        dir_layout.addWidget(dir_label)
+
+        self.local_dir_input = QtWidgets.QLineEdit()
+        self.local_dir_input.setPlaceholderText(_("Select a directory containing a plugin"))
+        self.local_dir_input.textChanged.connect(self._validate_local_directory)
+        dir_layout.addWidget(self.local_dir_input, stretch=1)
+
+        self.browse_button = QtWidgets.QPushButton(_("Browse..."))
+        self.browse_button.clicked.connect(self._browse_local_directory)
+        dir_layout.addWidget(self.browse_button)
+
+        layout.addLayout(dir_layout)
+
+        # Local directory validation feedback
+        self.local_feedback_container = QtWidgets.QFrame()
+        self.local_feedback_container.setFrameShape(QtWidgets.QFrame.Shape.NoFrame)
+        local_feedback_layout = QtWidgets.QVBoxLayout(self.local_feedback_container)
+        local_feedback_layout.setContentsMargins(0, 0, 0, 0)
+        local_feedback_layout.setSpacing(0)
+
+        self.local_feedback = QtWidgets.QLabel()
+        self.local_feedback.setStyleSheet("color: #d32f2f; font-size: 11px;")
+        self.local_feedback.setWordWrap(True)
+        self.local_feedback.hide()
+        local_feedback_layout.addWidget(self.local_feedback)
+
+        # Reserve a stable minimum height for feedback
+        local_feedback_min_height = self.fontMetrics().lineSpacing() + 6
+        self.local_feedback_container.setMinimumHeight(local_feedback_min_height)
+        self.local_feedback_container.setSizePolicy(
+            QtWidgets.QSizePolicy.Policy.Preferred,
+            QtWidgets.QSizePolicy.Policy.Fixed,
+        )
+        layout.addWidget(self.local_feedback_container)
+
+        # Plugin info display
+        self.plugin_info_group = QtWidgets.QGroupBox(_("Plugin Information"))
+        plugin_info_layout = QtWidgets.QVBoxLayout(self.plugin_info_group)
+
+        self.plugin_info_text = QtWidgets.QTextEdit()
+        self.plugin_info_text.setReadOnly(True)
+        self.plugin_info_text.setMaximumHeight(120)
+        self.plugin_info_text.setPlaceholderText(
+            _("Plugin information will appear here when a valid directory is selected")
+        )
+        plugin_info_layout.addWidget(self.plugin_info_text)
+
+        layout.addWidget(self.plugin_info_group)
+
+        # Add stretch to push content to top
+        layout.addStretch(1)
+
+        self.tab_widget.addTab(local_tab, _("From Local Directory"))
 
     def _connect_signals(self):
         """Connect UI signals."""
         self.button_box.accepted.connect(self._start_installation)
         self.button_box.rejected.connect(self.reject)
+        self.tab_widget.currentChanged.connect(self._on_tab_changed)
+
+    def _on_tab_changed(self, index: int) -> None:
+        """Handle tab change to update current method and button state."""
+        if index == 0:  # Git tab
+            self._current_method = "git"
+        else:  # Local tab
+            self._current_method = "local"
+        self._update_install_button_state()
+
+    def _browse_local_directory(self) -> None:
+        """Open directory browser for local plugin selection."""
+        from picard.ui.util import FileDialog
+
+        current_dir = self.local_dir_input.text().strip()
+        if not current_dir:
+            current_dir = str(Path.home())
+
+        directory = FileDialog.getExistingDirectory(parent=self, dir=current_dir, caption=_("Select Plugin Directory"))
+
+        if directory:
+            self.local_dir_input.setText(directory)
+
+    def _validate_local_directory(self) -> None:
+        """Validate the selected local directory and update UI feedback."""
+        directory_path = self.local_dir_input.text().strip()
+
+        if not directory_path:
+            self._hide_local_feedback()
+            self._clear_plugin_info()
+            self._update_install_button_state()
+            return
+
+        path = Path(directory_path)
+
+        # Check if path exists and is a directory
+        if not path.exists():
+            self._show_local_error_feedback(_("Directory does not exist"))
+            self._clear_plugin_info()
+            self._update_install_button_state()
+            return
+
+        if not path.is_dir():
+            self._show_local_error_feedback(_("Path is not a directory"))
+            self._clear_plugin_info()
+            self._update_install_button_state()
+            return
+
+        # Check for required plugin files
+        manifest_path = path / "MANIFEST.toml"
+        init_path = path / "__init__.py"
+
+        if not manifest_path.exists():
+            self._show_local_error_feedback(_("MANIFEST.toml not found in directory"))
+            self._clear_plugin_info()
+            self._update_install_button_state()
+            return
+
+        if not init_path.exists():
+            self._show_local_error_feedback(_("__init__.py not found in directory"))
+            self._clear_plugin_info()
+            self._update_install_button_state()
+            return
+
+        # Try to read and validate manifest
+        try:
+            from picard.plugin3.manager import _is_plugin_compatible
+            from picard.plugin3.manifest import PluginManifest
+
+            with open(manifest_path, 'rb') as manifest_file:
+                manifest = PluginManifest(path.name, manifest_file)
+
+            # Check API compatibility
+            if not _is_plugin_compatible(manifest.api_versions):
+                from picard import api_versions_tuple
+
+                error_msg = (
+                    f"Plugin is not compatible with this version of Picard. "
+                    f"Plugin requires API versions: {[str(v) for v in manifest.api_versions]}, "
+                    f"but Picard supports: {[str(v) for v in api_versions_tuple]}"
+                )
+                self._show_local_error_feedback(error_msg)
+                self._clear_plugin_info()
+                self._update_install_button_state()
+                return
+
+            # Display plugin information
+            self._display_plugin_info(manifest, path)
+            self._show_local_success_feedback(_("Valid plugin directory detected"))
+            self._update_install_button_state()
+
+        except Exception as e:
+            self._show_local_error_feedback(_("Invalid plugin manifest: {}").format(str(e)))
+            self._clear_plugin_info()
+            self._update_install_button_state()
+
+    def _display_plugin_info(self, manifest, path: Path) -> None:
+        """Display plugin information in the info text area."""
+        info_lines = []
+
+        # Plugin name
+        if hasattr(manifest, 'name') and manifest.name:
+            if isinstance(manifest.name, dict):
+                name = manifest.name.get('en', list(manifest.name.values())[0] if manifest.name else 'Unknown')
+            else:
+                name = str(manifest.name)
+            info_lines.append(f"<b>Name:</b> {name}")
+
+        # Authors
+        if hasattr(manifest, 'authors') and manifest.authors:
+            authors = ', '.join(manifest.authors) if isinstance(manifest.authors, list) else str(manifest.authors)
+            info_lines.append(f"<b>Authors:</b> {authors}")
+
+        # Description
+        if hasattr(manifest, 'description') and manifest.description:
+            if isinstance(manifest.description, dict):
+                desc = manifest.description.get(
+                    'en', list(manifest.description.values())[0] if manifest.description else 'No description'
+                )
+            else:
+                desc = str(manifest.description)
+            info_lines.append(f"<b>Description:</b> {desc}")
+
+        # API versions
+        if hasattr(manifest, 'api') and manifest.api:
+            api_versions = ', '.join(manifest.api) if isinstance(manifest.api, list) else str(manifest.api)
+            info_lines.append(f"<b>API Versions:</b> {api_versions}")
+
+        # License
+        if hasattr(manifest, 'license') and manifest.license:
+            info_lines.append(f"<b>License:</b> {manifest.license}")
+
+        # Directory path
+        info_lines.append(f"<b>Directory:</b> {path}")
+
+        self.plugin_info_text.setHtml('<br>'.join(info_lines))
+
+    def _clear_plugin_info(self) -> None:
+        """Clear the plugin information display."""
+        self.plugin_info_text.clear()
+
+    def _show_local_error_feedback(self, message: str) -> None:
+        """Show error feedback for local directory validation."""
+        self.local_feedback.setText(message)
+        self.local_feedback.setStyleSheet("color: #d32f2f; font-size: 11px;")
+        self.local_feedback.show()
+
+    def _show_local_success_feedback(self, message: str) -> None:
+        """Show success feedback for local directory validation."""
+        self.local_feedback.setText(message)
+        self.local_feedback.setStyleSheet("color: #2e7d32; font-size: 11px;")
+        self.local_feedback.show()
+
+    def _hide_local_feedback(self) -> None:
+        """Hide local directory feedback message."""
+        self.local_feedback.hide()
+
+    def _update_install_button_state(self) -> None:
+        """Update the install button state based on current method and validation."""
+        if self._current_method == "git":
+            # Use existing git validation logic
+            urls = self._collect_valid_urls()
+            self.button_box.button(QtWidgets.QDialogButtonBox.StandardButton.Ok).setEnabled(len(urls) > 0)
+        else:  # local
+            # Check if local directory is valid
+            directory_path = self.local_dir_input.text().strip()
+            if not directory_path:
+                self.button_box.button(QtWidgets.QDialogButtonBox.StandardButton.Ok).setEnabled(False)
+                return
+
+            path = Path(directory_path)
+            manifest_path = path / "MANIFEST.toml"
+            init_path = path / "__init__.py"
+
+            is_valid = path.exists() and path.is_dir() and manifest_path.exists() and init_path.exists()
+
+            self.button_box.button(QtWidgets.QDialogButtonBox.StandardButton.Ok).setEnabled(is_valid)
 
     def _on_add_url_clicked(self) -> None:
         """Add a new URL input row when + is clicked."""
@@ -432,17 +709,17 @@ class PluginInstallationDialog(PicardDialog, SingletonDialog):
 
         if invalid:
             self._show_error_feedback(_("Please enter a valid git repository URL (e.g., https://github.com/user/repo)"))
-            self.button_box.button(QtWidgets.QDialogButtonBox.StandardButton.Ok).setEnabled(False)
+            self._update_install_button_state()
             return
 
         if not non_empty:
             self._hide_feedback()
-            self.button_box.button(QtWidgets.QDialogButtonBox.StandardButton.Ok).setEnabled(False)
+            self._update_install_button_state()
             return
 
         count_unique = len({t for t in non_empty})
         self._show_success_feedback(_("{count} valid URL(s) detected").format(count=count_unique))
-        self.button_box.button(QtWidgets.QDialogButtonBox.StandardButton.Ok).setEnabled(True)
+        self._update_install_button_state()
 
     # Legacy single-URL validator preserved for test compatibility
     def _validate_url(self, url: str) -> None:
@@ -485,10 +762,19 @@ class PluginInstallationDialog(PicardDialog, SingletonDialog):
 
     def _start_installation(self) -> None:
         """Start the plugin installation process."""
-        urls = self._collect_valid_urls()
-        if not urls:
-            return
+        if self._current_method == "git":
+            urls = self._collect_valid_urls()
+            if not urls:
+                return
+            self._install_from_git_async(urls)
+        else:  # local
+            directory_path = self.local_dir_input.text().strip()
+            if not directory_path:
+                return
+            self._install_from_local_async(directory_path)
 
+    def _install_from_git_async(self, urls: list[str]) -> None:
+        """Install plugins from git repositories asynchronously."""
         # Hide previous messages
         self.error_label.hide()
 
@@ -503,6 +789,107 @@ class PluginInstallationDialog(PicardDialog, SingletonDialog):
 
         # Start installation in background thread
         self._install_plugins_async(urls)
+
+    def _install_from_local_async(self, directory_path: str) -> None:
+        """Install plugin from local directory asynchronously."""
+        # Hide previous messages
+        self.error_label.hide()
+
+        # Show progress
+        self._hide_local_feedback()
+        # Activate progress
+        self.progress_bar.setEnabled(True)
+        self.progress_bar.setRange(0, 0)  # Indeterminate
+        self.progress_label.setText(_("Installing plugin from local directory..."))
+        self.button_box.button(QtWidgets.QDialogButtonBox.StandardButton.Ok).setEnabled(False)
+        self.button_box.button(QtWidgets.QDialogButtonBox.StandardButton.Cancel).setEnabled(False)
+
+        # Start installation in background thread
+        def install_worker():
+            try:
+                from picard.const.appdirs import plugin_folder
+                from picard.plugin3.manager import _is_plugin_compatible
+                from picard.plugin3.manifest import PluginManifest
+                from picard.plugin3.plugin import PluginSourceLocal
+
+                path = Path(directory_path)
+                manifest_path = path / "MANIFEST.toml"
+
+                # Read manifest to get plugin name and validate compatibility
+                with open(manifest_path, 'rb') as manifest_file:
+                    manifest = PluginManifest(path.name, manifest_file)
+
+                plugin_name = path.name
+
+                def progress_cb(message: str) -> None:
+                    QtCore.QMetaObject.invokeMethod(
+                        self,
+                        "_update_progress",
+                        QtCore.Qt.ConnectionType.QueuedConnection,
+                        QtCore.Q_ARG(str, message),
+                    )
+
+                progress_cb("Validating plugin...")
+
+                # Check API compatibility before installation
+                if not _is_plugin_compatible(manifest.api_versions):
+                    from picard import api_versions_tuple
+
+                    error_msg = (
+                        f"Plugin '{plugin_name}' is not compatible with this version of Picard. "
+                        f"Plugin requires API versions: {[str(v) for v in manifest.api_versions]}, "
+                        f"but Picard supports: {[str(v) for v in api_versions_tuple]}"
+                    )
+                    QtCore.QMetaObject.invokeMethod(
+                        self,
+                        "_installation_failed",
+                        QtCore.Qt.ConnectionType.QueuedConnection,
+                        QtCore.Q_ARG(str, error_msg),
+                    )
+                    return
+
+                # Create plugin source and copy to plugins directory
+                source = PluginSourceLocal(path)
+                plugins_root = Path(plugin_folder())
+                target_dir = plugins_root / plugin_name
+
+                progress_cb("Installing plugin...")
+                source.sync(target_dir)
+
+                # Touch installation marker
+                (target_dir / ".installed").touch(exist_ok=True)
+
+                # Enable the newly installed plugin by default
+                QtCore.QMetaObject.invokeMethod(
+                    self,
+                    "_enable_plugin_by_name",
+                    QtCore.Qt.ConnectionType.QueuedConnection,
+                    QtCore.Q_ARG(str, plugin_name),
+                )
+
+                QtCore.QMetaObject.invokeMethod(
+                    self,
+                    "_installation_success",
+                    QtCore.Qt.ConnectionType.QueuedConnection,
+                    QtCore.Q_ARG(str, directory_path),
+                )
+
+                # Refresh plugin list
+                QtCore.QMetaObject.invokeMethod(
+                    self,
+                    "_refresh_plugins_list",
+                    QtCore.Qt.ConnectionType.QueuedConnection,
+                )
+
+            except Exception as e:
+                QtCore.QMetaObject.invokeMethod(
+                    self,
+                    "_installation_failed",
+                    QtCore.Qt.ConnectionType.QueuedConnection,
+                    QtCore.Q_ARG(str, str(e)),
+                )
+
+        thread.run_task(install_worker)
 
     def _install_plugins_async(self, urls: list[str]) -> None:
         """Install one or more plugins asynchronously."""
@@ -530,6 +917,14 @@ class PluginInstallationDialog(PicardDialog, SingletonDialog):
                     try:
                         installed_names = installer.install_from_git(url, progress=progress_cb)
                         success_count += len(installed_names)
+                        # Enable installed plugins by default
+                        for plugin_name in installed_names:
+                            QtCore.QMetaObject.invokeMethod(
+                                self,
+                                "_enable_plugin_by_name",
+                                QtCore.Qt.ConnectionType.QueuedConnection,
+                                QtCore.Q_ARG(str, plugin_name),
+                            )
                         QtCore.QMetaObject.invokeMethod(
                             self,
                             "_installation_success",
@@ -614,9 +1009,14 @@ class PluginInstallationDialog(PicardDialog, SingletonDialog):
         log.error("Plugin installation failed: %s", error_message)
 
     # --- Installed plugins pane logic ---
+    @QtCore.pyqtSlot()
     def _refresh_plugins_list(self) -> None:
-        names = [p.name for p in getattr(self._plugin_manager, 'plugins', [])]
+        names = self._get_installed_plugin_names()
         self.plugins_model.set_plugins(names)
+        enabled = set()
+        with suppress(AttributeError):
+            enabled = set(self._plugin_manager3.get_enabled_plugins())
+        self._disabled_plugins = set(names) - enabled
         self.plugins_model.set_disabled(self._disabled_plugins)
         self._update_plugin_action_buttons()
 
@@ -645,22 +1045,32 @@ class PluginInstallationDialog(PicardDialog, SingletonDialog):
         name = self._selected_plugin_name()
         if not name:
             return
-        if name in self._disabled_plugins:
-            self._disabled_plugins.remove(name)
-        else:
-            self._disabled_plugins.add(name)
-        self.plugins_model.set_disabled(self._disabled_plugins)
-        self._update_plugin_action_buttons()
+        try:
+            if name in self._disabled_plugins:
+                self._plugin_manager3.enable_plugin(name)
+            else:
+                self._plugin_manager3.disable_plugin(name)
+        except Exception as e:
+            log.warning("Failed to toggle plugin %s: %s", name, e)
+        self._refresh_plugins_list()
 
     def _uninstall_selected_plugin(self) -> None:
         name = self._selected_plugin_name()
         if not name:
             return
-        with suppress(OSError, RuntimeError, AttributeError):
-            plugin = next((p for p in self._plugin_manager.plugins if p.name == name), None)
-            module_name = plugin.module_name if plugin else None
-            if module_name:
-                self._plugin_manager.remove_plugin(module_name)
+        # Disable and remove the plugin directory from v3 plugins folder
+        with suppress(Exception):
+            self._plugin_manager3.disable_plugin(name)
+        try:
+            import shutil
+
+            from picard.const.appdirs import plugin_folder
+
+            target_dir = Path(plugin_folder()) / name
+            if target_dir.exists():
+                shutil.rmtree(target_dir)
+        except Exception as e:
+            log.warning("Failed to uninstall plugin %s: %s", name, e)
         self._disabled_plugins.discard(name)
         self._refresh_plugins_list()
 
@@ -676,24 +1086,16 @@ class PluginInstallationDialog(PicardDialog, SingletonDialog):
         self._reposition_add_button()
         self._validate_urls()
 
+        # Also reset local directory input
+        if hasattr(self, 'local_dir_input'):
+            self.local_dir_input.clear()
+            self._clear_plugin_info()
+            self._hide_local_feedback()
+
     def reject(self) -> None:  # type: ignore[override]
         """Handle Cancel: reset inputs then close the dialog."""
         self._reset_url_inputs()
         super().reject()
-
-    def _inject_demo_plugins(self) -> None:
-        """Insert two demo items: one enabled, one disabled for UI testing."""
-        demo_enabled = "Demo Plugin"
-        demo_disabled = "Demo Disabled Plugin"
-        # Merge with current list without duplicates
-        current = [p.name for p in getattr(self._plugin_manager, 'plugins', [])]
-        if demo_enabled not in current:
-            current.append(demo_enabled)
-        if demo_disabled not in current:
-            current.append(demo_disabled)
-        self.plugins_model.set_plugins(current)
-        self._disabled_plugins.add(demo_disabled)
-        self.plugins_model.set_disabled(self._disabled_plugins)
 
     @QtCore.pyqtSlot(int, int)
     def _installation_complete(self, success_count: int, error_count: int) -> None:
@@ -715,6 +1117,43 @@ class PluginInstallationDialog(PicardDialog, SingletonDialog):
         self.button_box.button(QtWidgets.QDialogButtonBox.StandardButton.Ok).setText(_("Close"))
         self.button_box.button(QtWidgets.QDialogButtonBox.StandardButton.Ok).setEnabled(True)
         self.button_box.button(QtWidgets.QDialogButtonBox.StandardButton.Cancel).hide()
+
+    def _get_installed_plugin_names(self) -> list[str]:
+        """Return names of installed plugins based on v3 plugin directory."""
+        names: list[str] = []
+        with suppress(Exception):
+            from picard.const.appdirs import plugin_folder
+
+            base = Path(plugin_folder())
+            if base.exists():
+                for entry in base.iterdir():
+                    if entry.is_dir():
+                        if (entry / "__init__.py").exists() and (entry / "MANIFEST.toml").exists():
+                            names.append(entry.name)
+        return sorted(names)
+
+    @QtCore.pyqtSlot(str)
+    def _enable_plugin_by_name(self, plugin_name: str) -> None:
+        """Enable a plugin by name using v3 manager and ensure loaded."""
+        try:
+            pm = self._plugin_manager3
+            # Make sure manager knows this plugin; if not, add directory and load
+            try:
+                known = any(p.name == plugin_name for p in getattr(pm, '_plugins', []))
+            except Exception:
+                known = False
+            if not known:
+                from picard.const.appdirs import plugin_folder
+
+                plugin_dir = Path(plugin_folder())
+                with suppress(Exception):
+                    plugin = pm._load_plugin(plugin_dir, plugin_name)  # type: ignore[attr-defined]
+                    if plugin:
+                        getattr(pm, '_plugins', []).append(plugin)
+            pm.enable_plugin(plugin_name)
+        except Exception as e:
+            log.warning("Failed to enable plugin %s: %s", plugin_name, e)
+        self._refresh_plugins_list()
 
     def _collect_valid_urls(self) -> list[str]:
         """Collect and return unique valid URLs in input order."""
