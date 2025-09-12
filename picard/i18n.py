@@ -196,6 +196,35 @@ def setup_gettext(localedir, ui_language=None, logger=None):
     _logger(_translation)
 
 
+def load_plugin_translation(plugin_domain: str, plugin_localedir: str, language: str = None) -> None:
+    """Load translation for a specific plugin.
+
+    Args:
+        plugin_domain: The plugin's translation domain (e.g., 'plugin-example')
+        plugin_localedir: Directory containing the plugin's .mo files
+        language: Language to load (defaults to current locale)
+    """
+    global _translation, _logger
+
+    if language is None:
+        # Get current locale from the main translation
+        current_locale = locale.getlocale()[0] or 'en'
+    else:
+        current_locale = language
+
+    if _logger:
+        _logger(
+            "Loading plugin translation for domain %s, localedir=%r, language=%r",
+            plugin_domain,
+            plugin_localedir,
+            current_locale,
+        )
+
+    # Load plugin translation with fallback to null translation
+    plugin_translation = _load_translation(plugin_domain, plugin_localedir, language=current_locale)
+    _translation[plugin_domain] = plugin_translation
+
+
 def gettext(message: str) -> str:
     """Translate the messsage using the current translator."""
     # Calling gettext("") by default returns the header of the PO file for the
@@ -217,6 +246,43 @@ def N_(message: str) -> str:
 
 def ngettext(singular: str, plural: str, n: int) -> str:
     return _translation['main'].ngettext(singular, plural, n)
+
+
+def P_(message: str, plugin_domain: str) -> str:
+    """Plugin-specific translation function with fallback to main domain.
+
+    Args:
+        message: The message to translate
+        plugin_domain: The plugin's translation domain
+
+    Returns:
+        Translated message, falling back to main domain if plugin translation not found
+    """
+    if message == "":
+        return message
+
+    # Try plugin-specific translation first
+    if plugin_domain in _translation:
+        translated = _translation[plugin_domain].gettext(message)
+        # If translation found (different from original), return it
+        if translated != message:
+            return translated
+
+    # Fallback to main domain
+    return _translation['main'].gettext(message)
+
+
+def PN_(message: str, plugin_domain: str) -> str:
+    """Plugin-specific no-op marker for translatable strings.
+
+    Args:
+        message: The message to mark as translatable
+        plugin_domain: The plugin's translation domain (unused in no-op)
+
+    Returns:
+        The original message unchanged
+    """
+    return message
 
 
 def pgettext_attributes(context: str, message: str) -> str:
