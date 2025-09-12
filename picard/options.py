@@ -386,6 +386,7 @@ Option('persist', 'plugins_list_sort_order', QtCore.Qt.SortOrder.AscendingOrder)
 Option('persist', 'plugins_list_sort_section', 0)
 Option('persist', 'plugins_list_state', QtCore.QByteArray())
 ListOption('setting', 'enabled_plugins', [])
+ListOption('setting', 'enabled_plugins3', [])
 
 # picard/ui/options/profiles.py
 # Option Profiles
