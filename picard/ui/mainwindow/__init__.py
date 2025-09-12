@@ -987,7 +987,7 @@ class MainWindow(QtWidgets.QMainWindow, PreserveGeometry):
 
     def show_install_plugin_dialog(self):
         """Show the plugin installation dialog."""
-        from picard.ui.plugin_installation_dialog import PluginInstallationDialog
+        from picard.ui.plugins_manager.plugin_installation_dialog import PluginInstallationDialog
 
         dialog = PluginInstallationDialog.show_instance(self)
         dialog.plugin_installed.connect(self._on_plugin_installed)

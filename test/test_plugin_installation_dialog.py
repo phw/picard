@@ -26,7 +26,7 @@ from PyQt6 import QtWidgets
 
 import pytest
 
-from picard.ui.plugin_installation_dialog import PluginInstallationDialog
+from picard.ui.plugins_manager.plugin_installation_dialog import PluginInstallationDialog
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -96,23 +96,25 @@ def test_dialog_initialization(dialog: PluginInstallationDialog) -> None:
     assert dialog.windowTitle() == "Install Plugin"
     assert dialog.isModal()
     assert dialog.url_input.placeholderText() == "https://github.com/user/picard-plugin-example"
-    assert not dialog.button_box.button(dialog.button_box.StandardButton.Ok).isEnabled()
-    assert not dialog.progress_group.isVisible()
+    assert not dialog.install_button.isEnabled()
+    # Progress group is always present; verify idle state instead of visibility
+    assert not dialog.progress_bar.isEnabled()
+    assert dialog.progress_label.text() == ""
     assert not dialog.error_label.isVisible()
     # Success is shown using the progress label; no separate success label exists
 
 
 @pytest.mark.parametrize(
-    ("url", "should_enable_ok", "expected_feedback_contains"),
+    ("url", "should_enable_install", "expected_feedback_contains"),
     [
         ("", False, None),
-        ("https://github.com/user/repo", True, "valid URL"),
+        ("https://github.com/user/repo", True, "valid URL(s) detected"),
         ("not-a-url", False, "Please enter a valid git repository URL"),
-        ("  https://github.com/user/repo  ", True, None),
+        ("  https://github.com/user/repo  ", True, "valid URL(s) detected"),
     ],
 )
 def test_url_input_validation(
-    dialog: PluginInstallationDialog, url: str, should_enable_ok: bool, expected_feedback_contains: str | None
+    dialog: PluginInstallationDialog, url: str, should_enable_install: bool, expected_feedback_contains: str | None
 ) -> None:
     """Test URL validation with various inputs."""
     dialog.url_input.setText(url)
@@ -121,8 +123,7 @@ def test_url_input_validation(
     # Process events to ensure UI updates are processed without showing dialog
     QtWidgets.QApplication.processEvents()
 
-    ok_button = dialog.button_box.button(dialog.button_box.StandardButton.Ok)
-    assert ok_button.isEnabled() == should_enable_ok
+    assert dialog.install_button.isEnabled() == should_enable_install
 
     if expected_feedback_contains:
         assert expected_feedback_contains in dialog.url_feedback.text()
@@ -222,8 +223,7 @@ def test_start_installation(
             # Note: In headless testing, we can't reliably test visibility
             # We test the functionality by checking the progress message
             assert expected_progress_contains in dialog.progress_label.text()
-            assert not dialog.button_box.button(dialog.button_box.StandardButton.Ok).isEnabled()
-            assert not dialog.button_box.button(dialog.button_box.StandardButton.Cancel).isEnabled()
+            assert not dialog.install_button.isEnabled()
         else:
             mock_install.assert_not_called()
 
@@ -263,8 +263,8 @@ def test_installation_success(
     """Test handling successful installation."""
     # Set up initial state
     dialog.progress_group.setVisible(True)
-    dialog.button_box.button(dialog.button_box.StandardButton.Ok).setText("Install")
-    dialog.button_box.button(dialog.button_box.StandardButton.Cancel).setEnabled(True)
+    dialog.install_button.setText("Install")
+    dialog.close_button.setEnabled(True)
 
     dialog._installation_success(url)
     # Process events to ensure UI updates are processed
@@ -273,8 +273,8 @@ def test_installation_success(
     # Note: In headless testing, we can't reliably test visibility
     # We test the functionality by checking the success message on progress label and button states
     assert expected_message_contains in dialog.progress_label.text()
-    assert dialog.button_box.button(dialog.button_box.StandardButton.Ok).text() == expected_button_text
-    assert dialog.button_box.button(dialog.button_box.StandardButton.Ok).isEnabled()
+    assert dialog.close_button.text() == expected_button_text
+    assert not dialog.install_button.isEnabled()
 
 
 @pytest.mark.parametrize(
@@ -291,8 +291,8 @@ def test_installation_failed(
     """Test handling installation failure."""
     # Set up initial state
     dialog.progress_group.setVisible(True)
-    dialog.button_box.button(dialog.button_box.StandardButton.Ok).setText("Install")
-    dialog.button_box.button(dialog.button_box.StandardButton.Cancel).setEnabled(False)
+    dialog.install_button.setText("Install")
+    dialog.close_button.setEnabled(True)
 
     dialog._installation_failed(error_message)
     # Process events to ensure UI updates are processed
@@ -301,9 +301,9 @@ def test_installation_failed(
     # Note: In headless testing, we can't reliably test visibility
     # We test the functionality by checking the error message and button states
     assert expected_message_contains in dialog.error_label.text()
-    assert dialog.button_box.button(dialog.button_box.StandardButton.Ok).text() == expected_button_text
-    assert dialog.button_box.button(dialog.button_box.StandardButton.Ok).isEnabled()
-    assert dialog.button_box.button(dialog.button_box.StandardButton.Cancel).isEnabled()
+    assert dialog.install_button.text() == expected_button_text
+    # After failure, install button enabled state depends on inputs; we check only Close availability
+    assert dialog.close_button.isEnabled()
 
 
 @pytest.mark.parametrize(
@@ -343,14 +343,11 @@ def test_button_box_connections(dialog: PluginInstallationDialog) -> None:
     # In headless testing, signal emission might not work as expected
     # So we test the connection setup instead
 
-    # Check that the button box has the expected buttons
-    ok_button = dialog.button_box.button(dialog.button_box.StandardButton.Ok)
-    cancel_button = dialog.button_box.button(dialog.button_box.StandardButton.Cancel)
-
-    assert ok_button is not None
-    assert cancel_button is not None
-    assert ok_button.text() == "Install"
-    assert cancel_button.text() == "Cancel"
+    # Check that the dialog has Install and Close buttons with expected labels
+    assert dialog.install_button is not None
+    assert dialog.close_button is not None
+    assert dialog.install_button.text() == "Install"
+    assert dialog.close_button.text() == "Close"
 
 
 def test_url_input_text_changed_connection(dialog: PluginInstallationDialog) -> None:
@@ -429,33 +426,27 @@ def test_placeholder_text_contains(dialog: PluginInstallationDialog, expected_te
 
 
 @pytest.mark.parametrize(
-    ("button_type", "expected_enabled", "expected_text"),
+    ("button_name", "expected_enabled", "expected_text"),
     [
-        ("Ok", False, "Install"),
-        ("Cancel", True, "Cancel"),
+        ("install_button", False, "Install"),
+        ("close_button", True, "Close"),
     ],
 )
 def test_initial_button_states(
-    dialog: PluginInstallationDialog, button_type: str, expected_enabled: bool, expected_text: str
+    dialog: PluginInstallationDialog, button_name: str, expected_enabled: bool, expected_text: str
 ) -> None:
     """Test initial button states."""
-    button = dialog.button_box.button(getattr(dialog.button_box.StandardButton, button_type))
+    button = getattr(dialog, button_name)
     assert button.isEnabled() == expected_enabled
     assert button.text() == expected_text
 
 
-@pytest.mark.parametrize(
-    "element_name",
-    [
-        "progress_group",
-        "error_label",
-        "url_feedback",
-    ],
-)
-def test_initial_visibility_states(dialog: PluginInstallationDialog, element_name: str) -> None:
-    """Test initial visibility states of UI elements."""
-    element = getattr(dialog, element_name)
-    assert not element.isVisible()
+def test_initial_visibility_states(dialog: PluginInstallationDialog) -> None:
+    """Test initial idle state of UI elements (not relying on visibility)."""
+    assert not dialog.progress_bar.isEnabled()
+    assert dialog.progress_label.text() == ""
+    assert not dialog.error_label.isVisible()
+    assert not dialog.url_feedback.isVisible()
 
 
 @pytest.mark.parametrize(
