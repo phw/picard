@@ -329,7 +329,67 @@ class PluginApi:
 
 ### Localization (l10n) and internationalization (i18n)
 
-TBD
+Plugins can provide their own translations using gettext `.mo` files. The plugin system implements a chained fallback approach for translations:
+
+1. **Plugin-specific translations**: Plugins can provide their own `.mo` files in a `locale/` directory within the plugin package
+2. **Fallback to main domain**: If a plugin translation is not found, the system falls back to Picard's main translation domain
+
+#### Plugin Translation Structure
+
+Plugins should organize their translations in the following structure:
+
+```text
+example/
+  __init__.py
+  MANIFEST.toml
+  locale/
+    en/
+      LC_MESSAGES/
+        plugin-example.mo
+    de/
+      LC_MESSAGES/
+        plugin-example.mo
+    fr/
+      LC_MESSAGES/
+        plugin-example.mo
+```
+
+#### Translation Functions
+
+The `PluginApi` provides two methods for handling translations:
+
+- `api.translate(message)`: Translate a message using plugin-specific translations with fallback to main domain
+- `api.translate_noop(message)`: Mark a message as translatable (no-op function for static analysis)
+
+#### Usage Example
+
+```python
+from picard.plugin3.api import PluginApi
+
+def enable(api: PluginApi) -> None:
+    # Translate a message
+    title = api.translate("My Plugin Settings")
+
+    # Mark a message as translatable (for static analysis)
+    description = api.translate_noop("This plugin does amazing things")
+
+    # Use in UI components
+    api.register_options_page(MyOptionsPage(title, description))
+```
+
+#### Translation Domain
+
+Each plugin gets its own translation domain based on its module name: `plugin-{module_name}`. For example, a plugin with module name `example` would use the domain `plugin-example`.
+
+#### Fallback Behavior
+
+The translation system implements a chained fallback approach:
+
+1. **Plugin domain**: Try to find translation in the plugin's specific domain
+2. **Main domain**: If not found, fall back to Picard's main translation domain
+3. **Original message**: If still not found, return the original message
+
+This ensures that plugins can provide their own translations while still benefiting from Picard's existing translations for common terms.
 
 
 ### Plugin life cycle
@@ -348,11 +408,141 @@ inside the plugin directory.
 
 ### Repository structure
 
-A Picard plugin repository MUST be a git repository containing exactly one
-plugin. The content of the git repository MUST match the plugin file structure
-as described above, containing at least the `__init__.py` and `MANIFEST.toml`
-files.
+A Picard plugin repository is a git repository that can contain one or more
+plugins. Each plugin within the repository MUST be a separate directory with
+its own `__init__.py` and `MANIFEST.toml` files, following the plugin file
+structure as described above.
 
+#### Single Plugin Repository
+
+For simple plugins, a repository can contain exactly one plugin:
+
+```text
+my-plugin-repo/
+  my_plugin/
+    __init__.py
+    MANIFEST.toml
+    locale/
+      en/
+        LC_MESSAGES/
+          plugin-my_plugin.mo
+  README.md
+  .gitignore
+```
+
+#### Multi-Plugin Repository
+
+For related plugins or plugin suites, a repository can contain multiple plugins:
+
+```text
+musicbrainz-plugins/
+  acousticid_plugin/
+    __init__.py
+    MANIFEST.toml
+    locale/
+      en/
+        LC_MESSAGES/
+          plugin-acousticid_plugin.mo
+  lastfm_plugin/
+    __init__.py
+    MANIFEST.toml
+    locale/
+      en/
+        LC_MESSAGES/
+          plugin-lastfm_plugin.mo
+  discogs_plugin/
+    __init__.py
+    MANIFEST.toml
+    locale/
+      en/
+        LC_MESSAGES/
+          plugin-discogs_plugin.mo
+  README.md
+  .gitignore
+```
+
+#### Repository Naming
+
+- **Single plugin repositories**: Should be named after the plugin (e.g., `picard-plugin-example`)
+- **Multi-plugin repositories**: Should have descriptive names indicating the plugin suite (e.g., `picard-musicbrainz-plugins`, `picard-metadata-plugins`)
+
+#### Plugin Discovery
+
+When Picard scans a plugin directory, it automatically discovers all plugins by:
+1. Iterating through all subdirectories
+2. Checking each subdirectory for a valid `MANIFEST.toml` file
+3. Loading plugins that have valid manifests and compatible API versions
+
+This means that multi-plugin repositories work seamlessly with the existing plugin discovery system.
+
+#### Best Practices for Multi-Plugin Repositories
+
+When creating multi-plugin repositories, consider the following guidelines:
+
+**Repository Organization:**
+- Group related plugins together (e.g., all MusicBrainz-related plugins)
+- Use clear, descriptive plugin directory names
+- Include a comprehensive README.md explaining all plugins in the repository
+- Use consistent naming conventions across plugins
+
+**Plugin Independence:**
+- Each plugin should be independently functional
+- Plugins should not have hard dependencies on other plugins in the same repository
+- Each plugin should have its own version number and release cycle
+- Plugin manifests should be self-contained
+
+**Shared Resources:**
+- Common utilities can be shared between plugins in the same repository
+- Use relative imports for shared modules: `from .shared_utils import helper_function`
+- Document shared dependencies in the repository README
+
+**Example Multi-Plugin Repository Structure:**
+
+```text
+picard-metadata-plugins/
+  README.md                    # Explains all plugins in the repository
+  shared/                      # Shared utilities
+    __init__.py
+    common_utils.py
+    metadata_helpers.py
+  acousticid_plugin/
+    __init__.py
+    MANIFEST.toml
+    acousticid.py
+    locale/
+      en/
+        LC_MESSAGES/
+          plugin-acousticid_plugin.mo
+  lastfm_plugin/
+    __init__.py
+    MANIFEST.toml
+    lastfm.py
+    locale/
+      en/
+        LC_MESSAGES/
+          plugin-lastfm_plugin.mo
+  discogs_plugin/
+    __init__.py
+    MANIFEST.toml
+    discogs.py
+    locale/
+      en/
+        LC_MESSAGES/
+          plugin-discogs_plugin.mo
+  .gitignore
+```
+
+**Plugin Manifest Example for Multi-Plugin Repository:**
+
+```toml
+# acousticid_plugin/MANIFEST.toml
+name.en = "AcousticID Plugin"
+name.de = "AcousticID Plugin"
+author = ["MusicBrainz Contributors"]
+description.en = "Acoustic fingerprinting using AcoustID service"
+api = ["3.0"]
+license = "GPL-2.0-or-later"
+```
 
 ### Installation and upgrade
 
@@ -360,8 +550,33 @@ Plugin installation is performed directly from git by cloning the git repository
 Likewise updates are performed by updating the repository and checking out the
 requested git ref.
 
-For plugins installed from git the version will be shown as a combination of
-the version from the manifest and the git ref (`{VERSION}-{GITREF}`).
+#### Single Plugin Installation
+
+For single-plugin repositories, the entire repository is cloned and the plugin
+is available immediately:
+
+```bash
+picard plugin install https://github.com/user/picard-plugin-example
+```
+
+#### Multi-Plugin Installation
+
+For multi-plugin repositories, the entire repository is cloned and all plugins
+within it are discovered and made available:
+
+```bash
+picard plugin install https://github.com/user/picard-musicbrainz-plugins
+# This installs all plugins in the repository:
+# - acousticid_plugin
+# - lastfm_plugin
+# - discogs_plugin
+```
+
+#### Version Display
+
+For plugins installed from git, the version will be shown as a combination of
+the version from the manifest and the git ref (`{VERSION}-{GITREF}`). Each
+plugin in a multi-plugin repository will show its own version independently.
 
 
 ### Official plugins
@@ -403,16 +618,50 @@ manage plugins.
 ```
 picard plugin list
 picard plugin install https://git.sr.ht/~phw/picard-plugin-example
+picard plugin install https://git.sr.ht/~phw/picard-musicbrainz-plugins
 picard plugin info https://git.sr.ht/~phw/picard-plugin-example
 picard plugin uninstall ...
 picard plugin enable ...
 picard plugin disable ...
 ```
 
-Plugins can be referenced by repository URI or by `{uri-hash}-{last-path-part}`.
-E.g. the plugin can be referenced by
-`https://git.sr.ht/~phw/picard-plugin-example` or by
-`0c43dd9b75eebb260a83e6ac57b4128f-picard-plugin-example`.
+#### Plugin References
+
+Plugins can be referenced by repository URI or by `{uri-hash}-{plugin-name}`.
+
+**Single Plugin Repository:**
+- Repository URI: `https://git.sr.ht/~phw/picard-plugin-example`
+- Plugin reference: `0c43dd9b75eebb260a83e6ac57b4128f-example`
+
+**Multi-Plugin Repository:**
+- Repository URI: `https://git.sr.ht/~phw/picard-musicbrainz-plugins`
+- Plugin references:
+  - `0c43dd9b75eebb260a83e6ac57b4128f-acousticid_plugin`
+  - `0c43dd9b75eebb260a83e6ac57b4128f-lastfm_plugin`
+  - `0c43dd9b75eebb260a83e6ac57b4128f-discogs_plugin`
+
+#### Multi-Plugin Repository Commands
+
+When working with multi-plugin repositories:
+
+```bash
+# Install entire repository (all plugins)
+picard plugin install https://git.sr.ht/~phw/picard-musicbrainz-plugins
+
+# List all plugins (shows individual plugins from multi-plugin repos)
+picard plugin list
+# Output:
+# acousticid_plugin (1.0.0-abc123) - AcousticID fingerprinting
+# lastfm_plugin (1.2.0-abc123) - Last.fm metadata lookup
+# discogs_plugin (0.9.0-abc123) - Discogs metadata lookup
+
+# Enable/disable individual plugins
+picard plugin enable acousticid_plugin
+picard plugin disable lastfm_plugin
+
+# Uninstall individual plugins (removes from enabled list)
+picard plugin uninstall acousticid_plugin
+```
 
 
 ## To be discussed

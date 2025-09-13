@@ -82,7 +82,13 @@ class ExtensionPoint:
 
     def __iter__(self):
         config = get_config()
-        enabled_plugins = config.setting['enabled_plugins'] if config else []
+        # Consider both legacy (v2) and new (v3) plugin enablement lists
+        if config:
+            legacy_enabled = config.setting['enabled_plugins']
+            v3_enabled = config.setting['enabled_plugins3']
+            enabled_plugins = set(legacy_enabled) | set(v3_enabled)
+        else:
+            enabled_plugins = set()
         for name in self.__dict:
             if name is None or name in enabled_plugins:
                 yield from self.__dict[name]

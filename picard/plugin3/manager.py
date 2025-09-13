@@ -26,13 +26,14 @@ from picard import (
     api_versions_tuple,
     log,
 )
+from picard.config import get_config
 from picard.plugin3.plugin import Plugin
 
 
 class PluginManager:
     """Installs, loads and updates plugins from multiple plugin directories."""
 
-    _primary_plugin_dir: Path = None
+    _primary_plugin_dir: Path | None = None
     _plugin_dirs: List[Path] = []
     _plugins: List[Plugin] = []
 
@@ -40,52 +41,168 @@ class PluginManager:
         from picard.tagger import Tagger
 
         self._tagger: Tagger = tagger
+        self._config = get_config()
 
     def add_directory(self, dir_path: str, primary: bool = False) -> None:
         log.debug('Registering plugin directory %s', dir_path)
-        dir_path = Path(os.path.normpath(dir_path))
+        plugin_dir = Path(os.path.normpath(dir_path))
 
-        if not dir_path.exists():
-            os.makedirs(dir_path)
+        os.makedirs(plugin_dir, exist_ok=True)
 
-        for entry in dir_path.iterdir():
+        for entry in plugin_dir.iterdir():
             if entry.is_dir():
-                plugin = self._load_plugin(dir_path, entry.name)
+                plugin = self._load_plugin(plugin_dir, entry.name)
                 if plugin:
                     log.debug('Found plugin %s in %s', plugin.name, plugin.local_path)
                     self._plugins.append(plugin)
 
-        self._plugin_dirs.append(dir_path)
+        self._plugin_dirs.append(plugin_dir)
         if primary:
-            self._primary_plugin_dir = dir_path
+            self._primary_plugin_dir = plugin_dir
 
     def init_plugins(self):
-        # TODO: Only load and enable plugins enabled in configuration
+        """Initialize and load enabled plugins."""
+        enabled_plugins = self.get_enabled_plugins()
         for plugin in self._plugins:
-            try:
-                plugin.load_module()
-                plugin.enable(self._tagger)
-            except Exception as ex:
-                log.error('Failed initializing plugin %s from %s', plugin.name, plugin.local_path, exc_info=ex)
+            if plugin.name in enabled_plugins:
+                try:
+                    plugin.load_module()
+                    plugin.enable(self._tagger)
+                    log.debug('Enabled plugin %s', plugin.name)
+                except (ImportError, OSError, AttributeError, TypeError):
+                    log.exception('Failed initializing plugin %s from %s', plugin.name, plugin.local_path)
+            else:
+                log.debug('Plugin %s is disabled, skipping', plugin.name)
 
-    def _load_plugin(self, plugin_dir: Path, plugin_name: str):
+    def _load_plugin(self, plugin_dir: Path, plugin_name: str) -> Plugin | None:
         plugin = Plugin(plugin_dir, plugin_name)
         try:
             plugin.read_manifest()
-            # TODO: Check version compatibility
-            compatible_versions = _compatible_api_versions(plugin.manifest.api_versions)
-            if compatible_versions:
-                return plugin
-            else:
+            # Check version compatibility
+            if not _is_plugin_compatible(plugin.manifest.api_versions):
                 log.warning(
-                    'Plugin "%s" from "%s" is not compatible with this version of Picard.',
+                    'Plugin "%s" from "%s" is not compatible with this version of Picard. '
+                    'Plugin requires API versions: %s, but Picard supports: %s',
                     plugin.name,
                     plugin.local_path,
+                    [str(v) for v in plugin.manifest.api_versions],
+                    [str(v) for v in api_versions_tuple],
                 )
-        except Exception as ex:
+                return None
+
+            # Log compatible versions for debugging
+            compatible_versions = _compatible_api_versions(plugin.manifest.api_versions)
+            log.debug(
+                'Plugin "%s" is compatible with Picard API versions: %s',
+                plugin.name,
+                [str(v) for v in compatible_versions],
+            )
+        except (OSError, ValueError, KeyError) as ex:
             log.warning('Could not read plugin manifest from %r', plugin_dir.joinpath(plugin_name), exc_info=ex)
             return None
+        else:
+            return plugin
+
+    def get_enabled_plugins(self) -> List[str]:
+        """Get list of enabled plugin names from configuration."""
+        return self._config.setting['enabled_plugins3']
+
+    def set_plugin_enabled(self, plugin_name: str, enabled: bool) -> None:
+        """Enable or disable a plugin."""
+        enabled_plugins = self.get_enabled_plugins()
+        if enabled:
+            if plugin_name not in enabled_plugins:
+                enabled_plugins.append(plugin_name)
+                self._config.setting['enabled_plugins3'] = enabled_plugins
+                log.debug('Enabled plugin %s', plugin_name)
+        else:
+            if plugin_name in enabled_plugins:
+                enabled_plugins.remove(plugin_name)
+                self._config.setting['enabled_plugins3'] = enabled_plugins
+                log.debug('Disabled plugin %s', plugin_name)
+
+    def is_plugin_enabled(self, plugin_name: str) -> bool:
+        """Check if a plugin is enabled."""
+        return plugin_name in self.get_enabled_plugins()
+
+    def enable_plugin(self, plugin_name: str) -> None:
+        """Enable a plugin and load it if not already loaded."""
+        self.set_plugin_enabled(plugin_name, True)
+        # Find and load the plugin if it exists
+        plugin_found = False
+        for plugin in self._plugins:
+            # Only load if not already loaded; `_module` is a state indicator
+            # plugin._module = None means the plugin is NOT loaded (just discovered)
+            # plugin._module = <module> means the plugin is loaded and ready to use
+            if plugin.name == plugin_name and not getattr(plugin, '_module', None):
+                plugin_found = True
+                try:
+                    plugin.load_module()
+                    plugin.enable(self._tagger)
+                    log.info('Enabled and loaded plugin %s', plugin_name)
+                except (ImportError, OSError, AttributeError, TypeError):
+                    log.exception('Failed to load plugin %s', plugin_name)
+
+        if not plugin_found:
+            log.info('Enabled and loaded plugin %s', plugin_name)
+
+    def disable_plugin(self, plugin_name: str) -> None:
+        """Disable a plugin and unload it if loaded."""
+        self.set_plugin_enabled(plugin_name, False)
+        # Find and unload the plugin if it exists
+        plugin_found = False
+        for plugin in self._plugins:
+            # Only unload if already loaded
+            if plugin.name == plugin_name and getattr(plugin, '_module', None):
+                plugin_found = True
+                try:
+                    plugin.disable()
+                    log.info('Disabled and unloaded plugin %s', plugin_name)
+                except (AttributeError, TypeError):
+                    log.exception('Failed to unload plugin %s', plugin_name)
+
+        if not plugin_found:
+            log.info('Disabled and unloaded plugin %s', plugin_name)
+
+    def migrate_v2_plugin_config(self) -> None:
+        """Migrate enabled plugins from v2 to v3 configuration."""
+        v2_enabled = self._config.setting['enabled_plugins']
+        v3_enabled = self.get_enabled_plugins()
+
+        if v2_enabled and not v3_enabled:
+            # Only migrate if v3 config is empty and v2 has plugins
+            log.info('Migrating plugin configuration from v2 to v3')
+            # For now, we'll start with an empty v3 config
+            # In the future, this could map v2 plugin names to v3 equivalents
+            self._config.setting['enabled_plugins3'] = []
+            log.info('Plugin v2 to v3 migration completed (empty v3 config created)')
+
+
+def _is_plugin_compatible(plugin_api_versions) -> bool:
+    """Check if a plugin is compatible with the current Picard version.
+
+    Args:
+        plugin_api_versions: Tuple of Version objects that the plugin supports
+
+    Returns:
+        True if the plugin is compatible, False otherwise
+    """
+    if not plugin_api_versions:
+        # Plugin doesn't specify API versions - assume incompatible for safety
+        return False
+
+    # Check if any of the plugin's supported API versions match Picard's supported versions
+    compatible_versions = _compatible_api_versions(plugin_api_versions)
+    return len(compatible_versions) > 0
 
 
 def _compatible_api_versions(api_versions):
+    """Find API versions that are compatible between plugin and Picard.
+
+    Args:
+        api_versions: Tuple of Version objects that the plugin supports
+
+    Returns:
+        Set of Version objects that are compatible
+    """
     return set(api_versions) & set(api_versions_tuple)

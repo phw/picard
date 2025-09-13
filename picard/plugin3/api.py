@@ -76,6 +76,44 @@ class PluginApi:
         self._logger = getLogger(full_name)
         self._api_config = ConfigSection(get_config(), full_name)
 
+        # Set up plugin translation domain
+        self._translation_domain = f'plugin-{self._manifest.module_name}'
+        self._setup_plugin_translations()
+
+    def _setup_plugin_translations(self) -> None:
+        """Set up plugin-specific translations if available."""
+        # Look for plugin translations in the plugin's locale directory
+        # This would typically be in the plugin's directory structure
+        # For now, we'll set up the domain but not load translations
+        # until we have a proper plugin directory structure
+        pass
+
+    def translate(self, message: str) -> str:
+        """Translate a message using plugin-specific translations with fallback.
+
+        Args:
+            message: The message to translate
+
+        Returns:
+            Translated message, falling back to main domain if plugin translation not found
+        """
+        from picard.i18n import P_
+
+        return P_(message, self._translation_domain)
+
+    def translate_noop(self, message: str) -> str:
+        """Mark a message as translatable (no-op for plugin-specific translations).
+
+        Args:
+            message: The message to mark as translatable
+
+        Returns:
+            The original message unchanged
+        """
+        from picard.i18n import PN_
+
+        return PN_(message, self._translation_domain)
+
     @property
     def web_service(self) -> WebService:
         return self._tagger.webservice

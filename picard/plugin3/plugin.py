@@ -21,6 +21,7 @@
 
 import importlib.util
 from pathlib import Path
+import shutil
 import sys
 
 from picard.plugin3.api import PluginApi
@@ -48,7 +49,7 @@ class PluginSource:
 class PluginSourceGit(PluginSource):
     """Plugin is stored in a git repository, local or remote"""
 
-    def __init__(self, url: str, ref: str = None):
+    def __init__(self, url: str, ref: str | None = None):
         super().__init__()
         # Note: url can be a local directory
         self.url = url
@@ -73,7 +74,7 @@ class PluginSourceGit(PluginSource):
             commit = repo.revparse_single('HEAD')
 
         print(commit)
-        print(commit.message)
+        print(getattr(commit, 'message', 'No message'))
         # hard reset to passed ref or HEAD
         repo.reset(commit.id, pygit2.enums.ResetMode.HARD)
 
@@ -81,18 +82,88 @@ class PluginSourceGit(PluginSource):
 class PluginSourceLocal(PluginSource):
     """Plugin is stored in a local directory, but is not a git repo"""
 
-    def sync(self, target_directory: Path):
-        # TODO: copy tree to plugin directory (?)
-        pass
+    def __init__(self, source_path: str | Path):
+        """Initialize local plugin source.
+
+        Args:
+            source_path: Path to the local directory containing the plugin source
+        """
+        super().__init__()
+        self.source_path = Path(source_path)
+        if not self.source_path.exists():
+            raise FileNotFoundError(f"Source path does not exist: {self.source_path}")
+        if not self.source_path.is_dir():
+            raise NotADirectoryError(f"Source path is not a directory: {self.source_path}")
+
+    def sync(self, target_directory: Path) -> None:
+        """Copy plugin source to target directory with conflict resolution.
+
+        Args:
+            target_directory: Directory where the plugin should be installed
+
+        Raises:
+            PluginSourceSyncError: If sync operation fails
+        """
+        try:
+            # Ensure target directory exists
+            target_directory.mkdir(parents=True, exist_ok=True)
+
+            # Handle existing installation
+            if target_directory.exists() and any(target_directory.iterdir()):
+                self._handle_existing_installation(target_directory)
+
+            # Copy the plugin source
+            self._copy_plugin_source(target_directory)
+
+        except (OSError, shutil.Error) as e:
+            raise PluginSourceSyncError(
+                f"Failed to sync plugin from {self.source_path} to {target_directory}: {e}"
+            ) from e
+
+    def _handle_existing_installation(self, target_directory: Path) -> None:
+        """Handle existing plugin installation with conflict resolution.
+
+        Args:
+            target_directory: Target directory that may contain existing files
+        """
+        # For now, we'll remove existing files to ensure clean installation
+        # In the future, this could implement more sophisticated conflict resolution
+        if target_directory.exists():
+            shutil.rmtree(target_directory)
+            target_directory.mkdir(parents=True, exist_ok=True)
+
+    def _copy_plugin_source(self, target_directory: Path) -> None:
+        """Copy plugin source files to target directory.
+
+        Args:
+            target_directory: Directory where files should be copied
+        """
+        # Use shutil.copytree with proper handling of symlinks and permissions
+        shutil.copytree(
+            self.source_path,
+            target_directory,
+            dirs_exist_ok=True,
+            symlinks=True,  # Preserve symbolic links
+            ignore=shutil.ignore_patterns(
+                '__pycache__',  # Ignore Python cache directories
+                '*.pyc',  # Ignore compiled Python files
+                '.git',  # Ignore git directories
+                '.gitignore',  # Ignore git ignore files
+                '*.egg-info',  # Ignore Python package metadata
+                '.pytest_cache',  # Ignore pytest cache
+                '.coverage',  # Ignore coverage files
+                '*.log',  # Ignore log files
+            ),
+        )
 
 
 class Plugin:
-    local_path: Path = None
-    remote_url: str = None
+    local_path: Path | None = None
+    remote_url: str | None = None
     ref = None
-    name: str = None
-    module_name: str = None
-    manifest: PluginManifest = None
+    name: str | None = None
+    module_name: str | None = None
+    manifest: PluginManifest | None = None
     _module = None
 
     def __init__(self, plugins_dir: Path, plugin_name: str):
@@ -100,12 +171,12 @@ class Plugin:
         self.module_name = f'picard.plugins.{self.name}'
         self.local_path = plugins_dir.joinpath(self.name)
 
-    def sync(self, plugin_source: PluginSource = None):
+    def sync(self, plugin_source: PluginSource | None = None):
         """Sync plugin source"""
         if plugin_source:
             try:
                 plugin_source.sync(self.local_path)
-            except Exception as e:
+            except (OSError, shutil.Error, PluginSourceSyncError) as e:
                 raise PluginSourceSyncError(e) from e
 
     def read_manifest(self):
@@ -118,8 +189,12 @@ class Plugin:
         """Load corresponding module from source path"""
         module_file = self.local_path.joinpath('__init__.py')
         spec = importlib.util.spec_from_file_location(self.module_name, module_file)
+        if spec is None:
+            raise ImportError(f'Could not create module spec for {self.module_name}')
         module = importlib.util.module_from_spec(spec)
         sys.modules[self.module_name] = module
+        if spec.loader is None:
+            raise ImportError(f'No loader available for {self.module_name}')
         spec.loader.exec_module(module)
         self._module = module
         return module

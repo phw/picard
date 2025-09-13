@@ -116,6 +116,13 @@ def _create_help_action(parent):
     return action
 
 
+@add_action(MainAction.MANAGE_PLUGINS)
+def _create_manage_plugin_action(parent):
+    action = QtGui.QAction(icontheme.lookup('plugin-enabled'), _("&Manage Plugins…"), parent)
+    action.triggered.connect(parent.show_install_plugin_dialog)
+    return action
+
+
 @add_action(MainAction.ABOUT)
 def _create_about_action(parent):
     action = QtGui.QAction(_("&About…"), parent)
