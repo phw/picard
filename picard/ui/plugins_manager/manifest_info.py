@@ -101,3 +101,31 @@ def build_manifest_info_html(manifest, path: Path, max_chars: int) -> str:
     info_lines.append(f"<b>Directory:</b> {path}")
 
     return '<br>'.join(info_lines)
+
+
+def build_multiple_manifest_summary_html(entries: list[tuple[str, Path, object]], invalid_errors: list[str]) -> str:
+    """Build HTML summary for multiple discovered plugins.
+
+    Parameters
+    ----------
+    entries
+        List of tuples ``(name, path, manifest)`` for valid plugins.
+    invalid_errors
+        List of error messages for invalid candidates.
+    """
+    items: list[str] = []
+    for name, plugin_path, manifest in entries:
+        display_name = (
+            manifest.name.get('en', next(iter(manifest.name.values())))
+            if hasattr(manifest, 'name') and isinstance(manifest.name, dict) and manifest.name
+            else str(getattr(manifest, 'name', name))
+        )
+        items.append(f"<li><b>{display_name}</b> <span style='color:#666'>({plugin_path.name})</span></li>")
+
+    html_parts = [
+        f"<b>Found {len(entries)} valid plugins:</b>",
+        "<ul>" + "".join(items) + "</ul>",
+    ]
+    if invalid_errors:
+        html_parts.append("<div style='color:#d32f2f'>Some entries were invalid and will be skipped.</div>")
+    return "".join(html_parts)

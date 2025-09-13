@@ -108,9 +108,9 @@ def test_dialog_initialization(dialog: PluginInstallationDialog) -> None:
     ("url", "should_enable_install", "expected_feedback_contains"),
     [
         ("", False, None),
-        ("https://github.com/user/repo", True, "valid URL(s) detected"),
+        ("https://github.com/user/repo", True, None),
         ("not-a-url", False, "Please enter a valid git repository URL"),
-        ("  https://github.com/user/repo  ", True, "valid URL(s) detected"),
+        ("  https://github.com/user/repo  ", True, None),
     ],
 )
 def test_url_input_validation(

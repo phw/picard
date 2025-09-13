@@ -28,7 +28,7 @@ from PyQt6 import (  # type: ignore[import-not-found]
 )
 
 from picard import log
-from picard.i18n import gettext as _
+from picard.i18n import gettext as _, ngettext
 from picard.plugin3.installer import PluginInstallationError
 from picard.tagger import Tagger
 from picard.util import thread
@@ -444,9 +444,15 @@ class PluginInstallationDialog(PicardDialog, SingletonDialog):
         self.progress_bar.setEnabled(False)
         self.progress_bar.setRange(0, 100)
         self.progress_bar.setValue(100 if success_count > 0 and error_count == 0 else 0)
-        self.progress_label.setText(
-            _("Completed: {ok} success(es), {err} error(s)").format(ok=success_count, err=error_count)
+        # Handle pluralization for both success and error counts
+        success_msg = ngettext(
+            "Completed: {ok} success, {err} error", "Completed: {ok} successes, {err} error", success_count
         )
+
+        if error_count != 1:
+            success_msg = success_msg.replace("error", "errors")
+
+        self.progress_label.setText(success_msg.format(ok=success_count, err=error_count))
         # After completion keep Close visible and disable Install until inputs change
         self.install_button.setEnabled(False)
 

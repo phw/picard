@@ -122,6 +122,7 @@ class LocalInstallTab(InstallationSource):
         self.local_dir_input.clear()
         self._discovered_local_plugins = []
         self.local_feedback.clear_and_hide()
+        self.local_feedback_container.hide()
         self.plugin_info_text.clear()
         self._set_ready(False)
 
@@ -154,6 +155,7 @@ class LocalInstallTab(InstallationSource):
         if not directory_path:
             self._discovered_local_plugins = []
             self.local_feedback.clear_and_hide()
+            self.local_feedback_container.hide()
             self.plugin_info_text.clear()
             self._set_ready(False)
             return
@@ -163,6 +165,7 @@ class LocalInstallTab(InstallationSource):
         if not path.exists():
             self._discovered_local_plugins = []
             self.local_feedback.show_error(_("Directory does not exist"))
+            self.local_feedback_container.show()
             self.plugin_info_text.clear()
             self._set_ready(False)
             return
@@ -170,6 +173,7 @@ class LocalInstallTab(InstallationSource):
         if not path.is_dir():
             self._discovered_local_plugins = []
             self.local_feedback.show_error(_("Path is not a directory"))
+            self.local_feedback_container.show()
             self.plugin_info_text.clear()
             self._set_ready(False)
             return
@@ -185,6 +189,7 @@ class LocalInstallTab(InstallationSource):
         if not candidates:
             self._discovered_local_plugins = []
             self.local_feedback.show_error(_("No plugins found in directory"))
+            self.local_feedback_container.show()
             self.plugin_info_text.clear()
             self._set_ready(False)
             return
@@ -209,6 +214,7 @@ class LocalInstallTab(InstallationSource):
         if not valid:
             self._discovered_local_plugins = []
             self.local_feedback.show_error(_("No compatible plugins found in directory"))
+            self.local_feedback_container.show()
             self.plugin_info_text.clear()
             self._set_ready(False)
             return
@@ -220,27 +226,16 @@ class LocalInstallTab(InstallationSource):
             _name, plugin_path, manifest = valid[0]
             html_text = build_manifest_info_html(manifest, plugin_path, max_chars=DialogConfig.DESCRIPTION_MAX_CHARS)
             self.plugin_info_text.setHtml(html_text)
-            self.local_feedback.show_success(_("Valid plugin directory detected"))
+            # Hide feedback container for success states to reduce blank space
+            self.local_feedback.clear_and_hide()
+            self.local_feedback_container.hide()
         else:
-            items = []
-            for name, plugin_path, manifest in valid:
-                display_name = (
-                    manifest.name.get('en', next(iter(manifest.name.values())))
-                    if hasattr(manifest, 'name') and isinstance(manifest.name, dict) and manifest.name
-                    else str(getattr(manifest, 'name', name))
-                )
-                items.append(f"<li><b>{display_name}</b> <span style='color:#666'>({plugin_path.name})</span></li>")
-            html = (
-                f"<b>Found {len(valid)} valid plugins:</b><ul>"
-                + "".join(items)
-                + "</ul>"
-                + (
-                    f"<div style='color:#d32f2f'>{_('Some entries were invalid and will be skipped')}.</div>"
-                    if invalid_errors
-                    else ""
-                )
-            )
+            from picard.ui.plugins_manager.manifest_info import build_multiple_manifest_summary_html
+
+            html = build_multiple_manifest_summary_html(valid, invalid_errors)
             self.plugin_info_text.setHtml(html)
-            self.local_feedback.show_success(_("Valid plugin repository detected"))
+            # Hide feedback container for success states to reduce blank space
+            self.local_feedback.clear_and_hide()
+            self.local_feedback_container.hide()
 
         self._set_ready(True)

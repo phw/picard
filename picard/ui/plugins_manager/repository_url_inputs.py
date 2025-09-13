@@ -127,18 +127,21 @@ class RepositoryUrlInputs(QtWidgets.QWidget):
             self.url_feedback.show_error(
                 _("Please enter a valid git repository URL (e.g., https://github.com/user/repo)")
             )
+            self.feedback_container.show()
             if self._on_change:
                 self._on_change()
             return
 
         if not non_empty:
             self.url_feedback.clear_and_hide()
+            self.feedback_container.hide()
             if self._on_change:
                 self._on_change()
             return
 
-        count_unique = len({t for t in non_empty})
-        self.url_feedback.show_success(_("{count} valid URL(s) detected").format(count=count_unique))
+        # Hide feedback container for success/idle states to reduce blank space
+        self.url_feedback.clear_and_hide()
+        self.feedback_container.hide()
         if self._on_change:
             self._on_change()
 
