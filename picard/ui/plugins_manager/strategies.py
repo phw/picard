@@ -26,6 +26,7 @@ from typing import Callable
 from picard.plugin3.installer import (
     ManifestValidationError,
     PluginCopier,
+    PluginCopyPlan,
     PluginDiscovery,
     PluginInstallationError,
     PluginInstallationService,
@@ -109,7 +110,6 @@ class LocalInstallationStrategy(InstallationStrategy):
             validated.append((name, candidate))
 
         progress("Installing plugins...")
-        from picard.plugin3.installer import PluginCopyPlan
 
         copy_plans = [
             PluginCopyPlan(source=src, target=self._copier.plugins_root.joinpath(name)) for (name, src) in validated

@@ -23,7 +23,9 @@ from pathlib import Path
 
 from PyQt6 import QtCore, QtGui, QtWidgets  # type: ignore[import-not-found]
 
+from picard.const.appdirs import plugin_folder
 from picard.i18n import gettext as _
+from picard.plugin3.manifest import PluginManifest
 
 
 DISABLED_ROLE: int = int(QtCore.Qt.ItemDataRole.UserRole) + 1
@@ -180,16 +182,18 @@ class PluginItemDelegate(QtWidgets.QStyledItemDelegate):
 
 
 def get_installed_plugins_with_labels() -> list[tuple[str, str]]:
-    """Return (slug, label) for installed plugins.
+    """Return installed plugin identifiers and human-readable labels.
 
-    Label is the human-readable name from MANIFEST.toml if available; fallback to slug.
+    Returns
+    -------
+    list[tuple[str, str]]
+        Pairs of ``(slug, label)``. The label is taken from ``MANIFEST.toml``
+        if available, otherwise it falls back to the slug.
     """
     items: list[tuple[str, str]] = []
-    with suppress(Exception):
-        from picard.const.appdirs import plugin_folder
-        from picard.plugin3.manifest import PluginManifest
-
-        base = Path(plugin_folder())
+    base = Path(plugin_folder())
+    # Guard against inaccessible plugin directory and manifest parsing errors
+    with suppress(OSError, ValueError, KeyError):
         if base.exists():
             for entry in base.iterdir():
                 if entry.is_dir():
@@ -197,13 +201,12 @@ def get_installed_plugins_with_labels() -> list[tuple[str, str]]:
                     mani = entry / "MANIFEST.toml"
                     if init_ok and mani.exists():
                         label = entry.name
-                        with suppress(OSError, ValueError, KeyError):
-                            with open(mani, 'rb') as fp:
-                                manifest = PluginManifest(entry.name, fp)
-                                raw_name = getattr(manifest, 'name', None)
-                                if isinstance(raw_name, dict) and raw_name:
-                                    label = raw_name.get('en', next(iter(raw_name.values())))
-                                elif isinstance(raw_name, str) and raw_name.strip():
-                                    label = raw_name.strip()
+                        with open(mani, 'rb') as fp:
+                            manifest = PluginManifest(entry.name, fp)
+                            raw_name = getattr(manifest, 'name', None)
+                            if isinstance(raw_name, dict) and raw_name:
+                                label = raw_name.get('en', next(iter(raw_name.values())))
+                            elif isinstance(raw_name, str) and raw_name.strip():
+                                label = raw_name.strip()
                         items.append((entry.name, label))
     return sorted(items, key=lambda p: p[1].lower())
