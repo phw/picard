@@ -45,7 +45,7 @@ jobs:
         cache: 'pip'
         cache-dependency-path: |
           requirements-build.txt
-          requirements-macos-11.0.txt
+          requirements-macos-${{ matrix.setup.macos-deployment-version }}.txt
     - name: Setup macOS build environment
       run: |
         ./scripts/package/macos-setup.sh
