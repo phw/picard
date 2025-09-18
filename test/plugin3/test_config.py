@@ -240,3 +240,73 @@ def test_plugin_error_handling(
     else:
         plugin_manager.disable_plugin('failing_plugin')
         assert plugin_manager.is_plugin_enabled('failing_plugin') is False
+
+
+@pytest.mark.parametrize(
+    ("plugin_name", "expected_result"),
+    [
+        ('test_plugin', True),
+        ('another_plugin', True),
+        ('nonexistent_plugin', False),
+        ('', False),
+    ],
+)
+def test_find_plugin_by_name(
+    plugin_manager: PluginManager, mock_plugin: Mock, plugin_name: str, expected_result: bool
+) -> None:
+    """Test finding a plugin by name."""
+    # Create additional mock plugins
+    another_plugin = Mock()
+    another_plugin.name = 'another_plugin'
+
+    plugin_manager._plugins = [mock_plugin, another_plugin]
+
+    result = plugin_manager.find_plugin_by_name(plugin_name)
+
+    if expected_result:
+        assert result is not None
+        assert result.name == plugin_name
+    else:
+        assert result is None
+
+
+def test_find_plugin_by_name_empty_plugins_list(plugin_manager: PluginManager) -> None:
+    """Test finding a plugin when no plugins are loaded."""
+    plugin_manager._plugins = []
+
+    result = plugin_manager.find_plugin_by_name('any_plugin')
+    assert result is None
+
+
+def test_find_plugin_by_name_multiple_plugins(plugin_manager: PluginManager) -> None:
+    """Test finding a plugin when multiple plugins exist."""
+    # Create multiple mock plugins
+    plugin1 = Mock()
+    plugin1.name = 'plugin1'
+    plugin2 = Mock()
+    plugin2.name = 'plugin2'
+    plugin3 = Mock()
+    plugin3.name = 'plugin3'
+
+    plugin_manager._plugins = [plugin1, plugin2, plugin3]
+
+    # Test finding each plugin
+    assert plugin_manager.find_plugin_by_name('plugin1') is plugin1
+    assert plugin_manager.find_plugin_by_name('plugin2') is plugin2
+    assert plugin_manager.find_plugin_by_name('plugin3') is plugin3
+
+    # Test finding non-existent plugin
+    assert plugin_manager.find_plugin_by_name('nonexistent') is None
+
+
+def test_find_plugin_by_name_case_sensitive(plugin_manager: PluginManager, mock_plugin: Mock) -> None:
+    """Test that plugin name matching is case sensitive."""
+    plugin_manager._plugins = [mock_plugin]
+
+    # Should find exact match
+    assert plugin_manager.find_plugin_by_name('test_plugin') is mock_plugin
+
+    # Should not find case variations
+    assert plugin_manager.find_plugin_by_name('Test_Plugin') is None
+    assert plugin_manager.find_plugin_by_name('TEST_PLUGIN') is None
+    assert plugin_manager.find_plugin_by_name('test_Plugin') is None

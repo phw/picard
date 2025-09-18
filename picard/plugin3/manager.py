@@ -125,43 +125,51 @@ class PluginManager:
         """Check if a plugin is enabled."""
         return plugin_name in self.get_enabled_plugins()
 
+    def find_plugin_by_name(self, plugin_name: str) -> Plugin | None:
+        """Find a plugin by name.
+
+        Args:
+            plugin_name: Name of the plugin to find
+
+        Returns:
+            Plugin instance if found, None otherwise
+        """
+        for plugin in self._plugins:
+            if plugin.name == plugin_name:
+                return plugin
+        return None
+
     def enable_plugin(self, plugin_name: str) -> None:
         """Enable a plugin and load it if not already loaded."""
         self.set_plugin_enabled(plugin_name, True)
         # Find and load the plugin if it exists
-        plugin_found = False
-        for plugin in self._plugins:
+        plugin = self.find_plugin_by_name(plugin_name)
+        if plugin and not getattr(plugin, '_module', None):
             # Only load if not already loaded; `_module` is a state indicator
             # plugin._module = None means the plugin is NOT loaded (just discovered)
             # plugin._module = <module> means the plugin is loaded and ready to use
-            if plugin.name == plugin_name and not getattr(plugin, '_module', None):
-                plugin_found = True
-                try:
-                    plugin.load_module()
-                    plugin.enable(self._tagger)
-                    log.info('Enabled and loaded plugin %s', plugin_name)
-                except (ImportError, OSError, AttributeError, TypeError):
-                    log.exception('Failed to load plugin %s', plugin_name)
-
-        if not plugin_found:
+            try:
+                plugin.load_module()
+                plugin.enable(self._tagger)
+                log.info('Enabled and loaded plugin %s', plugin_name)
+            except (ImportError, OSError, AttributeError, TypeError):
+                log.exception('Failed to load plugin %s', plugin_name)
+        else:
             log.info('Enabled and loaded plugin %s', plugin_name)
 
     def disable_plugin(self, plugin_name: str) -> None:
         """Disable a plugin and unload it if loaded."""
         self.set_plugin_enabled(plugin_name, False)
         # Find and unload the plugin if it exists
-        plugin_found = False
-        for plugin in self._plugins:
+        plugin = self.find_plugin_by_name(plugin_name)
+        if plugin and getattr(plugin, '_module', None):
             # Only unload if already loaded
-            if plugin.name == plugin_name and getattr(plugin, '_module', None):
-                plugin_found = True
-                try:
-                    plugin.disable()
-                    log.info('Disabled and unloaded plugin %s', plugin_name)
-                except (AttributeError, TypeError):
-                    log.exception('Failed to unload plugin %s', plugin_name)
-
-        if not plugin_found:
+            try:
+                plugin.disable()
+                log.info('Disabled and unloaded plugin %s', plugin_name)
+            except (AttributeError, TypeError):
+                log.exception('Failed to unload plugin %s', plugin_name)
+        else:
             log.info('Disabled and unloaded plugin %s', plugin_name)
 
 
