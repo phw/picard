@@ -30,7 +30,6 @@ def mock_config() -> Mock:
     """Create a mock config object for testing."""
     fake_config = Mock()
     fake_config.setting = {
-        'enabled_plugins3': [],
         'enabled_plugins': [],
     }
     fake_config.persist = {}
@@ -64,7 +63,7 @@ def test_get_enabled_plugins_empty(plugin_manager: PluginManager) -> None:
 
 def test_get_enabled_plugins_with_plugins(plugin_manager: PluginManager, mock_config: Mock) -> None:
     """Test getting enabled plugins when some are configured."""
-    mock_config.setting['enabled_plugins3'] = ['plugin1', 'plugin2']
+    mock_config.setting['enabled_plugins'] = ['plugin1', 'plugin2']
     enabled = plugin_manager.get_enabled_plugins()
     assert enabled == ['plugin1', 'plugin2']
 
@@ -89,13 +88,13 @@ def test_set_plugin_enabled_enable(
     # Check it's enabled
     enabled = plugin_manager.get_enabled_plugins()
     assert plugin_name in enabled
-    assert mock_config.setting['enabled_plugins3'] == [plugin_name]
+    assert mock_config.setting['enabled_plugins'] == [plugin_name]
 
 
 def test_set_plugin_enabled_disable(plugin_manager: PluginManager, mock_config: Mock) -> None:
     """Test disabling a plugin."""
     # Start with plugins enabled
-    mock_config.setting['enabled_plugins3'] = ['plugin1', 'plugin2']
+    mock_config.setting['enabled_plugins'] = ['plugin1', 'plugin2']
 
     # Disable a plugin
     plugin_manager.set_plugin_enabled('plugin1', False)
@@ -104,7 +103,7 @@ def test_set_plugin_enabled_disable(plugin_manager: PluginManager, mock_config: 
     enabled = plugin_manager.get_enabled_plugins()
     assert 'plugin1' not in enabled
     assert 'plugin2' in enabled
-    assert mock_config.setting['enabled_plugins3'] == ['plugin2']
+    assert mock_config.setting['enabled_plugins'] == ['plugin2']
 
 
 @pytest.mark.parametrize(
@@ -123,7 +122,7 @@ def test_set_plugin_enabled_idempotent(
     expected_result: list[str],
 ) -> None:
     """Test enabling/disabling a plugin that's already in the desired state."""
-    mock_config.setting['enabled_plugins3'] = initial_plugins.copy()
+    mock_config.setting['enabled_plugins'] = initial_plugins.copy()
 
     # Try to change state
     plugin_manager.set_plugin_enabled(plugin_name, action)
@@ -150,7 +149,7 @@ def test_is_plugin_enabled(
     expected_result: bool,
 ) -> None:
     """Test checking if a plugin is enabled."""
-    mock_config.setting['enabled_plugins3'] = enabled_plugins
+    mock_config.setting['enabled_plugins'] = enabled_plugins
     assert plugin_manager.is_plugin_enabled(plugin_name) is expected_result
 
 

@@ -36,7 +36,6 @@ def mock_config() -> Mock:
     """Create a mock config object for testing."""
     fake_config = Mock()
     fake_config.setting = {
-        'enabled_plugins3': [],
         'enabled_plugins': [],
     }
     fake_config.persist = {}

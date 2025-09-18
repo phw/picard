@@ -105,7 +105,7 @@ class PluginManager:
 
     def get_enabled_plugins(self) -> List[str]:
         """Get list of enabled plugin names from configuration."""
-        return self._config.setting['enabled_plugins3']
+        return self._config.setting['enabled_plugins']
 
     def set_plugin_enabled(self, plugin_name: str, enabled: bool) -> None:
         """Enable or disable a plugin."""
@@ -113,12 +113,12 @@ class PluginManager:
         if enabled:
             if plugin_name not in enabled_plugins:
                 enabled_plugins.append(plugin_name)
-                self._config.setting['enabled_plugins3'] = enabled_plugins
+                self._config.setting['enabled_plugins'] = enabled_plugins
                 log.debug('Enabled plugin %s', plugin_name)
         else:
             if plugin_name in enabled_plugins:
                 enabled_plugins.remove(plugin_name)
-                self._config.setting['enabled_plugins3'] = enabled_plugins
+                self._config.setting['enabled_plugins'] = enabled_plugins
                 log.debug('Disabled plugin %s', plugin_name)
 
     def is_plugin_enabled(self, plugin_name: str) -> bool:
