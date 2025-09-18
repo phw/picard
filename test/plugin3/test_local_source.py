@@ -124,10 +124,10 @@ def test_sync_new_installation(source_plugin_dir: Path, target_plugin_dir: Path)
     assert (target_plugin_dir / "utils" / "__init__.py").exists()
     assert (target_plugin_dir / "utils" / "helpers.py").exists()
 
-    # Check that ignored files were not copied
-    assert not (target_plugin_dir / "__pycache__").exists()
-    assert not (target_plugin_dir / ".git").exists()
-    assert not (target_plugin_dir / "test.log").exists()
+    # Check that previously ignored files are now copied
+    assert (target_plugin_dir / "__pycache__").exists()
+    assert (target_plugin_dir / ".git").exists()
+    assert (target_plugin_dir / "test.log").exists()
 
     # Check file contents
     assert (target_plugin_dir / "__init__.py").read_text() == (source_plugin_dir / "__init__.py").read_text()
@@ -222,9 +222,9 @@ def test_sync_creates_parent_directories(source_plugin_dir: Path, temp_dir: Path
     assert (target_plugin_dir / "__init__.py").exists()
 
 
-def test_ignore_patterns_comprehensive(source_plugin_dir: Path, target_plugin_dir: Path) -> None:
-    """Test that all ignore patterns work correctly."""
-    # Create various files that should be ignored
+def test_no_ignore_patterns_comprehensive(source_plugin_dir: Path, target_plugin_dir: Path) -> None:
+    """Test that all files are copied when no ignore patterns are used."""
+    # Create various files that were previously ignored
     (source_plugin_dir / "test.pyc").write_text("compiled")
     (source_plugin_dir / "package.egg-info").mkdir()
     (source_plugin_dir / "package.egg-info" / "PKG-INFO").write_text("package info")
@@ -236,14 +236,14 @@ def test_ignore_patterns_comprehensive(source_plugin_dir: Path, target_plugin_di
     source = PluginSourceLocal(source_plugin_dir)
     source.sync(target_plugin_dir)
 
-    # Check that ignored files were not copied
-    assert not (target_plugin_dir / "test.pyc").exists()
-    assert not (target_plugin_dir / "package.egg-info").exists()
-    assert not (target_plugin_dir / ".pytest_cache").exists()
-    assert not (target_plugin_dir / ".coverage").exists()
-    assert not (target_plugin_dir / "error.log").exists()
+    # Check that previously ignored files are now copied
+    assert (target_plugin_dir / "test.pyc").exists()
+    assert (target_plugin_dir / "package.egg-info").exists()
+    assert (target_plugin_dir / ".pytest_cache").exists()
+    assert (target_plugin_dir / ".coverage").exists()
+    assert (target_plugin_dir / "error.log").exists()
 
-    # Check that non-ignored files were copied
+    # Check that regular files were copied
     assert (target_plugin_dir / "__init__.py").exists()
     assert (target_plugin_dir / "MANIFEST.toml").exists()
 
@@ -276,7 +276,7 @@ def test_sync_with_complex_directory_structure(source_plugin_dir: Path, target_p
     # Check that the structure was preserved
     assert (target_plugin_dir / "subdir1" / "file1.py").exists()
     assert (target_plugin_dir / "subdir1" / "subdir2" / "file2.py").exists()
-    assert not (target_plugin_dir / "subdir1" / "subdir2" / "__pycache__").exists()
+    assert (target_plugin_dir / "subdir1" / "subdir2" / "__pycache__").exists()
 
     # Check file contents
     assert (target_plugin_dir / "subdir1" / "file1.py").read_text() == "file1"

@@ -144,16 +144,6 @@ class PluginSourceLocal(PluginSource):
             target_directory,
             dirs_exist_ok=True,
             symlinks=True,  # Preserve symbolic links
-            ignore=shutil.ignore_patterns(
-                '__pycache__',  # Ignore Python cache directories
-                '*.pyc',  # Ignore compiled Python files
-                '.git',  # Ignore git directories
-                '.gitignore',  # Ignore git ignore files
-                '*.egg-info',  # Ignore Python package metadata
-                '.pytest_cache',  # Ignore pytest cache
-                '.coverage',  # Ignore coverage files
-                '*.log',  # Ignore log files
-            ),
         )
 
 
