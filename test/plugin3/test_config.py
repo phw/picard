@@ -155,32 +155,6 @@ def test_is_plugin_enabled(
 
 
 @pytest.mark.parametrize(
-    ("v2_plugins", "v3_plugins", "expected_v3_result"),
-    [
-        ([], [], []),  # No v2 plugins - v3 remains unchanged
-        (['v2_plugin1', 'v2_plugin2'], [], []),  # Has v2 plugins - v3 gets set to empty
-        (['v2_plugin1'], ['v3_plugin1'], ['v3_plugin1']),  # V3 already exists - unchanged
-    ],
-)
-def test_migrate_v2_plugin_config(
-    plugin_manager: PluginManager,
-    mock_config: Mock,
-    v2_plugins: list[str],
-    v3_plugins: list[str],
-    expected_v3_result: list[str],
-) -> None:
-    """Test migration from v2 to v3 plugin configuration."""
-    mock_config.setting['enabled_plugins'] = v2_plugins
-    mock_config.setting['enabled_plugins3'] = v3_plugins
-
-    # Run migration
-    plugin_manager.migrate_v2_plugin_config()
-
-    # Check result
-    assert mock_config.setting['enabled_plugins3'] == expected_v3_result
-
-
-@pytest.mark.parametrize(
     ("plugin_name", "action", "expected_log_message"),
     [
         ('nonexistent_plugin', 'enable', 'Enabled and loaded plugin %s'),

@@ -354,8 +354,6 @@ class Tagger(QtWidgets.QApplication):
 
         self.pluginmanager3 = PluginManager(self)
         if not self._no_plugins:
-            # Migrate v2 plugin configuration to v3
-            self.pluginmanager3.migrate_v2_plugin_config()
             self.pluginmanager3.add_directory(plugin_folder(), primary=True)
 
     def _init_browser_integration(self):

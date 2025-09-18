@@ -164,19 +164,6 @@ class PluginManager:
         if not plugin_found:
             log.info('Disabled and unloaded plugin %s', plugin_name)
 
-    def migrate_v2_plugin_config(self) -> None:
-        """Migrate enabled plugins from v2 to v3 configuration."""
-        v2_enabled = self._config.setting['enabled_plugins']
-        v3_enabled = self.get_enabled_plugins()
-
-        if v2_enabled and not v3_enabled:
-            # Only migrate if v3 config is empty and v2 has plugins
-            log.info('Migrating plugin configuration from v2 to v3')
-            # For now, we'll start with an empty v3 config
-            # In the future, this could map v2 plugin names to v3 equivalents
-            self._config.setting['enabled_plugins3'] = []
-            log.info('Plugin v2 to v3 migration completed (empty v3 config created)')
-
 
 def _is_plugin_compatible(plugin_api_versions) -> bool:
     """Check if a plugin is compatible with the current Picard version.
