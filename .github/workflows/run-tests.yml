@@ -58,7 +58,7 @@ jobs:
       run: |
         python setup.py build_locales
         pip install pytest pytest-randomly pytest-cov
-        pytest --verbose --cov=picard --cov-report xml:coverage.xml test
+        pytest --verbose --numprocesses auto --cov=picard --cov-report xml:coverage.xml
     - name: Submit code coverage to Codacy
       if: env.CODACY_PROJECT_TOKEN
       run: |
@@ -100,7 +100,7 @@ jobs:
       timeout-minutes: 30
       run: |
         pip install pytest pytest-randomly pytest-cov
-        pytest --verbose test
+        pytest --verbose --numprocesses auto
 
   pip-install: # Test whether a clean pip install from source works
     runs-on: ${{ matrix.os }}
