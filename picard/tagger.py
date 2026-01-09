@@ -557,6 +557,9 @@ class Tagger(QtWidgets.QApplication):
         yield from self.iter_album_files()
         yield from self.clusters.iterfiles()
 
+    def get_num_unsaved_files(self):
+        return sum(1 for f in self.files.values() if not f.is_saved())
+
     # ==============================
     # Session export / import
     # ==============================

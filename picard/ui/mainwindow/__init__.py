@@ -400,7 +400,7 @@ class MainWindow(QtWidgets.QMainWindow, PreserveGeometry):
         if self.tagger.stopping:
             return True
 
-        unsaved_files = sum(a.get_num_unsaved_files() for a in self.tagger.albums.values())
+        unsaved_files = self.tagger.get_num_unsaved_files()
         QMessageBox = QtWidgets.QMessageBox
 
         if unsaved_files > 0:
