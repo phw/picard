@@ -754,7 +754,7 @@ class File(MetadataItem):
                 new_values = self.format_specific_metadata(self.metadata, name, config.setting)
                 if not (new_values or clear_existing_tags or name in self.metadata.deleted_tags):
                     continue
-                orig_values = self.orig_metadata.getall(name)
+                orig_values = self.format_specific_metadata(self.orig_metadata, name, config.setting)
                 if orig_values != new_values:
                     self.similarity = self.orig_metadata.compare(self.metadata, ignored_tags)
                     if self.state == File.State.NORMAL:
