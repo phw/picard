@@ -36,7 +36,6 @@
 
 
 from collections.abc import Sequence
-from contextlib import ExitStack
 from functools import partial
 import os
 import re
@@ -49,7 +48,6 @@ from PyQt6 import (
 )
 
 from picard import log
-from picard.album import Album
 from picard.config import get_config
 from picard.coverart.image import (
     CoverArtImage,
@@ -59,10 +57,7 @@ from picard.coverart.setters import (
     CoverArtSetter,
     CoverArtSetterMode,
 )
-from picard.coverart.setters.handlers import _iter_file_parents
-from picard.file import File
 from picard.i18n import gettext as _
-from picard.item import FileListItem
 from picard.util import (
     bytes2human,
     imageinfo,
@@ -77,11 +72,6 @@ from picard.ui.util import FileDialog
 
 
 HTML_IMG_SRC_REGEX = re.compile(r'<img .*?src="(.*?)"', re.UNICODE)
-
-
-def image_delete(obj, image):
-    obj.metadata.images.strip_selected_image(image)
-    obj.metadata_images_changed.emit()
 
 
 class CoverArtBox(QtWidgets.QGroupBox):
@@ -408,39 +398,8 @@ class CoverArtBox(QtWidgets.QGroupBox):
 
         debug_info = "Deleted %r from %r"
 
-        if isinstance(item, Album):
-            with ExitStack() as stack:
-                stack.enter_context(item.suspend_metadata_images_update)
-                for track in item.tracks:
-                    stack.enter_context(track.suspend_metadata_images_update)
-                    image_delete(track, selected_image)
-                for file in item.iterfiles():
-                    image_delete(file, selected_image)
-                    file.update(signal=False)
-                item.update(update_tracks=False)
-        elif isinstance(item, FileListItem):
-            with ExitStack() as stack:
-                parents = set()
-                stack.enter_context(item.suspend_metadata_images_update)
-                image_delete(item, selected_image)
-                for file in item.iterfiles():
-                    for parent in _iter_file_parents(file):
-                        stack.enter_context(parent.suspend_metadata_images_update)
-                        parents.add(parent)
-                    image_delete(file, selected_image)
-                    file.update(signal=False)
-                for parent in parents:
-                    image_delete(parent, selected_image)
-                    parent.enable_update_metadata_images(True)
-                    if isinstance(parent, Album):
-                        parent.update(update_tracks=False)
-                    else:
-                        parent.update()
-                item.update()
-        elif isinstance(item, File):
-            image_delete(item, selected_image)
-            item.update()
-        else:
+        setter = CoverArtSetter(CoverArtSetterMode.APPEND, selected_image, self.item)
+        if not setter.remove_coverart():
             debug_info = "Unable to delete %r from %r"
 
         log.debug(debug_info, selected_image, item)

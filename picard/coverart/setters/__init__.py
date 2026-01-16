@@ -39,7 +39,10 @@ from enum import IntEnum
 
 from picard import log
 
-from .handlers import _set_coverart_dispatch
+from .handlers import (
+    _remove_coverart_dispatch,
+    _set_coverart_dispatch,
+)
 
 
 class CoverArtSetterMode(IntEnum):
@@ -80,6 +83,17 @@ class CoverArtSetter:
         """
         return _set_coverart_dispatch(self.source_obj, self)
 
+    def remove_coverart(self) -> bool:
+        """
+        Remove cover art from the source object using single dispatch.
+
+        Returns
+        -------
+        bool
+            True if cover art was removed successfully, False otherwise
+        """
+        return _remove_coverart_dispatch(self.source_obj, self)
+
     def _set_image(self, obj) -> None:
         """
         Set the cover art image on an object based on the current mode.
@@ -96,4 +110,16 @@ class CoverArtSetter:
             log.debug("Appending image %r to %r", self.coverartimage, obj)
 
         obj.metadata.images.append(self.coverartimage)
+        obj.metadata_images_changed.emit()
+
+    def _delete_image(self, obj):
+        """
+        Remove the cover art image from an object.
+
+        Parameters
+        ----------
+        obj
+            The object to remove the image from
+        """
+        obj.metadata.images.strip_selected_image(self.coverartimage)
         obj.metadata_images_changed.emit()
