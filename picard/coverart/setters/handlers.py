@@ -248,7 +248,6 @@ def _remove_handle_filelist(filelist: FileListItem, setter):
             setter._delete_image(file)
             file.update(signal=False)
         for parent in parents:
-            setter._delete_image(parent)
             if isinstance(parent, Album):
                 parent.update(update_tracks=False)
             else:

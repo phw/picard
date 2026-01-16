@@ -201,11 +201,10 @@ class CoverArtBox(QtWidgets.QGroupBox):
             orig_metadata = self.item.orig_metadata
 
         if not metadata or not metadata.images:
-            self.cover_art.set_metadata(None)
-            self.orig_cover_art.set_metadata(None)
+            self.cover_art.set_metadata(orig_metadata)
         else:
             self.cover_art.set_metadata(metadata)
-            self.orig_cover_art.set_metadata(orig_metadata)
+        self.orig_cover_art.set_metadata(orig_metadata)
         self.update_display()
 
     @staticmethod
