@@ -36,6 +36,7 @@
 
 
 from collections.abc import Sequence
+from contextlib import ExitStack
 from functools import partial
 import os
 import re
@@ -48,6 +49,7 @@ from PyQt6 import (
 )
 
 from picard import log
+from picard.album import Album
 from picard.config import get_config
 from picard.coverart.image import (
     CoverArtImage,
@@ -57,7 +59,10 @@ from picard.coverart.setters import (
     CoverArtSetter,
     CoverArtSetterMode,
 )
+from picard.coverart.setters.handlers import _iter_file_parents
+from picard.file import File
 from picard.i18n import gettext as _
+from picard.item import FileListItem
 from picard.util import (
     bytes2human,
     imageinfo,
@@ -72,6 +77,11 @@ from picard.ui.util import FileDialog
 
 
 HTML_IMG_SRC_REGEX = re.compile(r'<img .*?src="(.*?)"', re.UNICODE)
+
+
+def image_delete(obj, image):
+    obj.metadata.images.strip_selected_image(image)
+    obj.metadata_images_changed.emit()
 
 
 class CoverArtBox(QtWidgets.QGroupBox):
@@ -201,10 +211,11 @@ class CoverArtBox(QtWidgets.QGroupBox):
             orig_metadata = self.item.orig_metadata
 
         if not metadata or not metadata.images:
-            self.cover_art.set_metadata(orig_metadata)
+            self.cover_art.set_metadata(None)
+            self.orig_cover_art.set_metadata(None)
         else:
             self.cover_art.set_metadata(metadata)
-        self.orig_cover_art.set_metadata(orig_metadata)
+            self.orig_cover_art.set_metadata(orig_metadata)
         self.update_display()
 
     @staticmethod
@@ -371,6 +382,69 @@ class CoverArtBox(QtWidgets.QGroupBox):
 
         return coverartimage
 
+    def delete_cover_art(self):
+        if not self.item or not self.item.metadata.images:
+            if not self.item.orig_metadata.images:
+                return
+
+        cover_art_list = [image.source or _("Unnamed Cover Art") for image in self.item.metadata.images]
+
+        selected_item, ok_pressed = QtWidgets.QInputDialog.getItem(
+            self, _("Delete Cover Art"), _("Select the cover art image to delete:"), cover_art_list, 0, False
+        )
+        if ok_pressed:
+            selected_image_index = cover_art_list.index(selected_item)
+            selected_image = self.item.metadata.images[selected_image_index]
+            try:
+                self.delete_cover_art_for_item(self.item, selected_image)
+            except CoverArtImageError as e:
+                log.error("Can't delete image: %s", e)
+                return
+
+    def delete_cover_art_for_item(self, item, selected_image):
+        metadata = item.metadata
+        if not metadata or not metadata.images:
+            return
+
+        debug_info = "Deleted %r from %r"
+
+        if isinstance(item, Album):
+            with ExitStack() as stack:
+                stack.enter_context(item.suspend_metadata_images_update)
+                for track in item.tracks:
+                    stack.enter_context(track.suspend_metadata_images_update)
+                    image_delete(track, selected_image)
+                for file in item.iterfiles():
+                    image_delete(file, selected_image)
+                    file.update(signal=False)
+                item.update(update_tracks=False)
+        elif isinstance(item, FileListItem):
+            with ExitStack() as stack:
+                parents = set()
+                stack.enter_context(item.suspend_metadata_images_update)
+                image_delete(item, selected_image)
+                for file in item.iterfiles():
+                    for parent in _iter_file_parents(file):
+                        stack.enter_context(parent.suspend_metadata_images_update)
+                        parents.add(parent)
+                    image_delete(file, selected_image)
+                    file.update(signal=False)
+                for parent in parents:
+                    image_delete(parent, selected_image)
+                    parent.enable_update_metadata_images(True)
+                    if isinstance(parent, Album):
+                        parent.update(update_tracks=False)
+                    else:
+                        parent.update()
+                item.update()
+        elif isinstance(item, File):
+            image_delete(item, selected_image)
+            item.update()
+        else:
+            debug_info = "Unable to delete %r from %r"
+
+        log.debug(debug_info, selected_image, item)
+
     def choose_local_file(self):
         file_chooser = FileDialog(parent=self)
         file_chooser.setFileMode(QtWidgets.QFileDialog.FileMode.ExistingFiles)
@@ -408,6 +482,13 @@ class CoverArtBox(QtWidgets.QGroupBox):
             show_more_details_action = QtGui.QAction(name, parent=menu)
             show_more_details_action.triggered.connect(self.show_cover_art_info)
             menu.addAction(show_more_details_action)
+
+        delete_cover_art_action = QtGui.QAction(_("Delete cover art"), parent=menu)
+        if self.item and self.item.can_show_coverart and self.item.metadata.images:
+            delete_cover_art_action.triggered.connect(self.delete_cover_art)
+        else:
+            delete_cover_art_action.setEnabled(False)
+        menu.addAction(delete_cover_art_action)
 
         if self.orig_cover_art.isVisible():
             name = _("Keep original cover art")

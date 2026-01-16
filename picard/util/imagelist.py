@@ -42,6 +42,7 @@ class ImageList(MutableSequence['CoverArtImage']):
         self._images: list['CoverArtImage'] = list(iterable or ())
         self._hash_dict = {}
         self._dirty = True
+        self._deleted = False
 
     def __len__(self):
         return len(self._images)
@@ -61,6 +62,7 @@ class ImageList(MutableSequence['CoverArtImage']):
     def insert(self, index, value: 'CoverArtImage'):
         self._images.insert(index, value)
         self._dirty = True
+        self._deleted = False
 
     def __repr__(self):
         return '%s(%r)' % (self.__class__.__name__, self._images)
@@ -105,6 +107,11 @@ class ImageList(MutableSequence['CoverArtImage']):
         self._images = [image for image in self._images if not image.is_front_image()]
         self._dirty = True
 
+    def strip_selected_image(self, image):
+        if image in self._images:
+            self._images.remove(image)
+            self._deleted = not self._images
+
     def hash_dict(self):
         if self._dirty:
             self._hash_dict = {img.datahash.hash: img for img in self._images}
@@ -121,3 +128,7 @@ class ImageList(MutableSequence['CoverArtImage']):
                     continue
             types_dict[image_types] = image
         return types_dict
+
+    @property
+    def deleted(self):
+        return self._deleted

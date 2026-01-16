@@ -595,6 +595,11 @@ class ID3File(File):
             if cover:
                 tags.setall('APIC', cover)
 
+        if self.metadata.images.deleted:
+            for key, frame in tags.items():
+                if frame.FrameID == 'APIC':
+                    del tags[key]
+
     @classmethod
     def supports_tag(cls, name):
         return (

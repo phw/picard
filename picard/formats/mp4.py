@@ -348,6 +348,9 @@ class MP4File(File):
                 if tag not in {'totaltracks', 'totaldiscs'}:
                     del tags[real_name]
 
+        if self.metadata.images.deleted:
+            del tags['covr']
+
     @classmethod
     def supports_tag(cls, name):
         return (
