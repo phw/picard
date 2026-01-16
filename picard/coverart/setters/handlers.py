@@ -53,7 +53,7 @@ def _set_coverart_dispatch(source_obj, setter):
 
 
 @_set_coverart_dispatch.register
-def _handle_album(album: Album, setter):
+def _set_handle_album(album: Album, setter):
     """
     Handle Album objects in the single dispatch pattern.
 
@@ -92,7 +92,7 @@ def _handle_album(album: Album, setter):
 
 
 @_set_coverart_dispatch.register
-def _handle_filelist(filelist: FileListItem, setter):
+def _set_handle_filelist(filelist: FileListItem, setter):
     """
     Handle FileListItem objects in the single dispatch pattern.
 
@@ -136,7 +136,7 @@ def _handle_filelist(filelist: FileListItem, setter):
 
 
 @_set_coverart_dispatch.register
-def _handle_file(file: File, setter):
+def _set_handle_file(file: File, setter):
     """
     Handle File objects in the single dispatch pattern.
 
@@ -157,6 +157,129 @@ def _handle_file(file: File, setter):
     log.debug("set_coverart_file %r", file)
 
     setter._set_image(file)
+    file.update()
+    return True
+
+
+@singledispatch
+def _remove_coverart_dispatch(source_obj, setter):
+    """
+    Handle unknown types in the single dispatch pattern.
+
+    Parameters
+    ----------
+    source_obj
+        The source object to remove cover art from (unsupported type)
+    setter
+        The CoverArtSetter instance
+
+    Returns
+    -------
+    bool
+        False for unsupported object types
+    """
+    log.debug("No remove_coverart handler for %r", source_obj)
+    return False
+
+
+@_remove_coverart_dispatch.register
+def _remove_handle_album(album: Album, setter):
+    """
+    Handle Album objects in the single dispatch pattern.
+
+    Remove cover art from an album and all its associated tracks and files.
+
+    Parameters
+    ----------
+    album : Album
+        The album to remove cover art from
+    setter
+        The CoverArtSetter instance
+
+    Returns
+    -------
+    bool
+        True if cover art was removed successfully
+    """
+    log.debug("remove_coverart_album %r", album)
+
+    with ExitStack() as stack:
+        stack.enter_context(album.suspend_metadata_images_update)
+        for track in album.tracks:
+            stack.enter_context(track.suspend_metadata_images_update)
+            setter._delete_image(track)
+        for file in album.iterfiles():
+            setter._delete_image(file)
+            file.update(signal=False)
+        album.update(update_tracks=False)
+
+    return True
+
+
+@_remove_coverart_dispatch.register
+def _remove_handle_filelist(filelist: FileListItem, setter):
+    """
+    Handle FileListItem objects in the single dispatch pattern.
+
+    Remove cover art from a file list item and all its associated files.
+
+    Parameters
+    ----------
+    filelist : FileListItem
+        The file list item to remove cover art from
+    setter
+        The CoverArtSetter instance
+
+    Returns
+    -------
+    bool
+        True if cover art was removed successfully
+    """
+    log.debug("remove_coverart_filelist %r", filelist)
+
+    with ExitStack() as stack:
+        parents = set()
+        stack.enter_context(filelist.suspend_metadata_images_update)
+        setter._delete_image(filelist)
+        for file in filelist.iterfiles():
+            for parent in _iter_file_parents(file):
+                stack.enter_context(parent.suspend_metadata_images_update)
+                parents.add(parent)
+            setter._delete_image(file)
+            file.update(signal=False)
+        for parent in parents:
+            setter._delete_image(parent)
+            if isinstance(parent, Album):
+                parent.update(update_tracks=False)
+            else:
+                parent.update()
+        filelist.update()
+
+    return True
+
+
+@_remove_coverart_dispatch.register
+def _remove_handle_file(file: File, setter):
+    """
+    Handle File objects in the single dispatch pattern.
+
+    Remove cover art from a single file.
+
+    Parameters
+    ----------
+    file : File
+        The file to remove cover art from
+    setter
+        The CoverArtSetter instance
+
+    Returns
+    -------
+    bool
+        True if cover art was removed successfully
+    """
+    log.debug("remove_coverart_file %r", file)
+
+    setter._delete_image(file)
     file.update()
     return True
 
