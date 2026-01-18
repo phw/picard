@@ -47,6 +47,11 @@ dependencies = [
     "pygit2~=1.18; python_version < '3.11'",
     "pygit2~=1.19; python_version >= '3.11'",
     "tomli>=2.3.0; python_version < '3.11'",
+    "winrt-windows-media>=3.2.1; sys_platform == 'win32'",
+    "winrt-windows-media-playback>=3.2.1; sys_platform == 'win32'",
+    "winrt-windows-foundation>=3.2.1; sys_platform == 'win32'",
+    "winrt-windows-foundation-collections>=3.2.1; sys_platform == 'win32'",
+    "winrt-windows-media-core>=3.2.1; sys_platform == 'win32'",
 ]
 
 [project.urls]
