@@ -48,21 +48,25 @@ def get_locale_messages():
 os_name = platform.system()
 build_portable = bool(os.environ.get('PICARD_BUILD_PORTABLE'))
 binaries = []
+optional_binaries = []
 
 data_files = get_locale_messages()
 
 fpcalc_name = 'fpcalc'
 if os_name == 'Windows':
-    fpcalc_name = 'fpcalc.exe'
-    binaries += [('discid.dll', '.')]
-    if os.path.exists('TaskbarLib.tlb'):
-        binaries += [('TaskbarLib.tlb', '.')]
+    optional_binaries.append(('fpcalc.exe', '.'))
+    optional_binaries.append(('discid.dll', '.'))
+    optional_binaries.append(('TaskbarLib.tlb', '.'))
 
 elif os_name == 'Darwin':
-    binaries += [('libdiscid.0.dylib', '.')]
+    optional_binaries.append(('fpcalc', '.'))
+    optional_binaries.append(('libdiscid.0.dylib', '.'))
 
-if os.path.isfile(fpcalc_name):
-    binaries += [(fpcalc_name, '.')]
+for bin_file, path in optional_binaries:
+    if os.path.isfile(bin_file):
+        binaries += [(bin_file, path)]
+    else:
+        print(f'WARNING: optional binary file {bin_file} not found.')
 
 runtime_hooks = []
 if os_name == 'Windows':
