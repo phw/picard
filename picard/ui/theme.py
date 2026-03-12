@@ -78,7 +78,7 @@ if IS_MACOS:
 elif IS_HAIKU:
     OS_SUPPORTS_THEMES = False
 elif IS_WIN:
-    import winreg
+    import winreg  # type: ignore[assignment]
 
 
 # Those are values stored in config file:

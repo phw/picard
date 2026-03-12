@@ -47,9 +47,9 @@ try:
 except ImportError:
     try:
         # use python-discid (http://python-discid.readthedocs.org/en/latest/)
-        import discid  # type: ignore[unresolved-import]
+        import discid
     except (ImportError, OSError):
-        discid = None
+        discid = None  # type: ignore[assignment]
 
 
 class Disc:

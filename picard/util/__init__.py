@@ -49,7 +49,7 @@ except ImportError:
     try:
         from chardet import detect  # type: ignore[unresolved-import]
     except ImportError:
-        detect = None
+        detect = None  # type: ignore[assignment]
 from collections import (
     defaultdict,
     namedtuple,
@@ -96,7 +96,7 @@ from picard.util.readthedocs import ReadTheDocs
 
 winreg = None
 if IS_WIN:
-    import winreg
+    import winreg  # type: ignore[assignment]
 
 # Windows path length constraints
 # See https://docs.microsoft.com/en-us/windows/win32/fileio/maximum-file-path-limitation
