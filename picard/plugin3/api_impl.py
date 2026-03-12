@@ -855,7 +855,7 @@ class PluginApi:
         if metadata:
             return plugin_manager.get_plugin_git_info(metadata)
 
-        return self._manifest.version or "Unknown"
+        return str(self._manifest.version) if self._manifest.version else "Unknown"
 
     def _set_class_name_and_title(self, cls: type[HasDisplayTitle]):
         if not hasattr(cls, 'NAME') or not cls.NAME:

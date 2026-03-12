@@ -217,7 +217,7 @@ _INFO_MAPPING = {
 }
 
 
-def get_image_format_from_format(format_string: str) -> ImageFormat:
+def get_image_format_from_format(format_string: str) -> ImageFormat | None:
     for fmt in list(ImageFormat):
         if format_string in fmt.aliases:
             return fmt
