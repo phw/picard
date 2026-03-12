@@ -660,6 +660,8 @@ class Plugin:
 
     def get_current_commit_id(self, short=False):
         """Get the current commit ID of the plugin if it's a git repository."""
+        if not self.local_path:
+            return None
         git_dir = self.local_path / '.git'
         if not git_dir.exists():
             return None
@@ -748,13 +750,14 @@ class Plugin:
                 break
 
         # Clear module from sys.modules to force reload on next enable
-        if self.module_name in sys.modules:
+        if self.module_name and self.module_name in sys.modules:
             del sys.modules[self.module_name]
         # Also clear any submodules
-        module_prefix = self.module_name + '.'
-        for module_name in list(sys.modules.keys()):
-            if module_name.startswith(module_prefix):
-                del sys.modules[module_name]
+        if self.module_name:
+            module_prefix = self.module_name + '.'
+            for module_name in list(sys.modules.keys()):
+                if module_name.startswith(module_prefix):
+                    del sys.modules[module_name]
 
         self.state = PluginState.DISABLED
 
