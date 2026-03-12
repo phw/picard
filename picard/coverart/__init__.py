@@ -153,7 +153,7 @@ class CoverArt:
         provider = next(self.providers)
         result = CoverArtProvider.QueueState._STARTED
         try:
-            instance = provider.cls(self)
+            instance = provider.provider_class(self)
             if provider.enabled and instance.enabled():
                 log.debug("Trying cover art provider %s …", provider.name)
                 result = instance.queue_images()
