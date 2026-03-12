@@ -122,7 +122,7 @@ def run_task(func, next_func=None, priority=0, thread_pool=None, task_counter=No
         task_counter.increment()
 
     if not thread_pool:
-        thread_pool = QCoreApplication.instance().thread_pool
+        thread_pool = QCoreApplication.instance().thread_pool  # type: ignore[attr-defined]
     thread_pool.start(Runnable(func, next_func, task_counter, traceback), priority)
 
 
