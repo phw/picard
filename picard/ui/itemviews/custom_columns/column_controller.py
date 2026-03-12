@@ -80,9 +80,10 @@ class ColumnController:
             First invalid specification found, or None if all valid.
         """
         reports = self.validate_specs(specs)
-        for spec, report in reports.items():
+        specs_dict = {s.key: s for s in specs if s.key}
+        for key, report in reports.items():
             if not report.is_valid:
-                return spec
+                return specs_dict.get(key)
         return None
 
     def first_invalid_spec_report(self, report: dict[str, ValidationReport]) -> tuple[str, ValidationReport] | None:

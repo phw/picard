@@ -46,7 +46,7 @@ except ImportError:
     try:
         import discid  # type: ignore[unresolved-import]
     except (ImportError, OSError):
-        discid = None
+        discid = None  # type: ignore[assignment]
 
 
 DISCID_NOT_LOADED_MESSAGE = "CDROM: discid library not found - Lookup CD functionality disabled"
