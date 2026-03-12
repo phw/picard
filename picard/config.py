@@ -142,12 +142,12 @@ class Option(QtCore.QObject):
 
 
 class TextOption(Option):
-    convert = str  # type: ignore
+    convert = str  # type: ignore[assignment]
     qtype = 'QString'
 
 
 class BoolOption(Option):
-    convert = bool  # type: ignore
+    convert = bool  # type: ignore[assignment]
     qtype = bool
 
 
@@ -161,7 +161,7 @@ class IntOption(Option):
 
 
 class FloatOption(Option):
-    convert = float  # type: ignore
+    convert = float  # type: ignore[assignment]
 
 
 class ListOption(Option):
@@ -194,7 +194,7 @@ class ConfigSection(QtCore.QObject):
         self.__qt_config = config
         self.__name = name
         self.__prefix = self.__name + '/'
-        self._memoization = defaultdict(Memovar)
+        self._memoization: dict[str, Memovar] = defaultdict(Memovar)
 
     def key(self, name):
         return self.__prefix + name
@@ -572,7 +572,7 @@ def load_new_config(filename: str):
 
 
 QuickMenuItem = namedtuple('QuickMenuItem', ['name', 'title'])
-_quick_menu_items = {}
+_quick_menu_items: dict[str, dict] = {}
 
 
 def register_quick_menu_item(group_order: int, group_name: str, group_parent: str, group_title, option: Option):

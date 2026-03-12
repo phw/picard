@@ -40,7 +40,7 @@ if TYPE_CHECKING:
 class ImageList(MutableSequence['CoverArtImage']):
     def __init__(self, iterable: Iterable['CoverArtImage'] | None = None):
         self._images: list['CoverArtImage'] = list(iterable or ())
-        self._hash_dict = {}
+        self._hash_dict: dict = {}
         self._dirty = True
 
     def __len__(self):

@@ -454,7 +454,7 @@ class OggTheoraFile(VCommentFile):
 class OggVorbisFile(VCommentFile):
     """Ogg Vorbis file."""
 
-    EXTENSIONS = []
+    EXTENSIONS: list[str] = []
     NAME = "Ogg Vorbis"
     _File = mutagen.oggvorbis.OggVorbis
 

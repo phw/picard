@@ -60,7 +60,7 @@ class OptionsPage(QtWidgets.QWidget, HasDisplayTitle):
     STYLESHEET = "QLabel { qproperty-wordWrap: true; }"
     OPTIONS = ()
 
-    _registered_settings = defaultdict(list)
+    _registered_settings: dict[str, list] = defaultdict(list)
     initialized = False
     loaded = False
 

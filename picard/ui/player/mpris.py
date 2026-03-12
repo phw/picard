@@ -104,7 +104,7 @@ class MPRIS2Service(QObject):
         QObject.__init__(self)
         self._bus = bus
         self._player = player
-        self._metadata = {}
+        self._metadata: dict = {}
 
         # Set up adaptors for DBus interfaces
         self._adaptor = MediaPlayer2Adaptor(self)

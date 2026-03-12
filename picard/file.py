@@ -214,7 +214,7 @@ class File(MetadataItem):
     # Whether date sanitization can be toggled for this format family via settings
     DATE_SANITIZATION_TOGGLEABLE = False
 
-    EXTENSIONS = []
+    EXTENSIONS: list[str] = []
 
     class State(Enum):
         UNDEFINED = -1
@@ -1114,7 +1114,7 @@ class File(MetadataItem):
 
     def update_item(self, update_selection=True):
         if self.ui_item:
-            self.ui_item.update(update_selection=update_selection)
+            self.ui_item.update(update_selection=update_selection)  # type: ignore[call-arg]
 
     def iterfiles(self, save=False):
         yield self
