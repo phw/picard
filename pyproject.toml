@@ -220,3 +220,27 @@ plugins.no-duplicate-header.enabled = true
 plugins.no-duplicate-header.allow_different_nesting = true
 plugins.no-multiple-blanks.enabled = false
 plugins.single-h1.enabled = true
+
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = false
+warn_unused_configs = true
+disallow_untyped_defs = false
+check_untyped_defs = false
+ignore_missing_imports = true
+exclude = [
+    "^picard/ui/forms/ui_.*\\.py$",
+    "^picard/resources\\.py$",
+    "^picard/const/attributes\\.py$",
+    "^picard/const/countries\\.py$",
+    "^scripts/picard\\.in$",
+]
+
+[tool.ty.src]
+exclude = [
+    "picard/ui/forms/ui_*.py",
+    "picard/resources.py",
+    "picard/const/attributes.py",
+    "picard/const/countries.py",
+    "scripts/picard.in",
+]
