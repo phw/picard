@@ -267,7 +267,7 @@ class CoverArt:
                 {
                     'type': image.types_as_string(),
                     'albumid': self.album.id,
-                    'host': image.url.host(),
+                    'host': image.url.host() if image.url else '',
                 },
                 echo=None,
             )
@@ -306,7 +306,7 @@ class CoverArt:
     def _message(self, *args, **kwargs):
         """Display message to status bar"""
         tagger = QtCore.QCoreApplication.instance()
-        tagger.window.set_statusbar_message(*args, **kwargs)
+        tagger.window.set_statusbar_message(*args, **kwargs)  # type: ignore[attr-defined]
 
 
 def _retrieve_coverart(album, metadata, release):
