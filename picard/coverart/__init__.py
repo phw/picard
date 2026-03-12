@@ -167,7 +167,7 @@ class CoverArt:
     def _handle_queued_image(self, image: CoverArtImage) -> CoverArtProvider.QueueState:
         # image has already data loaded
         if image.datahash:
-            info = imageinfo.ImageInfo(
+            info = imageinfo.ImageInfo(  # type: ignore[call-arg]
                 width=image.width,
                 height=image.height,
                 mime=image.mimetype,

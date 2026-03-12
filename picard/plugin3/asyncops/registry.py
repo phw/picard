@@ -66,4 +66,4 @@ class AsyncPluginRegistry:
 
     def search_plugins(self, query=None, category=None, trust_level=None):
         """Search plugins (synchronous - fast operation)."""
-        return self._registry.list_plugins(query=query, category=category, trust_level=trust_level)
+        return self._registry.list_plugins(query=query, category=category, trust_level=trust_level)  # type: ignore[call-arg]
