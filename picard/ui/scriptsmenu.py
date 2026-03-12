@@ -67,10 +67,10 @@ class ScriptsMenu(QtWidgets.QMenu):
                     'script': script.name,
                     'message': str(e),
                 }
-                self.tagger.window.set_statusbar_message(msg, mparms)
+                self.tagger.window.set_statusbar_message(msg, mparms)  # type: ignore[attr-defined]
 
     def _iter_unique_metadata_objects(self):
-        return iter_unique(self._iter_metadata_objects(self.tagger.window.selected_objects))
+        return iter_unique(self._iter_metadata_objects(self.tagger.window.selected_objects))  # type: ignore[attr-defined]
 
     def _iter_metadata_objects(self, objs):
         for obj in objs:
