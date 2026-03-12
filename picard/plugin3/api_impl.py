@@ -703,7 +703,7 @@ class PluginApi:
         provider_class.api = self
         self._set_class_name_and_title(provider_class)
         if getattr(provider_class, 'OPTIONS', None):
-            provider_class.OPTIONS.api = self
+            provider_class.OPTIONS.api = self  # type: ignore[attr-defined]
         return register_cover_art_provider(provider_class)
 
     def register_cover_art_filter(
@@ -859,6 +859,6 @@ class PluginApi:
 
     def _set_class_name_and_title(self, cls: type[HasDisplayTitle]):
         if not hasattr(cls, 'NAME') or not cls.NAME:
-            cls.NAME = f'{self.plugin_id}.{cls.__name__}'
+            cls.NAME = f'{self.plugin_id}.{cls.__name__}'  # type: ignore[attr-defined]
         if not hasattr(cls, 'TITLE') or not cls.TITLE:
-            cls.TITLE = self.manifest.name_i18n()
+            cls.TITLE = self.manifest.name_i18n()  # type: ignore[attr-defined]

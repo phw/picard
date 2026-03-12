@@ -33,11 +33,11 @@ class InstallablePlugin(ABC):
         self.name = name
         self._registry = registry
         # Only set attributes if they're not already properties
-        if not hasattr(type(self), 'trust_level') or not isinstance(type(self).trust_level, property):
+        if not hasattr(type(self), 'trust_level') or not isinstance(type(self).trust_level, property):  # type: ignore[attr-defined]
             self.trust_level = 'unregistered'
-        if not hasattr(type(self), 'categories') or not isinstance(type(self).categories, property):
+        if not hasattr(type(self), 'categories') or not isinstance(type(self).categories, property):  # type: ignore[attr-defined]
             self.categories = []
-        if not hasattr(type(self), 'description') or not isinstance(type(self).description, property):
+        if not hasattr(type(self), 'description') or not isinstance(type(self).description, property):  # type: ignore[attr-defined]
             self.description = ''
 
     @abstractmethod

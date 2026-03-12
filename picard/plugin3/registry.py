@@ -298,7 +298,7 @@ class PluginRegistry:
                     if callback:
                         callback(False, fetch_error)
 
-        tagger.webservice.get_url(
+        tagger.webservice.get_url(  # type: ignore[attr-defined]
             url=QUrl(url),
             handler=handler,
             cacheloadcontrol=QNetworkRequest.CacheLoadControl.PreferCache,
@@ -384,6 +384,8 @@ class PluginRegistry:
             set: Set of blacklist types present (e.g. {'url', 'uuid', 'url_regex'})
         """
         if not self._ensure_registry_loaded('get blacklist types'):
+            return set()
+        if not self._registry_data:
             return set()
 
         blacklist = self._registry_data.get('blacklist', [])
