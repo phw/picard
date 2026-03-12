@@ -55,7 +55,7 @@ class InterfaceTopTagsOptionsPage(OptionsPage):
         tags = list(self.ui.top_tags_list.tags)
         if tags != config.setting['metadatabox_top_tags']:
             config.setting['metadatabox_top_tags'] = tags
-            self.tagger.window.metadata_box.update()
+            self.tagger.window.metadata_box.update()  # type: ignore[attr-defined]
 
     def restore_defaults(self):
         self.ui.top_tags_list.clear()

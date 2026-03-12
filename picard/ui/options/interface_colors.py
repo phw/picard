@@ -70,7 +70,7 @@ class ColorButton(QtWidgets.QPushButton):
         new_color = QtWidgets.QColorDialog.getColor(
             self.color,
             title=_("Choose a color"),
-            parent=self.parent(),
+            parent=self.parent(),  # type: ignore[arg-type]
         )
 
         if new_color.isValid():
