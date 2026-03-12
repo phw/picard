@@ -312,14 +312,14 @@ class Pygit2Repository(GitRepository):
         _log_git_call("get_commit_date", commit_id, retval=commit.commit_time)
         return commit.commit_time
 
-    def fetch_remote(self, remote, refspec: str = None, callbacks=None):
+    def fetch_remote(self, remote, refspec: str | None = None, callbacks=None):
         _log_git_call("fetch_remote", str(remote.name), refspec)
         if refspec:
             remote.fetch([refspec], callbacks=callbacks)
         else:
             remote.fetch(callbacks=callbacks)
 
-    def fetch_remote_with_tags(self, remote, refspec: str = None, callbacks=None):
+    def fetch_remote_with_tags(self, remote, refspec: str | None = None, callbacks=None):
         """Fetch from remote including tags."""
         _log_git_call("fetch_remote_with_tags", str(remote.name), refspec)
         if refspec:
