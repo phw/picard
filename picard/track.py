@@ -124,7 +124,7 @@ class TagGenreFilter:
         return False
 
     def filter(self, counter: Counter, minusage=0) -> Counter:
-        result = Counter()
+        result: Counter = Counter()
         for name, count in counter.items():
             if not self.skip(name):
                 result[name] = count
@@ -153,7 +153,7 @@ class Track(FileListItem):
         super().__init__(track_id)
         self.album = album
         self.scripted_metadata = Metadata()
-        self._track_artists = []
+        self._track_artists: list = []
         self._orig_images = None
         self._iter_children_items_metadata_ignore_attrs = {'orig_metadata'}
 
@@ -229,7 +229,7 @@ class Track(FileListItem):
             self.metadata.images = self._orig_images.copy()
         run_file_post_removal_from_track_processors(self, file)
         self.update()
-        if self.ui_item.isSelected():
+        if self.ui_item and self.ui_item.isSelected():
             self.tagger.window.refresh_metadatabox()
 
     @staticmethod
@@ -422,7 +422,7 @@ class Track(FileListItem):
 class NonAlbumTrack(Track):
     def __init__(self, nat_id):
         tagger = QtCore.QCoreApplication.instance()
-        super().__init__(nat_id, tagger.nats)
+        super().__init__(nat_id, tagger.nats)  # type: ignore[attr-defined]
         self.callback = None
         self.loaded = False
         self.status = None

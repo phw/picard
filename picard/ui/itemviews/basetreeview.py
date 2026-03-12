@@ -741,7 +741,7 @@ class BaseTreeView(QtWidgets.QTreeWidget):
 
     @staticmethod
     def _matches_file_properties(obj, text: str, filters: set):
-        matches = set()
+        matches: set[str] = set()
         has_tags = False
         if not filters.intersection(FILE_FILTERS):  # No file filters to check
             return has_tags, matches
@@ -757,7 +757,7 @@ class BaseTreeView(QtWidgets.QTreeWidget):
 
     @staticmethod
     def _matches_metadata(obj, text: str, filters: set):
-        matches = set()
+        matches: set[str] = set()
         has_tags = False
         test_filters = filters - FILE_FILTERS
         if not test_filters:  # No metadata filters to check
