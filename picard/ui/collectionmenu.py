@@ -53,12 +53,12 @@ class CollectionMenu(QtWidgets.QMenu):
     def _update_collections(self):
         self._ignore_update = True
         self.clear()
-        self.actions = []
+        self.action_list = []
         for collection in sorted(user_collections.values(), key=lambda c: (sort_key(c.name), c.id)):
             action = QtWidgets.QWidgetAction(self)
             action.setDefaultWidget(CollectionMenuItem(self, action, collection))
             self.addAction(action)
-            self.actions.append(action)
+            self.action_list.append(action)
         self._ignore_update = False
         self.addSeparator()
         self.refresh_action = self.addAction(_("Refresh List"))
