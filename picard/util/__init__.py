@@ -47,7 +47,7 @@ try:
     from charset_normalizer import detect  # type: ignore[unresolved-import]
 except ImportError:
     try:
-        from chardet import detect  # type: ignore[unresolved-import]
+        from chardet import detect  # type: ignore[unresolved-import,no-redef]
     except ImportError:
         detect = None  # type: ignore[assignment]
 from collections import (
@@ -689,7 +689,7 @@ def is_hidden(filepath):
 
 
 if IS_WIN:
-    from ctypes import windll
+    from ctypes import windll  # type: ignore[attr-defined]
 
     def _has_hidden_attribute(filepath):
         try:

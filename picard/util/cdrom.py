@@ -87,7 +87,7 @@ def _parse_linux_cdrom_info(f):
 
 
 if IS_WIN:
-    from ctypes import windll
+    from ctypes import windll  # type: ignore[attr-defined]
 
     AUTO_DETECT_DRIVES = True
     DRIVE_TYPE_CDROM = 5

@@ -278,17 +278,17 @@ class ConfigSection(QtCore.QObject):
         if isinstance(default, str):
             option_type = TextOption
         elif isinstance(default, bool):
-            option_type = BoolOption
+            option_type = BoolOption  # type: ignore[assignment]
         elif isinstance(default, int):
-            option_type = IntOption
+            option_type = IntOption  # type: ignore[assignment]
         elif isinstance(default, float):
-            option_type = FloatOption
+            option_type = FloatOption  # type: ignore[assignment]
         elif isinstance(default, list) or isinstance(default, tuple):
-            option_type = ListOption
+            option_type = ListOption  # type: ignore[assignment]
         elif isinstance(default, Enum):
-            option_type = Option
+            option_type = Option  # type: ignore[assignment]
         else:
-            option_type = Option
+            option_type = Option  # type: ignore[assignment]
 
         return option_type(self.__name, name, default)
 

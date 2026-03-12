@@ -57,7 +57,7 @@ class Recording:
         self.sources = sources
 
 
-IncompleteRecording = namedtuple('Recording', 'mbid acoustid result_score sources')
+IncompleteRecording = namedtuple('IncompleteRecording', 'mbid acoustid result_score sources')
 
 
 class RecordingResolver:

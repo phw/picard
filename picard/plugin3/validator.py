@@ -30,7 +30,7 @@ import re
 
 
 try:
-    from markdown import markdown as render_markdown  # type: ignore[unresolved-import]
+    from markdown import markdown as render_markdown  # type: ignore[import-untyped,unresolved-import]
 except ImportError:
     render_markdown = None
 

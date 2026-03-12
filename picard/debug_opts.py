@@ -28,13 +28,13 @@ from picard.i18n import N_
 class DebugOptEnum(int, Enum):
     __registry__: set = set()
 
-    def __new__(cls, value: int, title: str, description: str) -> None:
+    def __new__(cls, value: int, title: str, description: str) -> 'DebugOptEnum':
         value = int(value)
         obj = super().__new__(cls, value)
         obj._value_ = value
         obj.title = title
         obj.description = description
-        return obj
+        return obj  # type: ignore[return-value]
 
     @property
     def optname(self):

@@ -57,7 +57,7 @@ class Section(IntEnum):
     see_also = 4
 
 
-SectionInfo = namedtuple('Section', ('title', 'tagvar_func'))
+SectionInfo = namedtuple('SectionInfo', ('title', 'tagvar_func'))
 SECTIONS = {
     Section.notes: SectionInfo(N_('Notes'), 'notes'),
     Section.options: SectionInfo(N_('Option Settings'), 'related_options_titles'),
