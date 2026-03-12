@@ -50,7 +50,12 @@ if IS_WIN:
     import win32file  # type: ignore
     import win32pipe  # type: ignore
 else:
-    WinApiError = None
+
+    class WinApiError(Exception):  # type: ignore[no-redef]
+        """Placeholder for Windows API error on non-Windows platforms."""
+
+        pass
+
     win32file = None
     win32pipe = None
 
