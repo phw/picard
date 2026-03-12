@@ -26,7 +26,7 @@ from picard.i18n import N_
 
 
 class DebugOptEnum(int, Enum):
-    __registry__ = set()
+    __registry__: set = set()
 
     def __new__(cls, value: int, title: str, description: str) -> None:
         value = int(value)

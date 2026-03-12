@@ -183,17 +183,17 @@ class MacNowPlayingService:
 
         self.info_center.setPlaybackState_(now_playing_state)
 
-        info = {}
+        info: dict = {}
         self._set_info_playback_times(info)
         self._update_playback_info(info)
 
     def update_playback_position(self, position: int):
-        info = {}
+        info: dict = {}
         self._set_info_playback_times(info)
         self._update_playback_info(info)
 
     def update_playback_rate(self, rate: float):
-        info = {}
+        info: dict = {}
         self._set_info_playback_times(info)
         self._update_playback_info(info)
 
