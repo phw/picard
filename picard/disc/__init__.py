@@ -47,7 +47,7 @@ try:
 except ImportError:
     try:
         # use python-discid (http://python-discid.readthedocs.org/en/latest/)
-        import discid
+        import discid  # type: ignore[unresolved-import]
     except (ImportError, OSError):
         discid = None  # type: ignore[assignment]
 
