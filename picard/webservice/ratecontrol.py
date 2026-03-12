@@ -75,7 +75,7 @@ CONGESTION_WINDOW_SIZE: dict[str, float] = defaultdict(lambda: 1.0)
 CONGESTION_SSTHRESH = defaultdict(lambda: 0)
 
 # Storage of last request times per host key
-LAST_REQUEST_TIMES: dict[str, int] = defaultdict(lambda: 0)
+LAST_REQUEST_TIMES: dict[str, float] = defaultdict(lambda: 0)
 
 
 def set_minimum_delay(hostkey, delay_ms):
