@@ -180,7 +180,7 @@ class PicardDialog(QtWidgets.QDialog, PreserveGeometry):
     ready_for_display = QtCore.pyqtSignal()
 
     def __init__(self, parent=None):
-        super().__init__(parent=parent, f=self.flags)
+        super().__init__(parent=parent, f=self.flags)  # type: ignore[call-arg]
         self.tagger = QtCore.QCoreApplication.instance()
         self.__shown = False
         self.ready_for_display.connect(self.restore_geometry)
