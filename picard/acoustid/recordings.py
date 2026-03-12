@@ -25,6 +25,7 @@ from collections import (
     deque,
     namedtuple,
 )
+from collections.abc import Callable
 from functools import partial
 
 from PyQt6.QtNetwork import QNetworkReply
@@ -67,17 +68,17 @@ class RecordingResolver:
 
     _recording_map: dict[str, dict[str, Recording]]
 
-    def __init__(self, ws: WebService, doc: dict, callback: callable) -> None:
+    def __init__(self, ws: WebService, doc: dict, callback: Callable) -> None:
         self._mbapi = MBAPIHelper(ws)
         self._doc = doc
         self._callback = callback
         self._recording_map = defaultdict(dict)
-        self._recording_cache = {}
-        self._missing_metadata = deque()
+        self._recording_cache: dict = {}
+        self._missing_metadata: deque = deque()
 
     def resolve(self) -> None:
         results = self._doc.get('results') or []
-        incomplete_counts = defaultdict(lambda: 0)
+        incomplete_counts: dict[str, int] = defaultdict(lambda: 0)
         for result in results:
             recordings = result.get('recordings') or []
             result_score = get_score(result)
