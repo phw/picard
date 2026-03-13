@@ -40,13 +40,14 @@ from picard.const.sys import (
 )
 
 
+discid = None
 try:
-    from libdiscid.compat import discid
+    from libdiscid.compat import discid  # type: ignore[no-redef]
 except ImportError:
     try:
-        import discid
+        import discid  # type: ignore[no-redef]
     except (ImportError, OSError):
-        discid = None
+        pass
 
 
 DISCID_NOT_LOADED_MESSAGE = "CDROM: discid library not found - Lookup CD functionality disabled"

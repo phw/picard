@@ -41,15 +41,16 @@ from picard.util.mbserver import build_submission_url
 from picard.ui.cdlookup import CDLookupDialog
 
 
+discid = None
 try:
     # use python-libdiscid (http://pythonhosted.org/python-libdiscid/)
-    from libdiscid.compat import discid
+    from libdiscid.compat import discid  # type: ignore[no-redef]
 except ImportError:
     try:
         # use python-discid (http://python-discid.readthedocs.org/en/latest/)
-        import discid
+        import discid  # type: ignore[no-redef]
     except (ImportError, OSError):
-        discid = None
+        pass
 
 
 class Disc:

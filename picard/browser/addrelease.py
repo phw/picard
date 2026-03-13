@@ -38,12 +38,12 @@ from picard.util.mbserver import build_submission_url
 from picard.util.webbrowser2 import open
 
 
+jwt: ModuleType | None = None  # type: ignore[no-redef]
 try:
     import jwt
     import jwt.exceptions
 except ImportError:
     log.debug("PyJWT not available, addrelease functionality disabled")
-    jwt: ModuleType | None = None  # type: ignore[no-redef]
 
 __key = token_bytes()  # Generating a new secret on each startup
 __algorithm = 'HS256'

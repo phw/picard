@@ -23,21 +23,23 @@ from collections import (
     OrderedDict,
     namedtuple,
 )
-from collections.abc import MutableSequence
+from collections.abc import Callable, MutableSequence
 from enum import IntEnum
 import html
-
-
-try:
-    from markdown import markdown
-except ImportError:
-    markdown = None
 
 from picard.i18n import (
     N_,
     gettext as _,
 )
 from picard.options import get_option_title
+
+
+markdown: Callable[[str], str] | None = None
+
+try:
+    from markdown import markdown  # type: ignore[no-redef]
+except ImportError:
+    pass
 
 
 DocumentLink = namedtuple('DocumentLink', ('title', 'link'))
