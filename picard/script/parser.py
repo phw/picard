@@ -208,7 +208,7 @@ class ScriptParser:
       argument    ::= (variable | function | argtext)*
     """
 
-    _cache: dict[str, list] = {}
+    _cache: dict[int, ScriptExpression] = {}
 
     def __init__(self):
         self._function_stack = LifoQueue()

@@ -116,7 +116,7 @@ class AbstractPipe(metaclass=ABCMeta):
     @classmethod
     @property
     @abstractmethod
-    def PIPE_DIRS(cls):
+    def PIPE_DIRS(cls):  # type: ignore[misc]
         """
         Tuple of dirs where pipe could possibly be created
 
