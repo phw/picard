@@ -124,7 +124,7 @@ class LocationDetector:
             return SessionItemLocation(
                 type=SessionConstants.LOCATION_TRACK,
                 album_id=parent.album.id,
-                recording_id=parent.id,  # type: ignore[arg-type]
+                recording_id=parent.id,
             )
 
         # Fallback to album unmatched

@@ -422,7 +422,7 @@ class Track(FileListItem):
 class NonAlbumTrack(Track):
     def __init__(self, nat_id):
         tagger = QtCore.QCoreApplication.instance()
-        super().__init__(nat_id, tagger.nats)  # type: ignore[attr-defined]
+        super().__init__(nat_id, tagger.nats)
         self.callback = None
         self.loaded = False
         self.status = None

@@ -26,7 +26,7 @@ from typing import Any
 
 
 try:
-    import pygit2  # type: ignore[unresolved-import]
+    import pygit2
 
     HAS_PYGIT2 = True
 except ImportError:

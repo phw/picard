@@ -34,7 +34,7 @@ class DebugOptEnum(int, Enum):
         obj._value_ = value
         obj.title = title
         obj.description = description
-        return obj  # type: ignore[return-value]
+        return obj
 
     @property
     def optname(self):

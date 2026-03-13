@@ -874,7 +874,7 @@ class Album(MetadataItem):
 
     def update(self, update_tracks=True, update_selection=True):
         if self.ui_item:
-            self.ui_item.update(update_tracks, update_selection=update_selection)  # type: ignore[call-arg]
+            self.ui_item.update(update_tracks, update_selection=update_selection)
 
     def add_file(self, track, file, new_album=True):
         self._files_count += 1

@@ -69,7 +69,7 @@ from picard.plugin3.validation import PluginValidation
 
 
 try:
-    from markdown import markdown as render_markdown  # type: ignore[unresolved-import]
+    from markdown import markdown as render_markdown
 except ImportError:
     render_markdown = None
 

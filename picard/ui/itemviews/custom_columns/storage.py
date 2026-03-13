@@ -326,7 +326,7 @@ def build_column_from_spec(spec: CustomColumnSpec) -> CustomColumn:
         from picard.ui.itemviews.custom_columns.script_provider import ChainedValueProvider
 
         base_provider = ChainedValueProvider(spec.expression)
-        provider = _apply_sorting_adapter(base_provider, sorting_adapter)  # type: ignore[assignment]
+        provider = _apply_sorting_adapter(base_provider, sorting_adapter)
         column = make_provider_column(
             spec.title,
             spec.key,

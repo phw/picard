@@ -167,7 +167,7 @@ class CoverArt:
     def _handle_queued_image(self, image: CoverArtImage) -> CoverArtProvider.QueueState:
         # image has already data loaded
         if image.datahash:
-            info = imageinfo.ImageInfo(  # type: ignore[call-arg]
+            info = imageinfo.ImageInfo(
                 width=image.width,
                 height=image.height,
                 mime=image.mimetype,
@@ -306,7 +306,7 @@ class CoverArt:
     def _message(self, *args, **kwargs):
         """Display message to status bar"""
         tagger = QtCore.QCoreApplication.instance()
-        tagger.window.set_statusbar_message(*args, **kwargs)  # type: ignore[attr-defined]
+        tagger.window.set_statusbar_message(*args, **kwargs)
 
 
 def _retrieve_coverart(album, metadata, release):

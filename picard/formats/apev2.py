@@ -138,7 +138,7 @@ class APEv2File(File):
     def _load(self, filename):
         log.debug("Loading file %r", filename)
         self.__casemap = {}
-        file = self._File(encode_filename(filename))  # type: ignore[misc]
+        file = self._File(encode_filename(filename))
         metadata = Metadata()
         if file.tags:
             for origname, values in file.tags.items():

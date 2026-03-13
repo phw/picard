@@ -142,7 +142,7 @@ class VCommentFile(File):
     def _load(self, filename):
         log.debug("Loading file %r", filename)
         config = get_config()
-        file = self._File(encode_filename(filename))  # type: ignore[misc]
+        file = self._File(encode_filename(filename))
         file.tags = file.tags or {}
         metadata = Metadata()
         for origname, values in file.tags.items():
@@ -253,7 +253,7 @@ class VCommentFile(File):
         config = get_config()
         is_flac = self._File == mutagen.flac.FLAC
         is_opus = self._File == mutagen.oggopus.OggOpus
-        file = self._File(encode_filename(filename))  # type: ignore[misc]
+        file = self._File(encode_filename(filename))
         if file.tags is None:
             file.add_tags()
         if config.setting['clear_existing_tags']:

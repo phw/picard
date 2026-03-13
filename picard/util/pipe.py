@@ -46,9 +46,9 @@ from picard.util import sanitize_filename
 
 
 if IS_WIN:
-    from pywintypes import error as WinApiError  # type: ignore
-    import win32file  # type: ignore
-    import win32pipe  # type: ignore
+    from pywintypes import error as WinApiError
+    import win32file
+    import win32pipe
 else:
 
     class WinApiError(Exception):  # type: ignore[no-redef]
@@ -116,7 +116,7 @@ class AbstractPipe(metaclass=ABCMeta):
     @classmethod
     @property
     @abstractmethod
-    def PIPE_DIRS(cls):  # type: ignore[misc]
+    def PIPE_DIRS(cls):
         """
         Tuple of dirs where pipe could possibly be created
 
@@ -161,7 +161,7 @@ class AbstractPipe(metaclass=ABCMeta):
             self._paths = self.__generate_filenames(app_name, app_version)  # type: ignore[assignment]
             self.path_was_forced = False
         else:
-            self._paths = (NamedTemporaryFile(delete=False).name,)  # type: ignore[assignment]
+            self._paths = (NamedTemporaryFile(delete=False).name,)
             self.path_was_forced = True
             log.debug("Pipe path had to be mocked by a temporary file")
         self.is_pipe_owner: bool = False
@@ -493,9 +493,9 @@ class WinPipe(AbstractPipe):
         if message is not None:
             message = message.decode('utf-8')
             if exit_code == 0:
-                return message  # type: ignore
+                return message
             else:
-                raise PipeErrorInvalidResponse(message)  # type: ignore
+                raise PipeErrorInvalidResponse(message)
         else:
             return self.NO_RESPONSE_MESSAGE
 

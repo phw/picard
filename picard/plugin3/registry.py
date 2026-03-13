@@ -37,9 +37,9 @@ from picard.plugin3.plugin import hash_string
 
 
 try:
-    import tomllib  # type: ignore[unresolved-import]
+    import tomllib
 except ModuleNotFoundError:
-    import tomli as tomllib  # type: ignore[no-redef]
+    import tomli as tomllib
 
 
 REGISTRY_CACHE_VERSION = 1  # Increment when cache format changes
@@ -298,7 +298,7 @@ class PluginRegistry:
                     if callback:
                         callback(False, fetch_error)
 
-        tagger.webservice.get_url(  # type: ignore[attr-defined]
+        tagger.webservice.get_url(
             url=QUrl(url),
             handler=handler,
             cacheloadcontrol=QNetworkRequest.CacheLoadControl.PreferCache,

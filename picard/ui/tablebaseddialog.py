@@ -111,8 +111,8 @@ class ResultTable(QtWidgets.QTableWidget):
             row_end = row_count - 1
 
         # Get the visual indices of the visible columns
-        column_start = max(horizontal_header.visualIndexAt(0), 0)  # type: ignore[union-attr]
-        column_end = horizontal_header.visualIndexAt(horizontal_header.width())  # type: ignore[union-attr]
+        column_start = max(horizontal_header.visualIndexAt(0), 0)
+        column_end = horizontal_header.visualIndexAt(horizontal_header.width())
         if column_end == -1:
             column_end = column_count - 1
 

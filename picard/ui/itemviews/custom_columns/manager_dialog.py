@@ -37,7 +37,7 @@ from dataclasses import (
     replace,
 )
 
-from PyQt6 import (  # type: ignore[unresolved-import]
+from PyQt6 import (
     QtCore,
     QtWidgets,
 )
@@ -387,7 +387,7 @@ class CustomColumnsManagerDialog(PicardDialog):
         # Reset uncommitted changes flag after populating form
         self._has_uncommitted_changes = False
 
-    def _on_form_changed(self, *args) -> None:  # type: ignore[no-untyped-def]
+    def _on_form_changed(self, *args) -> None:
         """Handle form changes by automatically updating the selected row."""
         if self._populating:
             return

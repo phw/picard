@@ -37,9 +37,9 @@ from picard.util.imageinfo import ImageInfo
 
 
 try:
-    import tomllib  # type: ignore[unresolved-import]
+    import tomllib
 except ImportError:
-    import tomli as tomllib  # type: ignore[no-redef]
+    import tomli as tomllib
 from typing import TYPE_CHECKING
 
 

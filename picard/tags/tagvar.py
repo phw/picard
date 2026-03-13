@@ -29,7 +29,7 @@ import html
 
 
 try:
-    from markdown import markdown  # type: ignore[unresolved-import]
+    from markdown import markdown
 except ImportError:
     markdown = None
 

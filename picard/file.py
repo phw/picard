@@ -1114,7 +1114,7 @@ class File(MetadataItem):
 
     def update_item(self, update_selection=True):
         if self.ui_item:
-            self.ui_item.update(update_selection=update_selection)  # type: ignore[call-arg]
+            self.ui_item.update(update_selection=update_selection)
 
     def iterfiles(self, save=False):
         yield self

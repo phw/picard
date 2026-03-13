@@ -69,9 +69,9 @@ AppKit = None
 winreg = None
 if IS_MACOS:
     try:
-        import AppKit  # type: ignore[unresolved-import,no-redef]
+        import AppKit  # type: ignore[no-redef]
     except ImportError:
-        AppKit = None
+        pass
 
     OS_SUPPORTS_THEMES = AppKit is not None and hasattr(AppKit.NSAppearance, '_darkAquaAppearance')
 

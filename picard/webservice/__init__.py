@@ -465,10 +465,10 @@ class WebService(QtCore.QObject):
         if request.method == 'DELETE':
             reply = send(request)
         elif data is not None:
-            reply = send(request, data.encode('utf-8'))  # type: ignore[call-overload]
+            reply = send(request, data.encode('utf-8'))
         else:
             reply = send(request)
-        self._active_requests[reply] = request  # type: ignore[index]
+        self._active_requests[reply] = request
         if task:
             self._task_to_reply[task] = reply
 

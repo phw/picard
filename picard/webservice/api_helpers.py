@@ -119,7 +119,7 @@ class APIHelper:
 
 class MBAPIHelper(APIHelper):
     @property
-    def base_url(self):  # type: ignore[misc]
+    def base_url(self):
         # we have to keep it dynamic since host/port can be changed via options
         config = get_config()
         host = config.setting['server_host']

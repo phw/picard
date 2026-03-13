@@ -20,7 +20,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 
-import yaml  # type: ignore[import-untyped]
+import yaml
 
 from picard.disc.utils import (
     TocEntry,

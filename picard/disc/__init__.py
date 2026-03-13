@@ -43,13 +43,13 @@ from picard.ui.cdlookup import CDLookupDialog
 
 try:
     # use python-libdiscid (http://pythonhosted.org/python-libdiscid/)
-    from libdiscid.compat import discid  # type: ignore[unresolved-import]
+    from libdiscid.compat import discid
 except ImportError:
     try:
         # use python-discid (http://python-discid.readthedocs.org/en/latest/)
-        import discid  # type: ignore[unresolved-import]
+        import discid
     except (ImportError, OSError):
-        discid = None  # type: ignore[assignment]
+        discid = None
 
 
 class Disc:

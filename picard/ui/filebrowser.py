@@ -196,7 +196,7 @@ class FileBrowser(QtWidgets.QTreeView):
                 path = extend_root_volume_path(path)
             model = self.model()
             if model:
-                index = model.index(find_existing_path(path))  # type: ignore[call-arg]
+                index = model.index(find_existing_path(path))
                 self.setCurrentIndex(index)
                 self.expand(index)
                 self.scrollTo(index, scrolltype)
