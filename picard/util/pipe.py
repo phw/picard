@@ -113,10 +113,9 @@ class AbstractPipe(metaclass=ABCMeta):
     MESSAGE_TO_IGNORE: str = '\0'
     TIMEOUT_SECS_WRITE: float = 1.5
 
-    @classmethod
     @property
     @abstractmethod
-    def PIPE_DIRS(cls):
+    def PIPE_DIRS(self):
         """
         Tuple of dirs where pipe could possibly be created
 
