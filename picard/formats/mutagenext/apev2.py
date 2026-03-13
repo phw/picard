@@ -33,7 +33,7 @@ def load_apev2_tags(f: FileType, filething):
     try:
         f.tags = APEv2(filething)  # type: ignore[assignment]
         # Correct the calculated length
-        if not hasattr(f.info, 'bitrate') or f.info.bitrate == 0:
+        if f.info is None or not hasattr(f.info, 'bitrate') or f.info.bitrate == 0:
             return
         ape_data = _APEv2Data(filething.fileobj)
         if ape_data.size is not None:
