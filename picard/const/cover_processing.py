@@ -227,4 +227,4 @@ def get_image_format_from_format(format_string: str) -> ImageFormat | None:
 COVER_PROCESSING_SLEEP = 0.001
 
 
-ALLOWED_QT_FORMATS: set[str] = set(str(x, 'utf-8') for x in QtGui.QImageWriter.supportedImageFormats())
+ALLOWED_QT_FORMATS: set[str] = {str(x, 'utf-8') for x in QtGui.QImageWriter.supportedImageFormats()}  # type: ignore[call-overload]
