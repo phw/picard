@@ -527,6 +527,7 @@ class CoverArtImage:
     def tempfile_filename(self) -> str | None:
         if self.datahash:
             return self.datahash.filename
+        return None
 
     def normalized_types(self):
         if self.types and self.support_types:
