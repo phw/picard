@@ -23,7 +23,10 @@ from collections import (
     OrderedDict,
     namedtuple,
 )
-from collections.abc import Callable, MutableSequence
+from collections.abc import (
+    Callable,
+    MutableSequence,
+)
 from enum import IntEnum
 import html
 
