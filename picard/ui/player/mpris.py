@@ -203,7 +203,7 @@ class MPRIS2Service(QObject):
         self._bus.send(msg)
 
 
-@pyqtClassInfo('D-Bus Interface', MPRIS2_DBUS_INTERFACE)
+@pyqtClassInfo('D-Bus Interface', MPRIS2_DBUS_INTERFACE)  # type: ignore[func-returns-value]
 class MediaPlayer2Adaptor(QDBusAbstractAdaptor):
     """See https://specifications.freedesktop.org/mpris/latest/Media_Player.html"""
 
@@ -258,7 +258,7 @@ class MediaPlayer2Adaptor(QDBusAbstractAdaptor):
         pass
 
 
-@pyqtClassInfo('D-Bus Interface', MPRIS2_DBUS_INTERFACE_PLAYER)
+@pyqtClassInfo('D-Bus Interface', MPRIS2_DBUS_INTERFACE_PLAYER)  # type: ignore[func-returns-value]
 class MediaPlayer2PlayerAdaptor(QDBusAbstractAdaptor):
     """See https://specifications.freedesktop.org/mpris/latest/Player_Interface.html"""
 
