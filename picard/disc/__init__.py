@@ -179,7 +179,6 @@ class Disc:
             self.tagger.move_files_to_album(self._files_to_match, album=album)
 
 
+discid_version: str | None = None
 if discid is not None:
-    discid_version: str = "discid %s, %s" % (discid.__version__, discid.LIBDISCID_VERSION_STRING)
-else:
-    discid_version = None
+    discid_version = "discid %s, %s" % (discid.__version__, discid.LIBDISCID_VERSION_STRING)
