@@ -62,7 +62,7 @@ class Option(QtCore.QObject):
     """Generic option."""
 
     registry: dict[tuple[str, str], 'Option'] = {}
-    qtype = None
+    qtype: object = None
 
     def __init__(self, section: str, name: str, default: ConfigValueType, title: str | None = None):
         super().__init__()
