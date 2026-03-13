@@ -35,7 +35,7 @@ class ImageInfo:
     width: int
     height: int
     datalen: int
-    format_info: ImageFormat
+    format_info: ImageFormat | None
 
 
 class IdentificationError(Exception):
