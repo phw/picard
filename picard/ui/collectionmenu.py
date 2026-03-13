@@ -106,7 +106,9 @@ class CollectionMenuItem(CheckboxMenuItem):
         palette.setColor(QtGui.QPalette.ColorRole.WindowText, textcolor)
         self._checkbox.setPalette(palette)
 
-    def keyPressEvent(self, event: QtGui.QKeyEvent):
+    def keyPressEvent(self, event: QtGui.QKeyEvent | None):
+        if event is None:
+            return
         if event.key() in {QtCore.Qt.Key.Key_Enter, QtCore.Qt.Key.Key_Return, QtCore.Qt.Key.Key_Space}:
             self._checkbox.nextCheckState()
             event.accept()
