@@ -215,7 +215,7 @@ class MediaPlayer2Adaptor(QDBusAbstractAdaptor):
     def Fullscreen(self):
         return False
 
-    @Fullscreen.setter
+    @Fullscreen.setter  # type: ignore[no-redef]
     def Fullscreen(self, value):
         raise NotImplementedError()
 
@@ -285,7 +285,7 @@ class MediaPlayer2PlayerAdaptor(QDBusAbstractAdaptor):
     def LoopStatus(self):
         return MPRIS2LoopStatus.None_.value
 
-    @LoopStatus.setter
+    @LoopStatus.setter  # type: ignore[no-redef]
     def LoopStatus(self, value):
         # Not supported
         pass
@@ -294,7 +294,7 @@ class MediaPlayer2PlayerAdaptor(QDBusAbstractAdaptor):
     def Rate(self):
         return self._player.playback_rate
 
-    @Rate.setter
+    @Rate.setter  # type: ignore[no-redef]
     def Rate(self, value):
         # The player automatically limits the value to the allowed minimum / maximum
         self._player.playback_rate = value
@@ -303,7 +303,7 @@ class MediaPlayer2PlayerAdaptor(QDBusAbstractAdaptor):
     def Shuffle(self):
         return False
 
-    @Shuffle.setter
+    @Shuffle.setter  # type: ignore[no-redef]
     def Shuffle(self, value):
         # Not supported
         pass
@@ -316,7 +316,7 @@ class MediaPlayer2PlayerAdaptor(QDBusAbstractAdaptor):
     def Volume(self):
         return self._player.volume
 
-    @Volume.setter
+    @Volume.setter  # type: ignore[no-redef]
     def Volume(self, value):
         # Ensure the value is inside the range
         value = min(max(value, 0.0), 1.0)
