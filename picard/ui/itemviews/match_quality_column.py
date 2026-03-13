@@ -302,6 +302,8 @@ class MatchQualityColumnDelegate(QtWidgets.QStyledItemDelegate):
         self.initStyleOption(option, index)
 
         # Draw the background
+        if painter is None:
+            return
         if option.state & QtWidgets.QStyle.StateFlag.State_Selected:
             fill_brush = option.palette.highlight()
         else:
@@ -353,7 +355,7 @@ class MatchQualityColumnDelegate(QtWidgets.QStyledItemDelegate):
         """
         # Get item data
         item_data = self._get_item_data(index)
-        if not item_data:
+        if not item_data or event is None:
             return False
 
         # Format tooltip text
