@@ -158,10 +158,10 @@ class AbstractPipe(metaclass=ABCMeta):
         if forced_path:
             self._paths = (forced_path,)
         elif IS_WIN or os.getenv('HOME'):
-            self._paths = self.__generate_filenames(app_name, app_version)
+            self._paths = self.__generate_filenames(app_name, app_version)  # type: ignore[assignment]
             self.path_was_forced = False
         else:
-            self._paths = (NamedTemporaryFile(delete=False).name,)
+            self._paths = (NamedTemporaryFile(delete=False).name,)  # type: ignore[assignment]
             self.path_was_forced = True
             log.debug("Pipe path had to be mocked by a temporary file")
         self.is_pipe_owner: bool = False
