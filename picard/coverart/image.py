@@ -211,10 +211,11 @@ class CoverArtImage:
     # indicator
     is_front: bool | None = None
     sourceprefix: str = 'URL'
+    url: QUrl | None = None
 
     def __init__(
         self,
-        url=None,
+        url: QUrl | str | None = None,
         types: list[str] | None = None,
         comment: str = '',
         data: bytes | None = None,
