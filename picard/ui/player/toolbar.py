@@ -303,7 +303,9 @@ class VolumeControlButton(QtWidgets.QToolButton):
         self._step = 3
         self._volume_fmt = N_("%d%%")
         self.set_volume(volume)
-        button_margin = self.style().pixelMetric(QtWidgets.QStyle.PixelMetric.PM_ButtonMargin)
+        style = self.style()
+        assert style is not None
+        button_margin = style.pixelMetric(QtWidgets.QStyle.PixelMetric.PM_ButtonMargin)
         min_width = get_text_width(self.font(), _(self._volume_fmt) % 888)
         self.setMinimumWidth(min_width + (2 * button_margin) + 2)
         self.clicked.connect(self.show_popover)
