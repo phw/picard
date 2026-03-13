@@ -69,7 +69,7 @@ class ColumnController:
         dict[str, ValidationReport]
             Dictionary mapping specification keys to validation reports.
         """
-        return self._validator.validate_multiple(specs)
+        return self._validator.validate_multiple(specs)  # type: ignore[arg-type]
 
     def first_invalid_spec(self, specs: Iterable[CustomColumnSpec]) -> CustomColumnSpec | None:
         """Find the first invalid specification in a collection.
