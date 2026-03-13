@@ -98,6 +98,9 @@ class ResultTable(QtWidgets.QTableWidget):
         vertical_header = self.verticalHeader()
         horizontal_header = self.horizontalHeader()
 
+        if vertical_header is None or horizontal_header is None:
+            return False
+
         # Get the visual indices of the visible rows
         # visualIndexAt(0) gives the visual index of the first visible item
         # visualIndexAt(header_height) gives the visual index of the last visible item
@@ -108,8 +111,8 @@ class ResultTable(QtWidgets.QTableWidget):
             row_end = row_count - 1
 
         # Get the visual indices of the visible columns
-        column_start = max(horizontal_header.visualIndexAt(0), 0)
-        column_end = horizontal_header.visualIndexAt(horizontal_header.width())
+        column_start = max(horizontal_header.visualIndexAt(0), 0)  # type: ignore[union-attr]
+        column_end = horizontal_header.visualIndexAt(horizontal_header.width())  # type: ignore[union-attr]
         if column_end == -1:
             column_end = column_count - 1
 
