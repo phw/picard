@@ -25,7 +25,7 @@ from collections import (
     deque,
     namedtuple,
 )
-from collections.abc import Callable
+from collections.abc import Callable, Iterable
 from functools import partial
 
 from PyQt6.QtNetwork import QNetworkReply
@@ -182,7 +182,7 @@ def parse_recording_map(recording_map: dict[str, dict[str, Recording]]):
             yield parsed_recording
 
 
-def max_source_count(recordings: list[Recording]):
+def max_source_count(recordings: Iterable[Recording]):
     """Given a list of recordings return the highest number of sources.
     This ignores recordings without metadata.
     """
