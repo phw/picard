@@ -57,7 +57,7 @@ class UnexpectedError(IdentificationError):
 class IdentifyImageType:
     w = -1
     h = -1
-    format_info: ImageFormat = None
+    format_info: ImageFormat | None = None
 
     def __init__(self, data):
         self.data = data
