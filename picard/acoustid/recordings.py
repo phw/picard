@@ -168,7 +168,7 @@ def get_score(node):
 
 def parse_recording_map(recording_map: dict[str, dict[str, Recording]]):
     for acoustid, recordings in recording_map.items():
-        recording_list = list(recordings.values())
+        recording_list = recordings.values()
         max_sources = max_source_count(recording_list)
         for recording in recording_list:
             parsed_recording = recording.recording
