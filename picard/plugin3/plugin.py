@@ -389,6 +389,8 @@ class PluginSourceGit(PluginSource):
                     f"Could not resolve relative ref '{self.ref}' after repository setup. Available refs: {available_refs}"
                 ) from None
 
+        if commit is None:
+            return None
         repo.reset(commit.id, GitResetMode.HARD)
         commit_id = commit.id
         repo.free()
