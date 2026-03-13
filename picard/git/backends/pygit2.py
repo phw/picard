@@ -26,12 +26,12 @@ from typing import Any
 
 
 try:
-    import pygit2
+    import pygit2  # type: ignore[unresolved-import]
 
     HAS_PYGIT2 = True
 except ImportError:
     HAS_PYGIT2 = False
-    pygit2 = None
+    pygit2 = None  # type: ignore[assignment]
 
 from picard import log
 from picard.git.backend import (
