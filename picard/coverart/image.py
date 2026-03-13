@@ -67,6 +67,7 @@ from picard.util.filenaming import (
     make_save_path,
     make_short_filename,
 )
+from picard.util.imageinfo import ImageInfo
 from picard.util.scripttofilename import script_to_filename
 
 
@@ -212,6 +213,10 @@ class CoverArtImage:
     is_front: bool | None = None
     sourceprefix: str = 'URL'
     url: QUrl | None = None
+    datahash: DataHash | None = None
+    thumbnail: 'CoverArtImage | None' = None
+    external_file_coverart: 'CoverArtImage | None' = None
+    format_info: 'ImageInfo | None' = None
 
     def __init__(
         self,

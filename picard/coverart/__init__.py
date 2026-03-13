@@ -170,9 +170,9 @@ class CoverArt:
             info = imageinfo.ImageInfo(
                 width=image.width,
                 height=image.height,
+                datalen=image.datalength,
                 mime=image.mimetype,
                 extension=image.extension,
-                datalen=image.datalength,
             )
             self._process_image_data(image, image.data, info)
             return CoverArtProvider.QueueState.WAIT
