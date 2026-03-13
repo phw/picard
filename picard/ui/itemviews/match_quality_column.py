@@ -283,7 +283,7 @@ class MatchQualityColumnDelegate(QtWidgets.QStyledItemDelegate):
 
     def paint(
         self,
-        painter: QtGui.QPainter,
+        painter: QtGui.QPainter | None,
         option: QtWidgets.QStyleOptionViewItem,
         index: QtCore.QModelIndex,
     ) -> None:
@@ -328,8 +328,8 @@ class MatchQualityColumnDelegate(QtWidgets.QStyledItemDelegate):
 
     def helpEvent(
         self,
-        event: QtGui.QHelpEvent,
-        view: QtWidgets.QWidget,
+        event: QtGui.QHelpEvent | None,
+        view: QtWidgets.QAbstractItemView | None,
         option: QtWidgets.QStyleOptionViewItem,
         index: QtCore.QModelIndex,
     ) -> bool:
