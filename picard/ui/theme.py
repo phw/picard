@@ -73,7 +73,7 @@ if IS_MACOS:
     except ImportError:
         AppKit = None
 
-    OS_SUPPORTS_THEMES = bool(AppKit) and hasattr(AppKit.NSAppearance, '_darkAquaAppearance')
+    OS_SUPPORTS_THEMES = AppKit is not None and hasattr(AppKit.NSAppearance, '_darkAquaAppearance')
 
 elif IS_HAIKU:
     OS_SUPPORTS_THEMES = False
