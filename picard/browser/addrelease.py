@@ -26,6 +26,7 @@ from html import escape
 from operator import attrgetter
 import re
 from secrets import token_bytes
+from types import ModuleType
 
 from PyQt6.QtCore import QCoreApplication
 
@@ -42,7 +43,7 @@ try:
     import jwt.exceptions  # type: ignore[unresolved-import]
 except ImportError:
     log.debug("PyJWT not available, addrelease functionality disabled")
-    jwt = None
+    jwt: ModuleType | None = None  # type: ignore[no-redef]
 
 __key = token_bytes()  # Generating a new secret on each startup
 __algorithm = 'HS256'

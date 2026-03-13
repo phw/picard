@@ -121,7 +121,7 @@ class ProcessingImage:
             width=image.width(),
             height=image.height(),
             datalen=0,
-            format_info=None,
+            format_info=None,  # type: ignore[arg-type]
         )
 
 
