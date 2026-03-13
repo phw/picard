@@ -79,9 +79,9 @@ class ArtworkTable(QtWidgets.QTableWidget):
     NUM_COLS = 3
 
     _columns: dict[str, int] = {}
-    _labels = ()
+    _labels: tuple[str, ...] = ()
     _tooltips: dict[str, str] = {}
-    artwork_columns = ()
+    artwork_columns: tuple[str, ...] = ()
 
     def __init__(self, parent=None):
         super().__init__(self.NUM_ROWS, self.NUM_COLS, parent=parent)
