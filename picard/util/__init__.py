@@ -1029,7 +1029,9 @@ def extract_year_from_date(dt: str | date | Mapping) -> int | None:
         if isinstance(dt, date):
             return dt.year
         elif isinstance(dt, Mapping):
-            return int(dt.get('year') or 0)
+            if 'year' not in dt:
+                return None
+            return int(dt['year'])
         else:
             if isinstance(dt, str):
                 dt = dt.strip()
