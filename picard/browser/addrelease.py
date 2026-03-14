@@ -38,10 +38,10 @@ from picard.util.mbserver import build_submission_url
 from picard.util.webbrowser2 import open
 
 
-jwt: ModuleType | None = None  # type: ignore[no-redef]
+jwt: ModuleType | None = None
 try:
-    import jwt
-    import jwt.exceptions
+    import jwt  # type: ignore[unresolved-import]
+    import jwt.exceptions  # type: ignore[unresolved-import]
 except ImportError:
     log.debug("PyJWT not available, addrelease functionality disabled")
 

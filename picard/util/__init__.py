@@ -44,10 +44,10 @@
 
 
 try:
-    from charset_normalizer import detect
+    from charset_normalizer import detect  # type: ignore[unresolved-import]
 except ImportError:
     try:
-        from chardet import detect  # type: ignore[no-redef]
+        from chardet import detect  # type: ignore[unresolved-import]
     except ImportError:
         detect = None  # type: ignore[assignment]
 from collections import (

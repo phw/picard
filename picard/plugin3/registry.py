@@ -37,7 +37,7 @@ from picard.plugin3.plugin import hash_string
 
 
 try:
-    import tomllib
+    import tomllib  # type: ignore[unresolved-import]
 except ModuleNotFoundError:
     import tomli as tomllib
 

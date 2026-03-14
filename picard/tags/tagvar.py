@@ -40,7 +40,7 @@ from picard.options import get_option_title
 markdown: Callable[[str], str] | None = None
 
 try:
-    from markdown import markdown  # type: ignore[no-redef]
+    from markdown import markdown  # type: ignore[unresolved-import]
 except ImportError:
     pass
 
