@@ -29,9 +29,9 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-
 from functools import partial
 import traceback
+from types import ModuleType
 
 from PyQt6 import QtCore
 
@@ -41,14 +41,14 @@ from picard.util.mbserver import build_submission_url
 from picard.ui.cdlookup import CDLookupDialog
 
 
-discid = None
+discid: ModuleType | None = None
 try:
     # use python-libdiscid (http://pythonhosted.org/python-libdiscid/)
-    from libdiscid.compat import discid  # type: ignore[unresolved-import]
+    from libdiscid.compat import discid  # type: ignore[unresolved-import,no-redef]
 except ImportError:
     try:
         # use python-discid (http://python-discid.readthedocs.org/en/latest/)
-        import discid  # type: ignore[unresolved-import]
+        import discid  # type: ignore[unresolved-import,no-redef]
     except (ImportError, OSError):
         pass
 

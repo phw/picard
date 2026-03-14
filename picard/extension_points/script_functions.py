@@ -54,7 +54,7 @@ from picard.plugin import ExtensionPoint
 markdown: Callable[[str], str] | None = None
 
 try:
-    from markdown import markdown  # type: ignore[unresolved-import]
+    from markdown import markdown  # type: ignore[unresolved-import,no-redef]
 except ImportError:
     pass
 

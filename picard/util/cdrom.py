@@ -31,6 +31,7 @@
 
 
 import os.path
+from types import ModuleType
 
 from picard import log
 from picard.config import get_config
@@ -40,12 +41,12 @@ from picard.const.sys import (
 )
 
 
-discid = None
+discid: ModuleType | None = None
 try:
-    from libdiscid.compat import discid  # type: ignore[unresolved-import]
+    from libdiscid.compat import discid  # type: ignore[unresolved-import,no-redef]
 except ImportError:
     try:
-        import discid  # type: ignore[unresolved-import]
+        import discid  # type: ignore[unresolved-import,no-redef]
     except (ImportError, OSError):
         pass
 
