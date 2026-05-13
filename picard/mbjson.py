@@ -227,7 +227,7 @@ def _relations_to_metadata_target_type_artist(relation: Node, m: 'Metadata', con
     artist_sort_name = translated_alias.sort_name
     if not has_translation and context.use_credited_as and 'target-credit' in relation:
         credited_as = relation['target-credit']
-        if credited_as:
+        if credited_as and credited_as != artist['name']:
             artist_name = credited_as
             artist_sort_name = _select_sort_name_from_aliases(artist, credited_as, config=context.config)
     reltype = relation['type']
@@ -651,7 +651,10 @@ def artist_credit_from_node(node: list[Node]) -> ArtistCreditInfo:
         has_translation = translated_alias.name != artist['name']
         if not has_translation and use_credited_as and 'name' in artist_info:
             name = artist_info['name']
-            sort_name = _select_sort_name_from_aliases(artist, name, config=config)
+            if name != artist['name']:
+                sort_name = _select_sort_name_from_aliases(artist, name, config=config)
+            else:
+                sort_name = translated_alias.sort_name
         else:
             name = translated_alias.name
             sort_name = translated_alias.sort_name
