@@ -1,339 +1,339 @@
 {
-  "text-representation": {
-    "script": "Latn",
-    "language": "eng"
-  },
-  "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
   "release-group": {
+    "secondary-types": [],
+    "primary-type": "Album",
+    "first-release-date": "2000-10-09",
+    "id": "3822abb6-ca53-3ae1-a4ec-7718cb321e9b",
     "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
     "artist-credit": [
       {
         "joinphrase": "",
         "artist": {
           "country": "CA",
-          "type": "Group",
-          "disambiguation": "",
-          "name": "Godspeed You! Black Emperor",
           "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+          "type": "Group",
+          "name": "Godspeed You! Black Emperor",
+          "id": "3648db01-b29d-4ab9-835c-83f6a5068fe4",
           "sort-name": "Godspeed You! Black Emperor",
-          "id": "3648db01-b29d-4ab9-835c-83f6a5068fe4"
+          "disambiguation": ""
         },
         "name": "Godspeed You Black Emperor!"
       }
     ],
-    "first-release-date": "2000-10-09",
     "secondary-type-ids": [],
     "disambiguation": "",
-    "title": "Lift Yr. Skinny Fists Like Antennas to Heaven!",
-    "secondary-types": [],
-    "primary-type": "Album",
-    "id": "3822abb6-ca53-3ae1-a4ec-7718cb321e9b"
+    "title": "Lift Yr. Skinny Fists Like Antennas to Heaven!"
   },
-  "artist-credit": [
-    {
-      "artist": {
-        "name": "Godspeed You! Black Emperor",
-        "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
-        "id": "3648db01-b29d-4ab9-835c-83f6a5068fe4",
-        "sort-name": "Godspeed You! Black Emperor",
-        "country": "CA",
-        "type": "Group",
-        "disambiguation": ""
-      },
-      "name": "Godspeed You Black Emperor!",
-      "joinphrase": ""
-    }
-  ],
-  "date": "2000-10-09",
+  "id": "e3334c4e-9612-43a2-923b-27e33acbd705",
   "label-info": [
     {
       "catalog-number": "CST012",
       "label": {
-        "label-code": null,
-        "disambiguation": "Montreal record label",
-        "type": "Original Production",
-        "id": "3496ee09-46bf-4bfd-92f1-38593e24d987",
-        "sort-name": "Constellation",
         "type-id": "7aaa37fe-2def-3476-b359-80245850062d",
-        "name": "Constellation"
+        "name": "Constellation",
+        "type": "Original Production",
+        "label-code": null,
+        "id": "3496ee09-46bf-4bfd-92f1-38593e24d987",
+        "disambiguation": "Montreal record label",
+        "sort-name": "Constellation"
       }
     }
   ],
   "quality": "normal",
-  "id": "e3334c4e-9612-43a2-923b-27e33acbd705",
+  "disambiguation": "",
+  "status": "Official",
+  "country": "AU",
   "packaging-id": "e724a489-a7e8-30a1-a17c-30dfd6831202",
-  "asin": "B00004ZD69",
-  "barcode": "666561001216",
-  "media": [
+  "date": "2000-10-09",
+  "cover-art-archive": {
+    "artwork": true,
+    "count": 7,
+    "darkened": false,
+    "back": true,
+    "front": true
+  },
+  "release-events": [
     {
-      "tracks": [
-        {
-          "artist-credit": [
-            {
-              "joinphrase": "",
-              "artist": {
-                "disambiguation": "",
-                "type": "Group",
-                "country": "CA",
-                "id": "3648db01-b29d-4ab9-835c-83f6a5068fe4",
-                "sort-name": "Godspeed You! Black Emperor",
-                "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
-                "name": "Godspeed You! Black Emperor"
-              },
-              "name": "Godspeed You Black Emperor!"
-            }
-          ],
-          "number": "A",
-          "recording": {
-            "first-release-date": "2000-10-09",
-            "artist-credit": [
-              {
-                "name": "Godspeed You Black Emperor!",
-                "artist": {
-                  "id": "3648db01-b29d-4ab9-835c-83f6a5068fe4",
-                  "sort-name": "Godspeed You! Black Emperor",
-                  "name": "Godspeed You! Black Emperor",
-                  "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
-                  "disambiguation": "",
-                  "country": "CA",
-                  "type": "Group"
-                },
-                "joinphrase": ""
-              }
-            ],
-            "title": "Storm",
-            "isrcs": [
-              "USI4R0401862"
-            ],
-            "video": false,
-            "length": 1352413,
-            "id": "519e6d2f-c762-48b1-8798-8f0299e11cc7",
-            "disambiguation": ""
-          },
-          "length": 1352413,
-          "id": "e89f3b46-d0d8-3165-969a-94e4992fc5b4",
-          "position": 1,
-          "title": "Storm (Lift Yr. Skinny Fists, Like Antennas to Heaven\u2026 / Gathering Storm / Il Pleut \u00c0 Mourir [+Clatters Like Worry] / \u201cWelcome to Barco AM/PM\u2026\u201d [L.A.X.; 5/14/00] / Cancer Towers on Holy Road Hi\u2010Way)"
-        },
-        {
-          "recording": {
-            "isrcs": [
-              "USI4R0401863"
-            ],
-            "video": false,
-            "title": "Static",
-            "id": "30d53b2b-dbd5-4975-bbdf-48986b4bd089",
-            "length": 1355946,
-            "disambiguation": "",
-            "first-release-date": "2000-10-09",
-            "artist-credit": [
-              {
-                "artist": {
-                  "sort-name": "Godspeed You! Black Emperor",
-                  "id": "3648db01-b29d-4ab9-835c-83f6a5068fe4",
-                  "name": "Godspeed You! Black Emperor",
-                  "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
-                  "disambiguation": "",
-                  "country": "CA",
-                  "type": "Group"
-                },
-                "name": "Godspeed You Black Emperor!",
-                "joinphrase": ""
-              }
-            ]
-          },
-          "id": "20f5f83f-ac61-32dd-a283-14e1a62526ca",
-          "length": 1355946,
-          "title": "Static (Terrible Canyons of Static / Atomic Clock / Chart #3 / World Police and Friendly Fire / [\u2026+The Buildings They Are Sleeping Now])",
-          "position": 2,
-          "artist-credit": [
-            {
-              "artist": {
-                "name": "Godspeed You! Black Emperor",
-                "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
-                "sort-name": "Godspeed You! Black Emperor",
-                "id": "3648db01-b29d-4ab9-835c-83f6a5068fe4",
-                "country": "CA",
-                "type": "Group",
-                "disambiguation": ""
-              },
-              "name": "Godspeed You Black Emperor!",
-              "joinphrase": ""
-            }
-          ],
-          "number": "B"
-        }
-      ],
-      "track-offset": 0,
-      "track-count": 2,
-      "format": "12\" Vinyl",
-      "format-id": "3e9080b0-5e6c-34ab-bd15-f526b6306a64",
-      "id": "0a422cdd-8519-3660-9407-a2e304bba86e",
-      "position": 1,
-      "title": ""
+      "area": {
+        "type-id": null,
+        "id": "106e0bec-b638-3b37-b731-f53d507dc00e",
+        "name": "Australia",
+        "type": null,
+        "iso-3166-1-codes": [
+          "AU"
+        ],
+        "sort-name": "Australia",
+        "disambiguation": ""
+      },
+      "date": "2000-10-09"
     },
     {
+      "date": "2000-10-09",
+      "area": {
+        "type-id": null,
+        "id": "71bbafaa-e825-3e15-8ca9-017dcad1748b",
+        "type": null,
+        "name": "Canada",
+        "iso-3166-1-codes": [
+          "CA"
+        ],
+        "sort-name": "Canada",
+        "disambiguation": ""
+      }
+    },
+    {
+      "date": "2000-10-09",
+      "area": {
+        "disambiguation": "",
+        "sort-name": "United Kingdom",
+        "iso-3166-1-codes": [
+          "GB"
+        ],
+        "name": "United Kingdom",
+        "type": null,
+        "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
+        "type-id": null
+      }
+    }
+  ],
+  "barcode": "666561001216",
+  "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
+  "artist-credit": [
+    {
+      "joinphrase": "",
+      "name": "Godspeed You Black Emperor!",
+      "artist": {
+        "country": "CA",
+        "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+        "id": "3648db01-b29d-4ab9-835c-83f6a5068fe4",
+        "name": "Godspeed You! Black Emperor",
+        "type": "Group",
+        "sort-name": "Godspeed You! Black Emperor",
+        "disambiguation": ""
+      }
+    }
+  ],
+  "packaging": "Gatefold Cover",
+  "media": [
+    {
+      "id": "0a422cdd-8519-3660-9407-a2e304bba86e",
+      "track-count": 2,
       "track-offset": 0,
+      "title": "",
+      "format": "12\" Vinyl",
+      "position": 1,
+      "format-id": "3e9080b0-5e6c-34ab-bd15-f526b6306a64",
       "tracks": [
         {
-          "number": "C",
-          "artist-credit": [
-            {
-              "name": "Godspeed You Black Emperor!",
-              "artist": {
-                "name": "Godspeed You! Black Emperor",
-                "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
-                "sort-name": "Godspeed You! Black Emperor",
-                "id": "3648db01-b29d-4ab9-835c-83f6a5068fe4",
-                "country": "CA",
-                "type": "Group",
-                "disambiguation": ""
-              },
-              "joinphrase": ""
-            }
-          ],
-          "title": "Sleep (Murray Ostril: \u201c\u2026 They Don\u2019t Sleep Anymore on the Beach\u2026\u201d / Monheim / Broken Windows, Locks of Love Pt. III. / 3rd Part)",
-          "position": 1,
-          "length": 1397746,
-          "id": "0515b4e1-6806-3f7c-9dd7-3479edea9d62",
+          "id": "e89f3b46-d0d8-3165-969a-94e4992fc5b4",
           "recording": {
+            "disambiguation": "",
+            "title": "Storm",
             "artist-credit": [
               {
                 "joinphrase": "",
                 "artist": {
+                  "id": "3648db01-b29d-4ab9-835c-83f6a5068fe4",
+                  "name": "Godspeed You! Black Emperor",
                   "type": "Group",
                   "country": "CA",
-                  "disambiguation": "",
                   "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
-                  "name": "Godspeed You! Black Emperor",
-                  "id": "3648db01-b29d-4ab9-835c-83f6a5068fe4",
-                  "sort-name": "Godspeed You! Black Emperor"
+                  "sort-name": "Godspeed You! Black Emperor",
+                  "disambiguation": ""
                 },
                 "name": "Godspeed You Black Emperor!"
               }
             ],
-            "first-release-date": "2000-10-09",
-            "disambiguation": "",
-            "length": 1397746,
-            "id": "b8f1c93d-4273-4428-96cb-c38c6fb0d867",
-            "title": "Sleep",
-            "video": false,
+            "length": 1352413,
             "isrcs": [
-              "USI4R0401864"
-            ]
-          }
-        },
-        {
-          "length": 1137586,
-          "id": "3dd71ba0-cdb4-3cd4-82c8-536f43c95b3c",
-          "position": 2,
-          "title": "Antennas to Heaven (Moya Sings \u201cBaby\u2010O\u201d\u2026 / Edgyswingsetacid / [Glockenspiel Duet Recorded on a Campsite in Rhinebeck, N.Y.] / \u201cAttention\u2026 Mon Ami\u2026 Fa\u2010Lala\u2010Lala\u2010La\u2010La\u2026\u201d [55\u2010St.Laurent] / She Dreamt She Was a Bulldozer, She Dreamt She Was Alone in an Empty Field / Deathkamp Drone / [Antennas to Heaven\u2026])",
-          "recording": {
-            "artist-credit": [
-              {
-                "artist": {
-                  "disambiguation": "",
-                  "country": "CA",
-                  "type": "Group",
-                  "id": "3648db01-b29d-4ab9-835c-83f6a5068fe4",
-                  "sort-name": "Godspeed You! Black Emperor",
-                  "name": "Godspeed You! Black Emperor",
-                  "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b"
-                },
-                "name": "Godspeed You Black Emperor!",
-                "joinphrase": ""
-              }
-            ],
-            "first-release-date": "2000-10-09",
-            "disambiguation": "",
-            "isrcs": [
-              "USI4R0401865"
+              "USI4R0401862"
             ],
             "video": false,
-            "title": "Antennas to Heaven",
-            "id": "5fb00c2b-5bc9-420a-882a-cc024d137a08",
-            "length": 1137586
+            "id": "519e6d2f-c762-48b1-8798-8f0299e11cc7",
+            "first-release-date": "2000-10-09"
           },
+          "title": "Storm (Lift Yr. Skinny Fists, Like Antennas to Heaven\u2026 / Gathering Storm / Il Pleut \u00c0 Mourir [+Clatters Like Worry] / \u201cWelcome to Barco AM/PM\u2026\u201d [L.A.X.; 5/14/00] / Cancer Towers on Holy Road Hi\u2010Way)",
+          "position": 1,
+          "number": "A",
+          "length": 1352413,
           "artist-credit": [
             {
               "joinphrase": "",
               "name": "Godspeed You Black Emperor!",
               "artist": {
-                "country": "CA",
-                "type": "Group",
                 "disambiguation": "",
-                "name": "Godspeed You! Black Emperor",
-                "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+                "sort-name": "Godspeed You! Black Emperor",
                 "id": "3648db01-b29d-4ab9-835c-83f6a5068fe4",
-                "sort-name": "Godspeed You! Black Emperor"
+                "name": "Godspeed You! Black Emperor",
+                "type": "Group",
+                "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+                "country": "CA"
+              }
+            }
+          ]
+        },
+        {
+          "recording": {
+            "disambiguation": "",
+            "title": "Static",
+            "artist-credit": [
+              {
+                "name": "Godspeed You Black Emperor!",
+                "artist": {
+                  "id": "3648db01-b29d-4ab9-835c-83f6a5068fe4",
+                  "type": "Group",
+                  "name": "Godspeed You! Black Emperor",
+                  "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+                  "country": "CA",
+                  "disambiguation": "",
+                  "sort-name": "Godspeed You! Black Emperor"
+                },
+                "joinphrase": ""
+              }
+            ],
+            "length": 1355946,
+            "video": false,
+            "isrcs": [
+              "USI4R0401863"
+            ],
+            "id": "30d53b2b-dbd5-4975-bbdf-48986b4bd089",
+            "first-release-date": "2000-10-09"
+          },
+          "id": "20f5f83f-ac61-32dd-a283-14e1a62526ca",
+          "artist-credit": [
+            {
+              "joinphrase": "",
+              "name": "Godspeed You Black Emperor!",
+              "artist": {
+                "disambiguation": "",
+                "sort-name": "Godspeed You! Black Emperor",
+                "id": "3648db01-b29d-4ab9-835c-83f6a5068fe4",
+                "type": "Group",
+                "name": "Godspeed You! Black Emperor",
+                "country": "CA",
+                "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b"
               }
             }
           ],
-          "number": "D"
+          "length": 1355946,
+          "number": "B",
+          "position": 2,
+          "title": "Static (Terrible Canyons of Static / Atomic Clock / Chart #3 / World Police and Friendly Fire / [\u2026+The Buildings They Are Sleeping Now])"
         }
-      ],
+      ]
+    },
+    {
+      "id": "a4a189bc-c3be-3b2a-b256-4ec136b32025",
       "track-count": 2,
-      "format": "12\" Vinyl",
+      "track-offset": 0,
       "position": 2,
+      "format": "12\" Vinyl",
       "title": "",
       "format-id": "3e9080b0-5e6c-34ab-bd15-f526b6306a64",
-      "id": "a4a189bc-c3be-3b2a-b256-4ec136b32025"
+      "tracks": [
+        {
+          "artist-credit": [
+            {
+              "joinphrase": "",
+              "artist": {
+                "name": "Godspeed You! Black Emperor",
+                "type": "Group",
+                "id": "3648db01-b29d-4ab9-835c-83f6a5068fe4",
+                "country": "CA",
+                "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+                "sort-name": "Godspeed You! Black Emperor",
+                "disambiguation": ""
+              },
+              "name": "Godspeed You Black Emperor!"
+            }
+          ],
+          "length": 1397746,
+          "number": "C",
+          "position": 1,
+          "title": "Sleep (Murray Ostril: \u201c\u2026 They Don\u2019t Sleep Anymore on the Beach\u2026\u201d / Monheim / Broken Windows, Locks of Love Pt. III. / 3rd Part)",
+          "recording": {
+            "id": "b8f1c93d-4273-4428-96cb-c38c6fb0d867",
+            "video": false,
+            "isrcs": [
+              "USI4R0401864"
+            ],
+            "first-release-date": "2000-10-09",
+            "title": "Sleep",
+            "disambiguation": "",
+            "length": 1397746,
+            "artist-credit": [
+              {
+                "joinphrase": "",
+                "name": "Godspeed You Black Emperor!",
+                "artist": {
+                  "id": "3648db01-b29d-4ab9-835c-83f6a5068fe4",
+                  "type": "Group",
+                  "name": "Godspeed You! Black Emperor",
+                  "country": "CA",
+                  "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+                  "sort-name": "Godspeed You! Black Emperor",
+                  "disambiguation": ""
+                }
+              }
+            ]
+          },
+          "id": "0515b4e1-6806-3f7c-9dd7-3479edea9d62"
+        },
+        {
+          "recording": {
+            "disambiguation": "",
+            "title": "Antennas to Heaven",
+            "artist-credit": [
+              {
+                "artist": {
+                  "id": "3648db01-b29d-4ab9-835c-83f6a5068fe4",
+                  "name": "Godspeed You! Black Emperor",
+                  "type": "Group",
+                  "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+                  "country": "CA",
+                  "disambiguation": "",
+                  "sort-name": "Godspeed You! Black Emperor"
+                },
+                "name": "Godspeed You Black Emperor!",
+                "joinphrase": ""
+              }
+            ],
+            "length": 1137586,
+            "video": false,
+            "isrcs": [
+              "USI4R0401865"
+            ],
+            "id": "5fb00c2b-5bc9-420a-882a-cc024d137a08",
+            "first-release-date": "2000-10-09"
+          },
+          "id": "3dd71ba0-cdb4-3cd4-82c8-536f43c95b3c",
+          "number": "D",
+          "position": 2,
+          "title": "Antennas to Heaven (Moya Sings \u201cBaby\u2010O\u201d\u2026 / Edgyswingsetacid / [Glockenspiel Duet Recorded on a Campsite in Rhinebeck, N.Y.] / \u201cAttention\u2026 Mon Ami\u2026 Fa\u2010Lala\u2010Lala\u2010La\u2010La\u2026\u201d [55\u2010St.Laurent] / She Dreamt She Was a Bulldozer, She Dreamt She Was Alone in an Empty Field / Deathkamp Drone / [Antennas to Heaven\u2026])",
+          "artist-credit": [
+            {
+              "artist": {
+                "type": "Group",
+                "name": "Godspeed You! Black Emperor",
+                "id": "3648db01-b29d-4ab9-835c-83f6a5068fe4",
+                "country": "CA",
+                "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+                "sort-name": "Godspeed You! Black Emperor",
+                "disambiguation": ""
+              },
+              "name": "Godspeed You Black Emperor!",
+              "joinphrase": ""
+            }
+          ],
+          "length": 1137586
+        }
+      ]
     }
   ],
-  "country": "AU",
-  "packaging": "Gatefold Cover",
-  "cover-art-archive": {
-    "artwork": true,
-    "count": 7,
-    "back": true,
-    "front": true,
-    "darkened": false
+  "text-representation": {
+    "language": "eng",
+    "script": "Latn"
   },
-  "title": "Lift Your Skinny Fists Like Antennas to Heaven!",
-  "release-events": [
-    {
-      "date": "2000-10-09",
-      "area": {
-        "disambiguation": "",
-        "iso-3166-1-codes": [
-          "AU"
-        ],
-        "id": "106e0bec-b638-3b37-b731-f53d507dc00e",
-        "type-id": null,
-        "name": "Australia",
-        "type": null,
-        "sort-name": "Australia"
-      }
-    },
-    {
-      "date": "2000-10-09",
-      "area": {
-        "iso-3166-1-codes": [
-          "CA"
-        ],
-        "disambiguation": "",
-        "name": "Canada",
-        "type-id": null,
-        "id": "71bbafaa-e825-3e15-8ca9-017dcad1748b",
-        "type": null,
-        "sort-name": "Canada"
-      }
-    },
-    {
-      "area": {
-        "disambiguation": "",
-        "iso-3166-1-codes": [
-          "GB"
-        ],
-        "id": "8a754a16-0027-3a29-b6d7-2b40ea0481ed",
-        "name": "United Kingdom",
-        "type-id": null,
-        "type": null,
-        "sort-name": "United Kingdom"
-      },
-      "date": "2000-10-09"
-    }
-  ],
-  "disambiguation": "",
-  "status": "Official"
+  "asin": "B00004ZD69",
+  "title": "Lift Your Skinny Fists Like Antennas to Heaven!"
 }

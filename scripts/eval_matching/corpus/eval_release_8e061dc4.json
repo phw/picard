@@ -1,65 +1,80 @@
 {
+  "quality": "normal",
+  "packaging-id": "ec27701a-4a22-37f4-bfac-6616e0f9750a",
   "cover-art-archive": {
+    "artwork": true,
     "count": 1,
     "back": false,
     "darkened": false,
-    "front": true,
-    "artwork": true
+    "front": true
   },
-  "packaging-id": "ec27701a-4a22-37f4-bfac-6616e0f9750a",
-  "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
   "country": "US",
-  "quality": "normal",
-  "barcode": "0720642442524",
+  "status-id": "4e304316-386d-3409-af2e-78857eec5cfe",
   "text-representation": {
-    "script": "Latn",
-    "language": "eng"
+    "language": "eng",
+    "script": "Latn"
   },
   "packaging": "Jewel Case",
+  "barcode": "0720642442524",
+  "status": "Official",
+  "artist-credit": [
+    {
+      "name": "Nirvana",
+      "artist": {
+        "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+        "name": "Nirvana",
+        "country": "US",
+        "type": "Group",
+        "id": "5b11f4ce-a62d-471e-81fc-a69a8278c7da",
+        "disambiguation": "1980s\u20131990s US grunge band",
+        "sort-name": "Nirvana"
+      },
+      "joinphrase": ""
+    }
+  ],
   "asin": "B000003TA4",
   "release-group": {
-    "title": "Nevermind",
-    "disambiguation": "",
     "id": "1b022e01-4da6-387b-8658-8678046e4cef",
-    "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
+    "disambiguation": "",
+    "title": "Nevermind",
     "first-release-date": "1991-09-24",
-    "secondary-types": [],
-    "primary-type": "Album",
+    "primary-type-id": "f529b476-6e62-324f-b0aa-1f3e33d313fc",
     "secondary-type-ids": [],
+    "primary-type": "Album",
+    "secondary-types": [],
     "artist-credit": [
       {
         "artist": {
           "name": "Nirvana",
           "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
-          "sort-name": "Nirvana",
           "disambiguation": "1980s\u20131990s US grunge band",
           "id": "5b11f4ce-a62d-471e-81fc-a69a8278c7da",
-          "type": "Group",
-          "country": "US"
+          "sort-name": "Nirvana",
+          "country": "US",
+          "type": "Group"
         },
         "joinphrase": "",
         "name": "Nirvana"
       }
     ]
   },
-  "status": "Official",
-  "artist-credit": [
+  "date": "1991-09-24",
+  "label-info": [
     {
-      "joinphrase": "",
-      "artist": {
-        "name": "Nirvana",
-        "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
-        "sort-name": "Nirvana",
-        "id": "5b11f4ce-a62d-471e-81fc-a69a8278c7da",
-        "disambiguation": "1980s\u20131990s US grunge band",
-        "type": "Group",
-        "country": "US"
+      "label": {
+        "label-code": 7266,
+        "name": "Geffen Records",
+        "type-id": "a2426aab-2dd4-339c-b47d-b4923a241678",
+        "sort-name": "Geffen Records",
+        "disambiguation": "",
+        "id": "0fadc2ce-f7de-4e27-bbe6-612b317e716b",
+        "type": "Production"
       },
-      "name": "Nirvana"
+      "catalog-number": "GED24425"
     }
   ],
-  "id": "8e061dc4-790e-4587-ba53-011e7852f88d",
   "disambiguation": "",
+  "id": "8e061dc4-790e-4587-ba53-011e7852f88d",
   "release-events": [
     {
       "date": "1991-09-24",
@@ -69,8 +84,8 @@
         "iso-3166-1-codes": [
           "US"
         ],
-        "id": "489ce91b-6658-3307-9877-795b68554c98",
         "disambiguation": "",
+        "id": "489ce91b-6658-3307-9877-795b68554c98",
         "type-id": null,
         "name": "United States"
       }
@@ -79,48 +94,19 @@
   "title": "Nevermind",
   "media": [
     {
-      "format": "CD",
-      "track-offset": 0,
+      "id": "c3e97a4e-ac8a-3ccf-aa52-000dedf9a34e",
+      "title": "",
+      "position": 1,
       "tracks": [
         {
-          "length": 301133,
-          "title": "Smells Like Teen Spirit",
-          "position": 1,
-          "recording": {
-            "artist-credit": [
-              {
-                "joinphrase": "",
-                "artist": {
-                  "type": "Group",
-                  "country": "US",
-                  "sort-name": "Nirvana",
-                  "disambiguation": "1980s\u20131990s US grunge band",
-                  "id": "5b11f4ce-a62d-471e-81fc-a69a8278c7da",
-                  "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
-                  "name": "Nirvana"
-                },
-                "name": "Nirvana"
-              }
-            ],
-            "title": "Smells Like Teen Spirit",
-            "id": "5fb524f1-8cc8-4c04-a921-e34c0a911ea7",
-            "isrcs": [
-              "USGF19942501"
-            ],
-            "disambiguation": "",
-            "video": false,
-            "first-release-date": "1991-09-10",
-            "length": 301133
-          },
-          "id": "b51442aa-f5a4-31a3-8f2b-ab02640c2e89",
           "artist-credit": [
             {
               "name": "Nirvana",
               "artist": {
                 "country": "US",
                 "type": "Group",
-                "id": "5b11f4ce-a62d-471e-81fc-a69a8278c7da",
                 "disambiguation": "1980s\u20131990s US grunge band",
+                "id": "5b11f4ce-a62d-471e-81fc-a69a8278c7da",
                 "sort-name": "Nirvana",
                 "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
                 "name": "Nirvana"
@@ -128,30 +114,335 @@
               "joinphrase": ""
             }
           ],
-          "number": "1"
+          "number": "1",
+          "length": 301133,
+          "id": "b51442aa-f5a4-31a3-8f2b-ab02640c2e89",
+          "title": "Smells Like Teen Spirit",
+          "recording": {
+            "title": "Smells Like Teen Spirit",
+            "disambiguation": "",
+            "id": "5fb524f1-8cc8-4c04-a921-e34c0a911ea7",
+            "isrcs": [
+              "USGF19942501"
+            ],
+            "first-release-date": "1991-09-10",
+            "video": false,
+            "length": 301133,
+            "artist-credit": [
+              {
+                "joinphrase": "",
+                "artist": {
+                  "sort-name": "Nirvana",
+                  "id": "5b11f4ce-a62d-471e-81fc-a69a8278c7da",
+                  "disambiguation": "1980s\u20131990s US grunge band",
+                  "type": "Group",
+                  "country": "US",
+                  "name": "Nirvana",
+                  "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b"
+                },
+                "name": "Nirvana"
+              }
+            ]
+          },
+          "position": 1
         },
         {
           "number": "2",
           "artist-credit": [
             {
               "artist": {
+                "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+                "name": "Nirvana",
                 "country": "US",
                 "type": "Group",
                 "id": "5b11f4ce-a62d-471e-81fc-a69a8278c7da",
                 "disambiguation": "1980s\u20131990s US grunge band",
-                "sort-name": "Nirvana",
-                "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
-                "name": "Nirvana"
+                "sort-name": "Nirvana"
               },
               "joinphrase": "",
               "name": "Nirvana"
             }
           ],
-          "position": 2,
+          "id": "5e55fa04-d664-3653-a1c9-0b660b08f846",
           "title": "In Bloom",
+          "position": 2,
           "recording": {
             "artist-credit": [
               {
+                "name": "Nirvana",
+                "artist": {
+                  "disambiguation": "1980s\u20131990s US grunge band",
+                  "id": "5b11f4ce-a62d-471e-81fc-a69a8278c7da",
+                  "sort-name": "Nirvana",
+                  "country": "US",
+                  "type": "Group",
+                  "name": "Nirvana",
+                  "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b"
+                },
+                "joinphrase": ""
+              }
+            ],
+            "video": false,
+            "first-release-date": "1991-09-24",
+            "length": 254973,
+            "disambiguation": "Nevermind version",
+            "id": "593e9317-a327-4a31-b796-416c62dcf49d",
+            "isrcs": [
+              "USGF19942502"
+            ],
+            "title": "In Bloom"
+          },
+          "length": 254933
+        },
+        {
+          "number": "3",
+          "artist-credit": [
+            {
+              "joinphrase": "",
+              "artist": {
+                "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+                "name": "Nirvana",
+                "country": "US",
+                "type": "Group",
+                "id": "5b11f4ce-a62d-471e-81fc-a69a8278c7da",
+                "disambiguation": "1980s\u20131990s US grunge band",
+                "sort-name": "Nirvana"
+              },
+              "name": "Nirvana"
+            }
+          ],
+          "position": 3,
+          "recording": {
+            "title": "Come as You Are",
+            "disambiguation": "original studio mix",
+            "id": "70ac6733-068f-4613-b06b-bea17cfbcc30",
+            "isrcs": [
+              "USGF19942503"
+            ],
+            "length": 219026,
+            "first-release-date": "1991-09-24",
+            "video": false,
+            "artist-credit": [
+              {
+                "name": "Nirvana",
+                "artist": {
+                  "sort-name": "Nirvana",
+                  "disambiguation": "1980s\u20131990s US grunge band",
+                  "id": "5b11f4ce-a62d-471e-81fc-a69a8278c7da",
+                  "type": "Group",
+                  "country": "US",
+                  "name": "Nirvana",
+                  "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b"
+                },
+                "joinphrase": ""
+              }
+            ]
+          },
+          "title": "Come as You Are",
+          "id": "8cbcbc84-3236-39a7-9510-4835d3653836",
+          "length": 219066
+        },
+        {
+          "length": 183760,
+          "id": "794e0eb3-6670-3c06-a0cd-fa83de9d8b36",
+          "position": 4,
+          "title": "Breed",
+          "recording": {
+            "disambiguation": "",
+            "id": "0cf9f95f-70e7-4f2e-8075-5d8ba38dd4a3",
+            "isrcs": [
+              "USGF19942504"
+            ],
+            "title": "Breed",
+            "video": false,
+            "first-release-date": "1991-09-24",
+            "length": 183840,
+            "artist-credit": [
+              {
+                "artist": {
+                  "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+                  "name": "Nirvana",
+                  "country": "US",
+                  "type": "Group",
+                  "id": "5b11f4ce-a62d-471e-81fc-a69a8278c7da",
+                  "disambiguation": "1980s\u20131990s US grunge band",
+                  "sort-name": "Nirvana"
+                },
+                "joinphrase": "",
+                "name": "Nirvana"
+              }
+            ]
+          },
+          "artist-credit": [
+            {
+              "artist": {
+                "sort-name": "Nirvana",
+                "id": "5b11f4ce-a62d-471e-81fc-a69a8278c7da",
+                "disambiguation": "1980s\u20131990s US grunge band",
+                "type": "Group",
+                "country": "US",
+                "name": "Nirvana",
+                "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b"
+              },
+              "joinphrase": "",
+              "name": "Nirvana"
+            }
+          ],
+          "number": "4"
+        },
+        {
+          "number": "5",
+          "artist-credit": [
+            {
+              "joinphrase": "",
+              "artist": {
+                "name": "Nirvana",
+                "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+                "sort-name": "Nirvana",
+                "disambiguation": "1980s\u20131990s US grunge band",
+                "id": "5b11f4ce-a62d-471e-81fc-a69a8278c7da",
+                "type": "Group",
+                "country": "US"
+              },
+              "name": "Nirvana"
+            }
+          ],
+          "id": "f27b5223-2100-3dfb-849c-4cd88d776ca2",
+          "recording": {
+            "artist-credit": [
+              {
+                "name": "Nirvana",
+                "joinphrase": "",
+                "artist": {
+                  "name": "Nirvana",
+                  "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+                  "sort-name": "Nirvana",
+                  "id": "5b11f4ce-a62d-471e-81fc-a69a8278c7da",
+                  "disambiguation": "1980s\u20131990s US grunge band",
+                  "type": "Group",
+                  "country": "US"
+                }
+              }
+            ],
+            "length": 257000,
+            "video": false,
+            "first-release-date": "1991-09-24",
+            "title": "Lithium",
+            "isrcs": [
+              "USGF19942505"
+            ],
+            "id": "3fac712c-4196-4865-8c1a-94231a7da309",
+            "disambiguation": ""
+          },
+          "title": "Lithium",
+          "position": 5,
+          "length": 257000
+        },
+        {
+          "number": "6",
+          "artist-credit": [
+            {
+              "name": "Nirvana",
+              "joinphrase": "",
+              "artist": {
+                "name": "Nirvana",
+                "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+                "id": "5b11f4ce-a62d-471e-81fc-a69a8278c7da",
+                "disambiguation": "1980s\u20131990s US grunge band",
+                "sort-name": "Nirvana",
+                "country": "US",
+                "type": "Group"
+              }
+            }
+          ],
+          "id": "28c77747-09b7-3fd0-9663-a381d59e191f",
+          "title": "Polly",
+          "position": 6,
+          "recording": {
+            "artist-credit": [
+              {
+                "artist": {
+                  "disambiguation": "1980s\u20131990s US grunge band",
+                  "id": "5b11f4ce-a62d-471e-81fc-a69a8278c7da",
+                  "sort-name": "Nirvana",
+                  "country": "US",
+                  "type": "Group",
+                  "name": "Nirvana",
+                  "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b"
+                },
+                "joinphrase": "",
+                "name": "Nirvana"
+              }
+            ],
+            "first-release-date": "1991-09-24",
+            "video": false,
+            "length": 177000,
+            "title": "Polly",
+            "isrcs": [
+              "USGF19942506"
+            ],
+            "id": "d088ed9e-1921-4568-ae75-fba8b15ed206",
+            "disambiguation": ""
+          },
+          "length": 177000
+        },
+        {
+          "number": "7",
+          "artist-credit": [
+            {
+              "name": "Nirvana",
+              "artist": {
+                "type": "Group",
+                "country": "US",
+                "sort-name": "Nirvana",
+                "id": "5b11f4ce-a62d-471e-81fc-a69a8278c7da",
+                "disambiguation": "1980s\u20131990s US grunge band",
+                "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+                "name": "Nirvana"
+              },
+              "joinphrase": ""
+            }
+          ],
+          "title": "Territorial Pissings",
+          "position": 7,
+          "recording": {
+            "id": "dbaa10b1-d46a-4960-8b50-4e2d80c8113c",
+            "isrcs": [
+              "USGF19942507"
+            ],
+            "disambiguation": "",
+            "title": "Territorial Pissings",
+            "video": false,
+            "first-release-date": "1991-09-24",
+            "length": 143000,
+            "artist-credit": [
+              {
+                "joinphrase": "",
+                "artist": {
+                  "name": "Nirvana",
+                  "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+                  "sort-name": "Nirvana",
+                  "disambiguation": "1980s\u20131990s US grunge band",
+                  "id": "5b11f4ce-a62d-471e-81fc-a69a8278c7da",
+                  "type": "Group",
+                  "country": "US"
+                },
+                "name": "Nirvana"
+              }
+            ]
+          },
+          "id": "7e5dd15b-57ec-3ba8-a92a-c8a512f59eaa",
+          "length": 143133
+        },
+        {
+          "length": 223866,
+          "id": "82a81dc4-2065-383a-bdb6-ca64ed668de7",
+          "title": "Drain You",
+          "position": 8,
+          "recording": {
+            "artist-credit": [
+              {
+                "name": "Nirvana",
                 "joinphrase": "",
                 "artist": {
                   "type": "Group",
@@ -161,27 +452,22 @@
                   "id": "5b11f4ce-a62d-471e-81fc-a69a8278c7da",
                   "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
                   "name": "Nirvana"
-                },
-                "name": "Nirvana"
+                }
               }
             ],
-            "title": "In Bloom",
-            "id": "593e9317-a327-4a31-b796-416c62dcf49d",
-            "disambiguation": "Nevermind version",
+            "id": "11cc49bd-f531-4cdd-9b59-e1f59b06c1d7",
+            "disambiguation": "",
             "isrcs": [
-              "USGF19942502"
+              "USGF19942508"
             ],
-            "length": 254973,
+            "title": "Drain You",
+            "length": 223880,
             "video": false,
-            "first-release-date": "1991-09-24"
+            "first-release-date": "1991-09-10"
           },
-          "id": "5e55fa04-d664-3653-a1c9-0b660b08f846",
-          "length": 254933
-        },
-        {
-          "number": "3",
           "artist-credit": [
             {
+              "joinphrase": "",
               "artist": {
                 "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
                 "name": "Nirvana",
@@ -191,45 +477,15 @@
                 "id": "5b11f4ce-a62d-471e-81fc-a69a8278c7da",
                 "disambiguation": "1980s\u20131990s US grunge band"
               },
-              "joinphrase": "",
               "name": "Nirvana"
             }
           ],
-          "id": "8cbcbc84-3236-39a7-9510-4835d3653836",
-          "title": "Come as You Are",
-          "recording": {
-            "artist-credit": [
-              {
-                "artist": {
-                  "type": "Group",
-                  "country": "US",
-                  "sort-name": "Nirvana",
-                  "id": "5b11f4ce-a62d-471e-81fc-a69a8278c7da",
-                  "disambiguation": "1980s\u20131990s US grunge band",
-                  "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
-                  "name": "Nirvana"
-                },
-                "joinphrase": "",
-                "name": "Nirvana"
-              }
-            ],
-            "title": "Come as You Are",
-            "disambiguation": "original studio mix",
-            "id": "70ac6733-068f-4613-b06b-bea17cfbcc30",
-            "isrcs": [
-              "USGF19942503"
-            ],
-            "length": 219026,
-            "first-release-date": "1991-09-24",
-            "video": false
-          },
-          "position": 3,
-          "length": 219066
+          "number": "8"
         },
         {
-          "length": 183760,
-          "id": "794e0eb3-6670-3c06-a0cd-fa83de9d8b36",
-          "position": 4,
+          "id": "1ae79dcd-eead-3563-8eb7-aae03a919063",
+          "position": 9,
+          "title": "Lounge Act",
           "recording": {
             "artist-credit": [
               {
@@ -246,86 +502,69 @@
                 "name": "Nirvana"
               }
             ],
-            "id": "0cf9f95f-70e7-4f2e-8075-5d8ba38dd4a3",
-            "disambiguation": "",
+            "id": "aef0677b-93b4-4c66-be74-10120d0e6f5a",
             "isrcs": [
-              "USGF19942504"
+              "USGF19942509"
             ],
-            "title": "Breed",
+            "disambiguation": "",
+            "title": "Lounge Act",
             "first-release-date": "1991-09-24",
             "video": false,
-            "length": 183840
+            "length": 156800
           },
-          "title": "Breed",
+          "length": 156773,
+          "number": "9",
           "artist-credit": [
             {
-              "name": "Nirvana",
-              "joinphrase": "",
               "artist": {
+                "name": "Nirvana",
+                "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
                 "id": "5b11f4ce-a62d-471e-81fc-a69a8278c7da",
                 "disambiguation": "1980s\u20131990s US grunge band",
                 "sort-name": "Nirvana",
                 "country": "US",
-                "type": "Group",
-                "name": "Nirvana",
-                "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b"
-              }
-            }
-          ],
-          "number": "4"
-        },
-        {
-          "id": "f27b5223-2100-3dfb-849c-4cd88d776ca2",
-          "recording": {
-            "length": 257000,
-            "first-release-date": "1991-09-24",
-            "video": false,
-            "title": "Lithium",
-            "id": "3fac712c-4196-4865-8c1a-94231a7da309",
-            "isrcs": [
-              "USGF19942505"
-            ],
-            "disambiguation": "",
-            "artist-credit": [
-              {
-                "artist": {
-                  "name": "Nirvana",
-                  "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
-                  "sort-name": "Nirvana",
-                  "disambiguation": "1980s\u20131990s US grunge band",
-                  "id": "5b11f4ce-a62d-471e-81fc-a69a8278c7da",
-                  "type": "Group",
-                  "country": "US"
-                },
-                "joinphrase": "",
-                "name": "Nirvana"
-              }
-            ]
-          },
-          "title": "Lithium",
-          "position": 5,
-          "length": 257000,
-          "number": "5",
-          "artist-credit": [
-            {
-              "name": "Nirvana",
-              "artist": {
-                "disambiguation": "1980s\u20131990s US grunge band",
-                "id": "5b11f4ce-a62d-471e-81fc-a69a8278c7da",
-                "sort-name": "Nirvana",
-                "country": "US",
-                "type": "Group",
-                "name": "Nirvana",
-                "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b"
+                "type": "Group"
               },
-              "joinphrase": ""
+              "joinphrase": "",
+              "name": "Nirvana"
             }
           ]
         },
         {
-          "number": "6",
+          "recording": {
+            "artist-credit": [
+              {
+                "name": "Nirvana",
+                "joinphrase": "",
+                "artist": {
+                  "sort-name": "Nirvana",
+                  "id": "5b11f4ce-a62d-471e-81fc-a69a8278c7da",
+                  "disambiguation": "1980s\u20131990s US grunge band",
+                  "type": "Group",
+                  "country": "US",
+                  "name": "Nirvana",
+                  "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b"
+                }
+              }
+            ],
+            "title": "Stay Away",
+            "id": "8bf26383-8b9b-4252-9cb3-0efa4d3f47f1",
+            "isrcs": [
+              "USGF19942510"
+            ],
+            "disambiguation": "",
+            "length": 212466,
+            "video": false,
+            "first-release-date": "1991-09-24"
+          },
+          "position": 10,
+          "title": "Stay Away",
+          "id": "e6726ebf-b261-3325-bd23-522482ae89e5",
+          "length": 212466,
+          "number": "10",
           "artist-credit": [
             {
+              "name": "Nirvana",
               "joinphrase": "",
               "artist": {
                 "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
@@ -335,292 +574,85 @@
                 "sort-name": "Nirvana",
                 "disambiguation": "1980s\u20131990s US grunge band",
                 "id": "5b11f4ce-a62d-471e-81fc-a69a8278c7da"
-              },
-              "name": "Nirvana"
-            }
-          ],
-          "position": 6,
-          "title": "Polly",
-          "recording": {
-            "id": "d088ed9e-1921-4568-ae75-fba8b15ed206",
-            "isrcs": [
-              "USGF19942506"
-            ],
-            "disambiguation": "",
-            "title": "Polly",
-            "length": 177000,
-            "first-release-date": "1991-09-24",
-            "video": false,
-            "artist-credit": [
-              {
-                "artist": {
-                  "type": "Group",
-                  "country": "US",
-                  "sort-name": "Nirvana",
-                  "disambiguation": "1980s\u20131990s US grunge band",
-                  "id": "5b11f4ce-a62d-471e-81fc-a69a8278c7da",
-                  "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
-                  "name": "Nirvana"
-                },
-                "joinphrase": "",
-                "name": "Nirvana"
               }
-            ]
-          },
-          "id": "28c77747-09b7-3fd0-9663-a381d59e191f",
-          "length": 177000
-        },
-        {
-          "artist-credit": [
-            {
-              "joinphrase": "",
-              "artist": {
-                "type": "Group",
-                "country": "US",
-                "sort-name": "Nirvana",
-                "disambiguation": "1980s\u20131990s US grunge band",
-                "id": "5b11f4ce-a62d-471e-81fc-a69a8278c7da",
-                "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
-                "name": "Nirvana"
-              },
-              "name": "Nirvana"
-            }
-          ],
-          "number": "7",
-          "length": 143133,
-          "position": 7,
-          "recording": {
-            "artist-credit": [
-              {
-                "name": "Nirvana",
-                "joinphrase": "",
-                "artist": {
-                  "id": "5b11f4ce-a62d-471e-81fc-a69a8278c7da",
-                  "disambiguation": "1980s\u20131990s US grunge band",
-                  "sort-name": "Nirvana",
-                  "country": "US",
-                  "type": "Group",
-                  "name": "Nirvana",
-                  "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b"
-                }
-              }
-            ],
-            "id": "dbaa10b1-d46a-4960-8b50-4e2d80c8113c",
-            "isrcs": [
-              "USGF19942507"
-            ],
-            "disambiguation": "",
-            "title": "Territorial Pissings",
-            "length": 143000,
-            "video": false,
-            "first-release-date": "1991-09-24"
-          },
-          "title": "Territorial Pissings",
-          "id": "7e5dd15b-57ec-3ba8-a92a-c8a512f59eaa"
-        },
-        {
-          "artist-credit": [
-            {
-              "name": "Nirvana",
-              "joinphrase": "",
-              "artist": {
-                "country": "US",
-                "type": "Group",
-                "id": "5b11f4ce-a62d-471e-81fc-a69a8278c7da",
-                "disambiguation": "1980s\u20131990s US grunge band",
-                "sort-name": "Nirvana",
-                "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
-                "name": "Nirvana"
-              }
-            }
-          ],
-          "number": "8",
-          "length": 223866,
-          "id": "82a81dc4-2065-383a-bdb6-ca64ed668de7",
-          "title": "Drain You",
-          "position": 8,
-          "recording": {
-            "artist-credit": [
-              {
-                "joinphrase": "",
-                "artist": {
-                  "country": "US",
-                  "type": "Group",
-                  "disambiguation": "1980s\u20131990s US grunge band",
-                  "id": "5b11f4ce-a62d-471e-81fc-a69a8278c7da",
-                  "sort-name": "Nirvana",
-                  "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
-                  "name": "Nirvana"
-                },
-                "name": "Nirvana"
-              }
-            ],
-            "id": "11cc49bd-f531-4cdd-9b59-e1f59b06c1d7",
-            "disambiguation": "",
-            "isrcs": [
-              "USGF19942508"
-            ],
-            "title": "Drain You",
-            "video": false,
-            "first-release-date": "1991-09-10",
-            "length": 223880
-          }
-        },
-        {
-          "artist-credit": [
-            {
-              "name": "Nirvana",
-              "artist": {
-                "disambiguation": "1980s\u20131990s US grunge band",
-                "id": "5b11f4ce-a62d-471e-81fc-a69a8278c7da",
-                "sort-name": "Nirvana",
-                "country": "US",
-                "type": "Group",
-                "name": "Nirvana",
-                "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b"
-              },
-              "joinphrase": ""
-            }
-          ],
-          "number": "9",
-          "length": 156773,
-          "id": "1ae79dcd-eead-3563-8eb7-aae03a919063",
-          "position": 9,
-          "title": "Lounge Act",
-          "recording": {
-            "artist-credit": [
-              {
-                "joinphrase": "",
-                "artist": {
-                  "disambiguation": "1980s\u20131990s US grunge band",
-                  "id": "5b11f4ce-a62d-471e-81fc-a69a8278c7da",
-                  "sort-name": "Nirvana",
-                  "country": "US",
-                  "type": "Group",
-                  "name": "Nirvana",
-                  "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b"
-                },
-                "name": "Nirvana"
-              }
-            ],
-            "length": 156800,
-            "first-release-date": "1991-09-24",
-            "video": false,
-            "title": "Lounge Act",
-            "isrcs": [
-              "USGF19942509"
-            ],
-            "id": "aef0677b-93b4-4c66-be74-10120d0e6f5a",
-            "disambiguation": ""
-          }
-        },
-        {
-          "recording": {
-            "id": "8bf26383-8b9b-4252-9cb3-0efa4d3f47f1",
-            "isrcs": [
-              "USGF19942510"
-            ],
-            "disambiguation": "",
-            "title": "Stay Away",
-            "length": 212466,
-            "first-release-date": "1991-09-24",
-            "video": false,
-            "artist-credit": [
-              {
-                "name": "Nirvana",
-                "artist": {
-                  "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
-                  "name": "Nirvana",
-                  "type": "Group",
-                  "country": "US",
-                  "sort-name": "Nirvana",
-                  "disambiguation": "1980s\u20131990s US grunge band",
-                  "id": "5b11f4ce-a62d-471e-81fc-a69a8278c7da"
-                },
-                "joinphrase": ""
-              }
-            ]
-          },
-          "title": "Stay Away",
-          "position": 10,
-          "id": "e6726ebf-b261-3325-bd23-522482ae89e5",
-          "length": 212466,
-          "number": "10",
-          "artist-credit": [
-            {
-              "artist": {
-                "id": "5b11f4ce-a62d-471e-81fc-a69a8278c7da",
-                "disambiguation": "1980s\u20131990s US grunge band",
-                "sort-name": "Nirvana",
-                "country": "US",
-                "type": "Group",
-                "name": "Nirvana",
-                "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b"
-              },
-              "joinphrase": "",
-              "name": "Nirvana"
             }
           ]
         },
         {
+          "number": "11",
           "artist-credit": [
             {
-              "name": "Nirvana",
               "artist": {
-                "sort-name": "Nirvana",
                 "disambiguation": "1980s\u20131990s US grunge band",
                 "id": "5b11f4ce-a62d-471e-81fc-a69a8278c7da",
-                "type": "Group",
+                "sort-name": "Nirvana",
                 "country": "US",
+                "type": "Group",
                 "name": "Nirvana",
                 "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b"
               },
-              "joinphrase": ""
+              "joinphrase": "",
+              "name": "Nirvana"
             }
           ],
-          "number": "11",
-          "length": 196400,
+          "title": "On a Plain",
           "position": 11,
           "recording": {
             "artist-credit": [
               {
                 "joinphrase": "",
                 "artist": {
-                  "disambiguation": "1980s\u20131990s US grunge band",
-                  "id": "5b11f4ce-a62d-471e-81fc-a69a8278c7da",
-                  "sort-name": "Nirvana",
-                  "country": "US",
-                  "type": "Group",
+                  "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
                   "name": "Nirvana",
-                  "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b"
+                  "type": "Group",
+                  "country": "US",
+                  "sort-name": "Nirvana",
+                  "id": "5b11f4ce-a62d-471e-81fc-a69a8278c7da",
+                  "disambiguation": "1980s\u20131990s US grunge band"
                 },
                 "name": "Nirvana"
               }
             ],
+            "first-release-date": "1991-09-24",
+            "video": false,
+            "length": 196373,
+            "id": "ea61d42b-9a76-47fd-bcf7-df911640c309",
+            "disambiguation": "",
             "isrcs": [
               "USGF19942511"
             ],
-            "id": "ea61d42b-9a76-47fd-bcf7-df911640c309",
-            "disambiguation": "",
-            "title": "On a Plain",
-            "first-release-date": "1991-09-24",
-            "video": false,
-            "length": 196373
+            "title": "On a Plain"
           },
-          "title": "On a Plain",
-          "id": "4b688a9c-0080-3cb8-9d4a-2c0cf6ee7131"
+          "id": "4b688a9c-0080-3cb8-9d4a-2c0cf6ee7131",
+          "length": 196400
         },
         {
-          "title": "Something in the Way / Endless, Nameless",
+          "artist-credit": [
+            {
+              "name": "Nirvana",
+              "joinphrase": "",
+              "artist": {
+                "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
+                "name": "Nirvana",
+                "type": "Group",
+                "country": "US",
+                "sort-name": "Nirvana",
+                "disambiguation": "1980s\u20131990s US grunge band",
+                "id": "5b11f4ce-a62d-471e-81fc-a69a8278c7da"
+              }
+            }
+          ],
+          "number": "12",
+          "length": 1235066,
           "recording": {
             "length": 1235066,
             "video": false,
             "first-release-date": "1991-09-24",
-            "disambiguation": "",
             "id": "d506a8b2-4ba9-49b9-941f-40d1295ebd29",
             "isrcs": [
               "USUM71113875"
             ],
+            "disambiguation": "",
             "title": "Something in the Way / Endless, Nameless",
             "artist-credit": [
               {
@@ -639,46 +671,14 @@
             ]
           },
           "position": 12,
-          "id": "f1f333d1-d3f3-3037-a815-aae8591606e2",
-          "length": 1235066,
-          "number": "12",
-          "artist-credit": [
-            {
-              "name": "Nirvana",
-              "joinphrase": "",
-              "artist": {
-                "type-id": "e431f5f6-b5d2-343d-8b36-72607fffb74b",
-                "name": "Nirvana",
-                "country": "US",
-                "type": "Group",
-                "disambiguation": "1980s\u20131990s US grunge band",
-                "id": "5b11f4ce-a62d-471e-81fc-a69a8278c7da",
-                "sort-name": "Nirvana"
-              }
-            }
-          ]
+          "title": "Something in the Way / Endless, Nameless",
+          "id": "f1f333d1-d3f3-3037-a815-aae8591606e2"
         }
       ],
       "format-id": "9712d52a-4509-3d4b-a1a2-67c88c643e31",
       "track-count": 12,
-      "title": "",
-      "position": 1,
-      "id": "c3e97a4e-ac8a-3ccf-aa52-000dedf9a34e"
-    }
-  ],
-  "date": "1991-09-24",
-  "label-info": [
-    {
-      "catalog-number": "GED24425",
-      "label": {
-        "type": "Production",
-        "sort-name": "Geffen Records",
-        "disambiguation": "",
-        "id": "0fadc2ce-f7de-4e27-bbe6-612b317e716b",
-        "type-id": "a2426aab-2dd4-339c-b47d-b4923a241678",
-        "label-code": 7266,
-        "name": "Geffen Records"
-      }
+      "track-offset": 0,
+      "format": "CD"
     }
   ]
 }
