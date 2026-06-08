@@ -1190,7 +1190,7 @@ def _save_snapshot(results, path):
             }
         )
     with open(path, "w", encoding="utf-8") as f:
-        json.dump(snapshot, f, indent=2)
+        json.dump(snapshot, f, indent=2, sort_keys=True)
         f.write("\n")
     print(f"\n  Snapshot saved to {path} ({len(snapshot)} entries)")
 

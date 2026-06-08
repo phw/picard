@@ -338,7 +338,7 @@ def save_results(results, path):
             }
         )
     with open(path, "w", encoding="utf-8") as f:
-        json.dump(snapshot, f, indent=2)
+        json.dump(snapshot, f, indent=2, sort_keys=True)
     print(f"Saved {len(snapshot)} results to {path}")
 
 
