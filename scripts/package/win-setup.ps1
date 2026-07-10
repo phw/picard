@@ -10,7 +10,10 @@ Param(
   $FpcalcVersion,
   [Parameter(Mandatory=$true)]
   [String]
-  $FpcalcSha256Sum
+  $FpcalcSha256Sum,
+  [ValidateSet("x64", "arm64")]
+  [String]
+  $Arch = $(if ([System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture -eq "Arm64") { "arm64" } else { "x64" })
 )
 
 $ErrorActionPreference = "Stop"
@@ -26,7 +29,7 @@ DownloadFile -Url "https://data.metabrainz.org/pub/musicbrainz/libdiscid/libdisc
   -FileName $ArchiveFile
 VerifyHash -FileName $ArchiveFile -Sha256Sum $DiscidSha256Sum
 Expand-Archive -Path $ArchiveFile -DestinationPath .\build\libdiscid -Force
-Copy-Item .\build\libdiscid\libdiscid-$DiscidVersion-win\x64\discid.dll .
+Copy-Item .\build\libdiscid\libdiscid-$DiscidVersion-win\$Arch\discid.dll .
 
 $ArchiveFile = ".\build\fpcalc.zip"
 Write-Output "Downloading chromaprint-fpcalc $FpcalcVersion to $ArchiveFile..."
