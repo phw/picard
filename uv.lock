@@ -598,7 +598,7 @@ dependencies = [
 
 [package.optional-dependencies]
 plugins = [
-    { name = "opencc" },
+    { name = "opencc", marker = "platform_machine != 'ARM64' or sys_platform != 'win32'" },
     { name = "zstandard" },
 ]
 
@@ -631,7 +631,7 @@ requires-dist = [
     { name = "discid", specifier = "~=1.0" },
     { name = "markdown", specifier = "~=3.2" },
     { name = "mutagen", specifier = "~=1.45" },
-    { name = "opencc", marker = "extra == 'plugins'", specifier = ">=1.1.9" },
+    { name = "opencc", marker = "(platform_machine != 'ARM64' and extra == 'plugins') or (sys_platform != 'win32' and extra == 'plugins')", specifier = ">=1.1.9" },
     { name = "pygit2", marker = "python_full_version < '3.11'", specifier = ">=1.18.2,<1.19" },
     { name = "pygit2", marker = "python_full_version >= '3.11'", specifier = "~=1.19" },
     { name = "pyjwt", specifier = "~=2.0" },

@@ -60,7 +60,8 @@ picard-cli = "picard.cli:main"
 
 [project.optional-dependencies]
 plugins = [
-    "opencc>=1.1.9",
+    # opencc does not provide wheels for Windows ARM64 yet
+    "opencc>=1.1.9; sys_platform != 'win32' or platform_machine != 'ARM64'",
     "zstandard>=0.25.0",
 ]
 
