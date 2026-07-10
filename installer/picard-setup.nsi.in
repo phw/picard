@@ -273,8 +273,12 @@ Function un.onInit
 FunctionEnd
 
 Function .onInit
-  ; Abort installation if this is not a 64 bit system
-  ${IfNot} ${RunningX64}
+  ; Abort installation if this is not a 64 bit system. Both x64 and ARM64
+  ; are supported (with separate installers per architecture); only 32-bit
+  ; (x86) Windows is rejected. IsNative* reports the true OS architecture
+  ; even when running under emulation, unlike RunningX64.
+  ${IfNot} ${IsNativeAMD64}
+  ${AndIfNot} ${IsNativeARM64}
     MessageBox MB_ICONSTOP|MB_OK "$(MsgRequires64Bit)" /SD IDOK
     Abort
   ${EndIf}
