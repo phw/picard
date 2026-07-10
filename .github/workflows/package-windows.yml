@@ -6,9 +6,10 @@ permissions: {}
 
 jobs:
   package-windows:
-    runs-on: windows-2022
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
+        os: [windows-2022, windows-11-arm]
         setup:
           - type: installer
           - type: portable
@@ -146,5 +147,5 @@ jobs:
     - name: Archive production artifacts
       uses: actions/upload-artifact@v7
       with:
-        name: windows-${{ matrix.setup.type }}
+        name: windows-${{ matrix.setup.type }}-${{ runner.arch == 'ARM64' && 'arm64' || 'x64' }}
         path: artifacts/
