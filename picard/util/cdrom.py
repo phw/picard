@@ -30,8 +30,9 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 
+from collections.abc import Sequence
 import os.path
-from types import ModuleType
+from typing import Protocol
 
 from picard import log
 from picard.config import get_config
@@ -41,21 +42,47 @@ from picard.const.sys import (
 )
 
 
-discid: ModuleType | None = None
-try:
-    # use python-libdiscid (https://python-libdiscid.readthedocs.io/)
-    from libdiscid.compat import discid  # type: ignore[unresolved-import,no-redef,import-not-found]
-except ImportError:
-    try:
-        # use python-discid (httpds://python-discid.readthedocs.org/)
-        import discid  # type: ignore[unresolved-import,no-redef,import-not-found]
-    except (ImportError, OSError):
-        pass
-
-
 DISCID_NOT_LOADED_MESSAGE = "CDROM: discid library not found - Lookup CD functionality disabled"
 DISCID_NO_ISRC_MESSAGE = "CDROM: discid library has no ISRC support - ISRC extraction from CD disabled"
 LINUX_CDROM_INFO = '/proc/sys/dev/cdrom/info'
+
+
+class Disc(Protocol): ...
+
+
+class DiscidModule(Protocol):
+    # __version__: str
+    # LIBDISCID_VERSION_STRING: str
+    # FEATURES: list[str]
+    # DiscError: Any
+    # TOCError: Any
+
+    # def read(self, device: str | bytes | None = None, features: Iterable[str] | None = None) -> Disc:
+    #     ...
+
+    def put(self, first: int, last: int, disc_sectors: int, track_offsets: Sequence[int]) -> Disc: ...
+
+    # def get_default_device(self) -> str
+    #     ...
+
+
+def load_discid() -> DiscidModule | None:
+    try:
+        # use python-libdiscid (https://python-libdiscid.readthedocs.io/)
+        from libdiscid.compat import discid  # type: ignore[unresolved-import,no-redef,import-not-found]
+
+        discid.read()
+    except ImportError:
+        try:
+            # use python-discid (httpds://python-discid.readthedocs.org/)
+            import discid  # type: ignore[unresolved-import,no-redef,import-not-found]
+        except (ImportError, OSError):
+            return None
+
+    return discid
+
+
+discid = load_discid()
 
 
 def has_isrc_support():
