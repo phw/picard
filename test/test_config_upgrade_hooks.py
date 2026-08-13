@@ -846,3 +846,28 @@ class TestPicardConfigUpgrades(TestPicardConfigCommon):
         settings = {'browser_integration_port': 8021}
         hooks.clamp_browser_integration_port(settings)
         self.assertEqual(8020, settings['browser_integration_port'])
+
+    def test_upgrade_local_cover_regex_for_subpath_matching_anchored(self):
+        settings = {'local_cover_regex': r'^cover\.jpg$'}
+        hooks.upgrade_local_cover_regex_for_subpath_matching(settings)
+        self.assertEqual(r'(^|/)cover\.jpg$', settings['local_cover_regex'])
+
+    def test_upgrade_local_cover_regex_for_subpath_matching_unanchored(self):
+        settings = {'local_cover_regex': r'cover\.jpg'}
+        hooks.upgrade_local_cover_regex_for_subpath_matching(settings)
+        self.assertEqual(r'cover\.jpg', settings['local_cover_regex'])
+
+    def test_upgrade_local_cover_regex_for_subpath_matching_with_slash(self):
+        settings = {'local_cover_regex': r'^artwork/.*\.png$'}
+        hooks.upgrade_local_cover_regex_for_subpath_matching(settings)
+        self.assertEqual(r'^artwork/.*\.png$', settings['local_cover_regex'])
+
+    def test_upgrade_local_cover_regex_for_subpath_matching_empty(self):
+        settings = {'local_cover_regex': ''}
+        hooks.upgrade_local_cover_regex_for_subpath_matching(settings)
+        self.assertEqual('', settings['local_cover_regex'])
+
+    def test_upgrade_local_cover_regex_for_subpath_matching_escaped_caret(self):
+        settings = {'local_cover_regex': r'\^literal'}
+        hooks.upgrade_local_cover_regex_for_subpath_matching(settings)
+        self.assertEqual(r'\^literal', settings['local_cover_regex'])

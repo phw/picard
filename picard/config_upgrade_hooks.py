@@ -829,3 +829,21 @@ def clamp_browser_integration_port(settings):
         return max(BROWSER_INTEGRATION_MIN_PORT, min(BROWSER_INTEGRATION_MAX_PORT, int(value)))
 
     upgrade_option_value(settings, 'browser_integration_port', _clamp_port)
+
+
+@upgrade_settings('3.0.0b10')
+def upgrade_local_cover_regex_for_subpath_matching(settings):
+    """Adapt local_cover_regex for subpath matching.
+
+    The local cover art provider now always matches the regex against the full
+    relative path (e.g. 'artwork/cover.jpg') instead of just the filename.
+    Patterns using ^ without a / were previously matched against bare filenames,
+    matching in any subdirectory. Replace ^ with (^|/) to preserve that behavior.
+    """
+
+    def _upgrade_regex(regex):
+        if not regex or '/' in regex:
+            return regex
+        return re.sub(r'(?<!\\)\^', '(^|/)', regex)
+
+    upgrade_option_value(settings, 'local_cover_regex', _upgrade_regex)

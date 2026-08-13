@@ -56,12 +56,34 @@ def testdir():
         (r"^artwork/.*\.png$", ['artwork/cover.png', 'artwork/back.png']),
         (r"^artwork/.*\.gif$", []),
         (r"^artwork/back\.png$", ['artwork/back.png']),
+        # Anchored pattern without / only matches at root level
+        (r"^cover\.jpg$", ['cover.jpg']),
+        # Use (^|/) prefix to match filename at any level (upgrade compatibility)
+        (r"(^|/)cover\.jpg$", ['cover.jpg', 'artwork/cover.jpg']),
     ],
 )
 def test_find_local_images(testdir, pattern, expected_paths):
     provider = CoverArtProviderLocal(Mock())
     images = list(provider.find_local_images(testdir, re.compile(pattern)))
     assert all(isinstance(image, LocalFileCoverArtImage) for image in images)
-    found_paths = set(os.path.normpath(image.url.toLocalFile()) for image in images if image.url)
+    assert all(image.url is not None for image in images)
+    found_paths = set(os.path.normpath(image.url.toLocalFile()) for image in images)
     expected_paths = set(os.path.normpath(os.path.join(testdir, path)) for path in expected_paths)
     assert found_paths == expected_paths
+
+
+def test_find_local_images_filepath_uses_correct_join(tmp_path, monkeypatch):
+    """Regression test: filepath must be os.path.join(root, filename),
+    not os.path.join(current_dir, root, filename). When current_dir is
+    relative, the latter produces a doubled path like 'dir/dir/sub/file'
+    which does not exist, causing the file to be silently skipped."""
+    # Create a subdirectory structure and use a relative path as current_dir
+    music_dir = tmp_path / 'music'
+    music_dir.mkdir()
+    (music_dir / 'sub').mkdir()
+    (music_dir / 'sub' / 'cover.jpg').touch()
+    monkeypatch.chdir(tmp_path)
+    provider = CoverArtProviderLocal(Mock())
+    pattern = re.compile(r'cover\.jpg')
+    images = list(provider.find_local_images('music', pattern))
+    assert len(images) == 1, "file in subdirectory not found when current_dir is relative"
