@@ -69,7 +69,6 @@ from picard.util import (
     icontheme,
     restore_method,
     thread,
-    throttle,
 )
 
 from .edittagdialog import (
@@ -308,6 +307,9 @@ class MetadataBox(QtWidgets.QTableWidget):
         plugin_manager = self.tagger.get_plugin_manager()
         if plugin_manager:
             plugin_manager.plugin_state_changed.connect(self._on_plugin_changed)
+
+        # A timer to schedule updates for the metadata view
+        self._update_timer = None
 
         # Table widget configuration
         self.setAccessibleName(_("metadata view"))
@@ -902,8 +904,16 @@ class MetadataBox(QtWidgets.QTableWidget):
         self.objects = objects
         self.selection_mutex.unlock()
 
-    @throttle(100)
     def update(self, drop_album_caches=False):
+        if self._update_timer:
+            self._update_timer.stop()
+
+        self._update_timer = QtCore.QTimer()
+        self._update_timer.setSingleShot(True)
+        self._update_timer.timeout.connect(partial(self._run_update, drop_album_caches))
+        self._update_timer.start(200)
+
+    def _run_update(self, drop_album_caches=False):
         new_selection = self.selection_dirty
         if self.editing or (self.ignore_updates and not new_selection):
             return
