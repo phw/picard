@@ -17,3 +17,9 @@ $InternalPath = (Join-Path -Path $Path -ChildPath _internal)
 # Workaround for https://tickets.metabrainz.org/browse/PICARD-2736
 Move-Item -Path (Join-Path -Path $InternalPath -ChildPath libcrypto-3*.dll) -Destination $Path -Force
 Move-Item -Path (Join-Path -Path $InternalPath -ChildPath libssl-3*.dll) -Destination $Path -Force
+
+# Remove not needed files
+$OpenCCPath = (Join-Path -Path $InternalPath -ChildPath opencc)
+Remove-Item -Path (Join-Path -Path $OpenCCPath -ChildPath bin) -Recurse
+Remove-Item -Path (Join-Path -Path $OpenCCPath -ChildPath include) -Recurse
+Remove-Item -Path (Join-Path -Path $OpenCCPath -ChildPath lib) -Recurse
