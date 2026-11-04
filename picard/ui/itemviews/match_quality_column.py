@@ -27,6 +27,7 @@ from PyQt6 import (
     QtWidgets,
 )
 
+from picard.album import Album
 from picard.i18n import gettext as _
 from picard.item import Item
 
@@ -65,24 +66,9 @@ class MatchQualityProvider(ColumnValueProvider, DelegateProvider):
         str
             The match percentage as a string (e.g., "0.75" for 75%).
         """
-        if not hasattr(obj, 'get_num_matched_tracks') or not hasattr(obj, 'tracks'):
-            return "0.0"
+        return str(self._get_match_score(obj))
 
-        # Album object
-        total = len(obj.tracks) if obj.tracks else 0
-
-        if total == 0:
-            return "0.0"
-
-        get_num_matched_tracks = getattr(obj, 'get_num_matched_tracks', None)
-        if not callable(get_num_matched_tracks):
-            return "0.0"
-
-        matched = int(get_num_matched_tracks())
-        percentage = matched / total
-        return str(percentage)
-
-    def get_match_stats(self, obj: Item) -> dict[str, int] | None:
+    def get_match_stats(self, obj: Item) -> dict[str, float] | None:
         """Get comprehensive match statistics for the given object.
 
         Parameters
@@ -143,6 +129,7 @@ class MatchQualityProvider(ColumnValueProvider, DelegateProvider):
             'duplicates': duplicates,
             'extra': extra,
             'missing': missing,
+            'score': self._get_match_score(obj),
         }
 
     def get_delegate_class(self) -> type[QtWidgets.QStyledItemDelegate]:
@@ -154,6 +141,40 @@ class MatchQualityProvider(ColumnValueProvider, DelegateProvider):
             The delegate class (subclass of QStyledItemDelegate).
         """
         return self._delegate_class
+
+    def _get_match_score(self, obj: Item) -> float:
+        """Return the match percentage as a string for sorting.
+
+        Parameters
+        ----------
+        obj
+            The item to evaluate.
+
+        Returns
+        -------
+        float
+            The match percentage (e.g., 0.75 for 75%).
+        """
+        if not hasattr(obj, 'get_num_matched_tracks') or not hasattr(obj, 'tracks'):
+            return 0.0
+
+        # Album object
+        assert isinstance(obj, Album)
+        total_tracks = len(obj.tracks) if obj.tracks else 0
+
+        if total_tracks == 0:
+            return 0.0
+
+        total_score = 0.0
+
+        for track in obj.tracks:
+            if track.files:
+                avg_file_score = sum(f.similarity for f in track.files) / len(track.files)
+                total_score += avg_file_score
+
+        avg_score = total_score / total_tracks
+
+        return avg_score
 
 
 class MatchQualityColumnDelegate(QtWidgets.QStyledItemDelegate):
@@ -207,17 +228,8 @@ class MatchQualityColumnDelegate(QtWidgets.QStyledItemDelegate):
         if hasattr(provider, '_base'):
             provider = provider._base  # Unwrap adapter
 
-        stats = provider.get_match_stats(obj)
-        if not stats:
-            return None
-
-        total = stats.get('total', 0)
-        if total == 0:
-            return match_icons[0]
-
-        matched = stats.get('matched', 0)
-        percentage = matched / total if total else 0.0
-        return match_icons[similarity_to_level(percentage)]
+        score = provider.get_match_score(obj)
+        return match_icons[similarity_to_level(score)]
 
     def _format_tooltip_text(self, stats: dict[str, int]) -> str:
         """Format stats into a detailed tooltip string.
@@ -299,7 +311,8 @@ class MatchQualityColumnDelegate(QtWidgets.QStyledItemDelegate):
             return
 
         # Get the match icon from the provider
-        icon = self._get_match_icon(item_data.obj, item_data.column)
+        score = item_data.stats.get('score', 0.0)
+        icon = match_icons[similarity_to_level(score)]
 
         # Calculate layout
         icon_size = item_data.column.size

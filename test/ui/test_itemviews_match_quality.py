@@ -94,6 +94,13 @@ class TestMatchQualityProvider:
         mock_album.get_num_matched_tracks.return_value = matched
         mock_album.tracks = [Mock() for _ in range(total)]
 
+        # Setup tracks with appropriate file counts
+        for i, track in enumerate(mock_album.tracks):
+            if i < matched:
+                track.files = [Mock(similarity=1.0)]
+            else:
+                track.files = []
+
         result = provider.evaluate(mock_album)
         assert result == expected_percentage
 
@@ -108,12 +115,12 @@ class TestMatchQualityProvider:
         assert result == "0.0"
 
     @pytest.mark.parametrize(
-        ("matched", "total", "unmatched", "duplicates", "extra", "missing"),
+        ("matched", "total", "unmatched", "duplicates", "extra", "missing", "score"),
         [
-            (5, 10, 2, 1, 1, 2),  # Normal case
-            (0, 0, 0, 0, 0, 0),  # Empty album
-            (10, 10, 0, 0, 0, 0),  # Perfect match
-            (0, 10, 5, 0, 5, 10),  # No matches
+            (5, 10, 2, 1, 1, 2, 0.8),  # Normal case
+            (0, 0, 0, 0, 0, 0, 0.0),  # Empty album
+            (10, 10, 0, 0, 0, 0, 1.0),  # Perfect match
+            (0, 10, 5, 0, 5, 10, 0.0),  # No matches
         ],
     )
     def test_get_match_stats(
@@ -126,6 +133,7 @@ class TestMatchQualityProvider:
         duplicates: int,
         extra: int,
         missing: int,
+        score: float,
     ) -> None:
         """Test _get_match_stats returns correct statistics."""
         # Setup mock album
@@ -139,9 +147,9 @@ class TestMatchQualityProvider:
             if i < missing:
                 track.files = []  # Missing tracks
             elif i < missing + duplicates:
-                track.files = [Mock(), Mock()]  # Duplicate files
+                track.files = [Mock(similarity=1.0), Mock(similarity=1.0)]  # Duplicate files
             else:
-                track.files = [Mock()]  # Normal tracks
+                track.files = [Mock(similarity=1.0)]  # Normal tracks
 
         stats = provider.get_match_stats(mock_album)
 
@@ -152,6 +160,7 @@ class TestMatchQualityProvider:
         assert stats['duplicates'] == duplicates
         assert stats['extra'] == extra
         assert stats['missing'] == missing
+        assert stats['score'] == score
 
     def test_get_match_stats_no_album_attributes(self, provider: MatchQualityProvider) -> None:
         """Test _get_match_stats returns None for objects without album attributes."""
@@ -231,9 +240,9 @@ class TestMatchQualityColumnFactory:
         # Test that it can handle numeric evaluation
         from unittest.mock import Mock
 
-        mock_album = Mock()
-        mock_album.get_num_matched_tracks.return_value = 5
-        mock_album.tracks = [Mock() for _ in range(10)]
+        mock_album = Mock(spec=Album)
+        mock_album.tracks = [Mock(files=[]) for _ in range(5)]
+        mock_album.tracks += [Mock(files=[Mock(similarity=1.0)]) for _ in range(5)]
 
         # The column's sortkey should return a tuple for sorting
         sort_key = column.sortkey(mock_album)
@@ -284,8 +293,8 @@ class TestMatchQualityColumn:
     def test_provider_evaluation(self, match_quality_column: DelegateColumn, mock_album: Mock) -> None:
         """Test that the provider correctly evaluates match percentage."""
         # Setup mock album
-        mock_album.get_num_matched_tracks.return_value = 5
-        mock_album.tracks = [Mock() for _ in range(10)]
+        mock_album.tracks = [Mock(files=[Mock(similarity=1.0)]) for _ in range(5)]
+        mock_album.tracks += [Mock(files=[]) for _ in range(5)]
 
         # Test that the provider evaluates correctly
         result = match_quality_column.delegate_provider.evaluate(mock_album)
@@ -304,9 +313,9 @@ class TestMatchQualityColumn:
             if i < 1:
                 track.files = []  # Missing track
             elif i < 2:
-                track.files = [Mock(), Mock()]  # Duplicate files
+                track.files = [Mock(similarity=0.9), Mock(similarity=0.7)]  # Duplicate files
             else:
-                track.files = [Mock()]  # Normal tracks
+                track.files = [Mock(similarity=1.0)]  # Normal tracks
 
         # Test the provider's get_match_stats method
         provider = match_quality_column.delegate_provider
@@ -320,6 +329,7 @@ class TestMatchQualityColumn:
         assert stats['duplicates'] == 1
         assert stats['extra'] == 1
         assert stats['missing'] == 1
+        assert stats['score'] == 0.76
 
 
 class TestMatchQualityColumnDelegate:
@@ -641,9 +651,9 @@ class TestMatchQualityColumnDelegate:
             if i < 2:  # 2 missing tracks
                 track.files = []
             elif i < 3:  # 1 track with duplicates
-                track.files = [Mock(), Mock()]
+                track.files = [Mock(similarity=1.0), Mock(similarity=1.0)]
             else:  # Normal tracks
-                track.files = [Mock()]
+                track.files = [Mock(similarity=1.0)]
 
         mock_item.obj = mock_album
 
@@ -771,9 +781,9 @@ class TestItemViewsIntegration:
         assert match_quality_column is not None
 
         # Test with album object
-        album = Mock()
-        album.get_num_matched_tracks.return_value = 3
-        album.tracks = [Mock() for _ in range(5)]
+        album = Mock(spec=Album)
+        album.tracks = [Mock(files=[Mock(similarity=1.0)]) for _ in range(3)]
+        album.tracks += [Mock(files=[]) for _ in range(2)]
 
         # Test that the provider correctly evaluates match percentage
         result = match_quality_column.delegate_provider.evaluate(album)
