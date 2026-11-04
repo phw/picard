@@ -556,10 +556,9 @@ class TreeItem(QtWidgets.QTreeWidgetItem):
                     try:
                         self.setText(i, column.provider.evaluate(self.obj))
                     except (AttributeError, TypeError, ValueError, KeyError, NotImplementedError) as exc:
-                        log.debug("Custom column '%s' evaluate failed: %r", column.key, exc)
-                    continue
-
-                self.setText(i, self.obj.column(column.key))
+                        log.error("Custom column '%s' evaluate failed: %r", column.key, exc)
+                else:
+                    self.setText(i, self.obj.column(column.key))
 
 
 class ClusterListItem(TreeItem):
