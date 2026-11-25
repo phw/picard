@@ -373,6 +373,11 @@ class MacOSPipe(UnixPipe):
 class HaikuPipe(UnixPipe):
     PIPE_DIRS: tuple[str] = ("~/config/var/MusicBrainz/Picard/",)
 
+    def stop(self):
+        super().stop()
+        if self.is_pipe_owner and os.path.exists(self.path):
+            os.unlink(self.path)
+
 
 class WinPipe(AbstractPipe):
     # win32pipe.CreateNamedPipe
